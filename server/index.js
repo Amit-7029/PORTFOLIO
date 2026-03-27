@@ -100,11 +100,14 @@ app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
 app.get("/health", (_req, res) => {
+  const firebase = getFirebaseConfig();
+  const cloudinary = getCloudinaryConfig();
+
   res.json({
     ok: true,
-    firebaseConfigured: getFirebaseConfig().configured,
-    cloudinaryConfigured: getCloudinaryConfig().configured,
-    persistenceMode: getFirebaseConfig().configured ? "firestore" : "json-fallback",
+    firebaseConfigured: firebase.configured,
+    cloudinaryConfigured: cloudinary.configured,
+    persistenceMode: firebase.configured && cloudinary.configured ? "firestore-with-cloudinary-fallback" : firebase.configured ? "firestore" : cloudinary.configured ? "cloudinary" : "json-fallback",
   });
 });
 

@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { getFirebaseServices } = require("./firebaseAdmin");
+const { getCloudinaryConfig, readJsonAsset, uploadJsonAsset } = require("./cloudinary");
 const seedStore = require("../data/store.json");
 
 const DATA_PATH = path.join(__dirname, "..", "data", "store.json");
@@ -21,45 +22,59 @@ function isFirestoreUnavailable(error) {
 
 async function readStore() {
   const services = getFirebaseServices();
-  if (!services.configured) {
-    return readJsonSeed();
+  const cloudinary = getCloudinaryConfig();
+
+  if (services.configured) {
+    try {
+      const docRef = services.db.collection(COLLECTION).doc(DOC_ID);
+      const snapshot = await docRef.get();
+
+      if (!snapshot.exists) {
+        const seed = readJsonSeed();
+        await docRef.set(seed);
+        return seed;
+      }
+
+      return snapshot.data();
+    } catch (error) {
+      if (!isFirestoreUnavailable(error)) {
+        throw error;
+      }
+    }
   }
 
-  try {
-    const docRef = services.db.collection(COLLECTION).doc(DOC_ID);
-    const snapshot = await docRef.get();
-
-    if (!snapshot.exists) {
-      const seed = readJsonSeed();
-      await docRef.set(seed);
-      return seed;
+  if (cloudinary.configured) {
+    const remote = await readJsonAsset();
+    if (remote) {
+      return remote;
     }
-
-    return snapshot.data();
-  } catch (error) {
-    if (isFirestoreUnavailable(error)) {
-      return readJsonSeed();
-    }
-    throw error;
   }
+
+  return readJsonSeed();
 }
 
 async function writeStore(next) {
   const services = getFirebaseServices();
-  if (!services.configured) {
-    fs.writeFileSync(DATA_PATH, JSON.stringify(next, null, 2));
+  const cloudinary = getCloudinaryConfig();
+
+  if (services.configured) {
+    try {
+      await services.db.collection(COLLECTION).doc(DOC_ID).set(next);
+      return next;
+    } catch (error) {
+      if (!isFirestoreUnavailable(error)) {
+        throw error;
+      }
+    }
+  }
+
+  if (cloudinary.configured) {
+    await uploadJsonAsset(next);
     return next;
   }
 
-  try {
-    await services.db.collection(COLLECTION).doc(DOC_ID).set(next);
-    return next;
-  } catch (error) {
-    if (isFirestoreUnavailable(error)) {
-      throw new Error("Firestore database is not ready. Create a Firestore database in Firebase to enable saving from the admin panel.");
-    }
-    throw error;
-  }
+  fs.writeFileSync(DATA_PATH, JSON.stringify(next, null, 2));
+  return next;
 }
 
 async function updateStore(mutator) {

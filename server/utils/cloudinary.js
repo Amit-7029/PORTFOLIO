@@ -1,4 +1,5 @@
 const { v2: cloudinary } = require("cloudinary");
+const CMS_PUBLIC_ID = "portfolio-cms/content";
 
 function getCloudinaryConfig() {
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
@@ -58,6 +59,58 @@ function uploadBuffer(file, folder = "portfolio-media") {
   });
 }
 
+async function readJsonAsset(publicId = CMS_PUBLIC_ID) {
+  const client = getCloudinary();
+  if (!client) return null;
+
+  try {
+    const resource = await client.api.resource(publicId, { resource_type: "raw" });
+    const response = await fetch(resource.secure_url);
+    if (!response.ok) {
+      throw new Error(`Unable to fetch Cloudinary asset: ${response.status}`);
+    }
+    return response.json();
+  } catch (error) {
+    if (error?.http_code === 404 || String(error?.message || "").includes("not found")) {
+      return null;
+    }
+    throw error;
+  }
+}
+
+function uploadJsonAsset(data, publicId = CMS_PUBLIC_ID) {
+  const client = getCloudinary();
+  if (!client) {
+    throw new Error("Cloudinary is not configured");
+  }
+
+  const buffer = Buffer.from(JSON.stringify(data, null, 2), "utf8");
+
+  return new Promise((resolve, reject) => {
+    const stream = client.uploader.upload_stream(
+      {
+        public_id: publicId,
+        overwrite: true,
+        invalidate: true,
+        resource_type: "raw",
+      },
+      (error, result) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        resolve({
+          url: result.secure_url,
+          publicId: result.public_id,
+        });
+      },
+    );
+
+    stream.end(buffer);
+  });
+}
+
 async function destroyAsset(publicId) {
   const client = getCloudinary();
   if (!client || !publicId) return;
@@ -65,7 +118,10 @@ async function destroyAsset(publicId) {
 }
 
 module.exports = {
+  CMS_PUBLIC_ID,
   getCloudinaryConfig,
   uploadBuffer,
+  readJsonAsset,
+  uploadJsonAsset,
   destroyAsset,
 };
