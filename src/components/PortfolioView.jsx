@@ -177,6 +177,15 @@ export default function PortfolioView({ data, preview = false }) {
   };
 
   const aboutPreview = stripHtml(data.profile.aboutHtml);
+  const contactSettings = {
+    kicker: data.settings.contactKicker || "Contact",
+    title: data.settings.contactTitle || "Let&apos;s Build Something That Looks Professional And Works Hard",
+    description:
+      data.settings.contactDescription ||
+      "Open to opportunities where financial accuracy, digital visibility, and practical web execution can create stronger business results.",
+    availability:
+      data.settings.contactAvailability || "Available for business support, portfolio websites, and growth-focused freelance work.",
+  };
   const topHighlights = [
     data.skills?.[0]?.name,
     data.skills?.[1]?.name,
@@ -465,20 +474,38 @@ export default function PortfolioView({ data, preview = false }) {
       </section>
 
       <section className="portfolio-section" id="contact" data-section-id="contact" data-reveal>
-        <article className="contact-copy contact-copy-wide">
-          <p className="portfolio-kicker">Contact</p>
-          <h3>Let&apos;s Build Something That Looks Professional And Works Hard</h3>
-          <p>
-            Open to opportunities where financial accuracy, digital visibility, and practical web execution can create
-            stronger business results.
-          </p>
-          <div className="contact-list">
-            <a href={`mailto:${data.settings.email}`}>{data.settings.email}</a>
-            <a href={`tel:${data.settings.phone.replace(/\s+/g, "")}`}>{data.settings.phone}</a>
-            <a href={data.settings.whatsappLink} target="_blank" rel="noreferrer">
-              WhatsApp Conversation
+        <article className="contact-copy contact-copy-wide contact-showcase">
+          <div className="contact-glow-orb contact-glow-orb-one" aria-hidden="true" />
+          <div className="contact-glow-orb contact-glow-orb-two" aria-hidden="true" />
+
+          <div className="contact-showcase-copy">
+            <p className="portfolio-kicker">{contactSettings.kicker}</p>
+            <div className="contact-signal">
+              <span className="contact-signal-dot" />
+              <span>{contactSettings.availability}</span>
+            </div>
+            <h3 dangerouslySetInnerHTML={{ __html: contactSettings.title }} />
+            <p>{contactSettings.description}</p>
+          </div>
+
+          <div className="contact-channel-grid">
+            <a className="contact-channel-card" href={`mailto:${data.settings.email}`}>
+              <span className="contact-channel-label">Email</span>
+              <strong>{data.settings.email}</strong>
+              <small>Best for project discussion and formal communication.</small>
+            </a>
+            <a className="contact-channel-card" href={`tel:${data.settings.phone.replace(/\s+/g, "")}`}>
+              <span className="contact-channel-label">Phone</span>
+              <strong>{data.settings.phone}</strong>
+              <small>Direct call for quick coordination.</small>
+            </a>
+            <a className="contact-channel-card contact-channel-card-accent" href={data.settings.whatsappLink} target="_blank" rel="noreferrer">
+              <span className="contact-channel-label">WhatsApp</span>
+              <strong>Start Instant Chat</strong>
+              <small>Fastest way to reach out for freelance or client work.</small>
             </a>
           </div>
+
           {preview ? (
             <div className="preview-only-card">
               <strong>Live Preview Active</strong>

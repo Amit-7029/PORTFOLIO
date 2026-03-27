@@ -335,6 +335,10 @@ export default function AdminPage() {
               <label>Phone<input value={draft.settings.phone} onChange={(e) => updateDraft("settings", { phone: e.target.value })} /></label>
               <label>Email<input value={draft.settings.email} onChange={(e) => updateDraft("settings", { email: e.target.value })} /></label>
               <label className="full-span">WhatsApp Link<input value={draft.settings.whatsappLink} onChange={(e) => updateDraft("settings", { whatsappLink: e.target.value })} /></label>
+              <label>Contact Kicker<input value={draft.settings.contactKicker || ""} onChange={(e) => updateDraft("settings", { contactKicker: e.target.value })} /></label>
+              <label>Availability Line<input value={draft.settings.contactAvailability || ""} onChange={(e) => updateDraft("settings", { contactAvailability: e.target.value })} /></label>
+              <label className="full-span">Contact Title<input value={draft.settings.contactTitle || ""} onChange={(e) => updateDraft("settings", { contactTitle: e.target.value })} /></label>
+              <label className="full-span">Contact Description<textarea value={draft.settings.contactDescription || ""} onChange={(e) => updateDraft("settings", { contactDescription: e.target.value })} /></label>
               <label className="full-span">Meta Title<input value={draft.settings.seoTitle} onChange={(e) => updateDraft("settings", { seoTitle: e.target.value })} /></label>
               <label className="full-span">Meta Description<textarea value={draft.settings.seoDescription} onChange={(e) => updateDraft("settings", { seoDescription: e.target.value })} /></label>
               <label className="full-span">Keywords<input value={draft.settings.seoKeywords} onChange={(e) => updateDraft("settings", { seoKeywords: e.target.value })} /></label>
