@@ -1,10 +1,28 @@
 const { v2: cloudinary } = require("cloudinary");
 const CMS_PUBLIC_ID = "portfolio-cms/content";
 
+function parseCloudinaryUrl(value) {
+  if (!value || !String(value).startsWith("cloudinary://")) {
+    return null;
+  }
+
+  try {
+    const parsed = new URL(value);
+    return {
+      cloudName: parsed.hostname,
+      apiKey: decodeURIComponent(parsed.username),
+      apiSecret: decodeURIComponent(parsed.password),
+    };
+  } catch {
+    return null;
+  }
+}
+
 function getCloudinaryConfig() {
-  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-  const apiKey = process.env.CLOUDINARY_API_KEY;
-  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+  const inlineConfig = parseCloudinaryUrl(process.env.CLOUDINARY_CLOUD_NAME);
+  const cloudName = inlineConfig?.cloudName || process.env.CLOUDINARY_CLOUD_NAME;
+  const apiKey = inlineConfig?.apiKey || process.env.CLOUDINARY_API_KEY;
+  const apiSecret = inlineConfig?.apiSecret || process.env.CLOUDINARY_API_SECRET;
 
   return {
     configured: Boolean(cloudName && apiKey && apiSecret),
