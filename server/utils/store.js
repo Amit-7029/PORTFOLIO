@@ -14,22 +14,34 @@ function readJsonSeed() {
   return structuredClone(seedStore);
 }
 
+function isFirestoreUnavailable(error) {
+  const message = error?.message || "";
+  return message.includes("5 NOT_FOUND") || message.includes("The database") || message.includes("Could not load the default credentials");
+}
+
 async function readStore() {
   const services = getFirebaseServices();
   if (!services.configured) {
     return readJsonSeed();
   }
 
-  const docRef = services.db.collection(COLLECTION).doc(DOC_ID);
-  const snapshot = await docRef.get();
+  try {
+    const docRef = services.db.collection(COLLECTION).doc(DOC_ID);
+    const snapshot = await docRef.get();
 
-  if (!snapshot.exists) {
-    const seed = readJsonSeed();
-    await docRef.set(seed);
-    return seed;
+    if (!snapshot.exists) {
+      const seed = readJsonSeed();
+      await docRef.set(seed);
+      return seed;
+    }
+
+    return snapshot.data();
+  } catch (error) {
+    if (isFirestoreUnavailable(error)) {
+      return readJsonSeed();
+    }
+    throw error;
   }
-
-  return snapshot.data();
 }
 
 async function writeStore(next) {
@@ -39,8 +51,15 @@ async function writeStore(next) {
     return next;
   }
 
-  await services.db.collection(COLLECTION).doc(DOC_ID).set(next);
-  return next;
+  try {
+    await services.db.collection(COLLECTION).doc(DOC_ID).set(next);
+    return next;
+  } catch (error) {
+    if (isFirestoreUnavailable(error)) {
+      throw new Error("Firestore database is not ready. Create a Firestore database in Firebase to enable saving from the admin panel.");
+    }
+    throw error;
+  }
 }
 
 async function updateStore(mutator) {

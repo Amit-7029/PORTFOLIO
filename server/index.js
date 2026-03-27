@@ -104,6 +104,7 @@ app.get("/health", (_req, res) => {
     ok: true,
     firebaseConfigured: getFirebaseConfig().configured,
     cloudinaryConfigured: getCloudinaryConfig().configured,
+    persistenceMode: getFirebaseConfig().configured ? "firestore" : "json-fallback",
   });
 });
 
