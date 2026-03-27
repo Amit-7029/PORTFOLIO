@@ -3,13 +3,12 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "functions": {
-    "server/index.js": {
+    "api/[...all].js": {
       "includeFiles": "server/data/**"
     }
   },
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/server/index.js" },
-    { "source": "/uploads/(.*)", "destination": "/server/index.js" },
+    { "source": "/uploads/(.*)", "destination": "/api/uploads/$1" },
     { "source": "/admin/(.*)", "destination": "/index.html" },
     { "source": "/admin", "destination": "/index.html" },
     { "source": "/(.*)", "destination": "/index.html" }
