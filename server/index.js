@@ -1,32 +1,20 @@
 const express = require("express");
 const cors = require("cors");
-const path = require("path");
-const fs = require("fs");
 const multer = require("multer");
 const { nanoid } = require("nanoid");
 const { readStore, updateStore } = require("./utils/store");
 const { comparePassword, signToken, verifyToken } = require("./utils/auth");
+const { getFirebaseServices, getFirebaseConfig } = require("./utils/firebaseAdmin");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-const uploadsDir = path.join(__dirname, "uploads");
 const clients = new Set();
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 function broadcast(type, payload) {
   const body = `event: ${type}\ndata: ${JSON.stringify(payload)}\n\n`;
   for (const client of clients) client.write(body);
-}
-
-function authMiddleware(req, res, next) {
-  const token = req.headers.authorization?.replace("Bearer ", "");
-  if (!token) return res.status(401).json({ message: "Unauthorized" });
-
-  try {
-    req.user = verifyToken(token);
-    next();
-  } catch {
-    res.status(401).json({ message: "Invalid token" });
-  }
 }
 
 function sanitizeStore(store) {
@@ -43,22 +31,72 @@ function dashboardStats(store) {
   };
 }
 
+function authMiddleware(req, res, next) {
+  const token = req.headers.authorization?.replace("Bearer ", "");
+  if (!token) return res.status(401).json({ message: "Unauthorized" });
+
+  try {
+    req.user = verifyToken(token);
+    next();
+  } catch {
+    res.status(401).json({ message: "Invalid token" });
+  }
+}
+
+function asyncHandler(handler) {
+  return (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
+}
+
+async function uploadToFirebaseStorage(file) {
+  const services = getFirebaseServices();
+  if (!services.configured || !services.bucket) {
+    throw new Error("Firebase Storage is not configured");
+  }
+
+  const ext = file.originalname.includes(".") ? file.originalname.split(".").pop() : "bin";
+  const safeName = file.originalname.replace(/\s+/g, "-").toLowerCase().replace(/[^a-z0-9._-]/g, "");
+  const storagePath = `portfolio-media/${Date.now()}-${safeName || `upload.${ext}`}`;
+  const downloadToken = nanoid(24);
+  const firebaseFile = services.bucket.file(storagePath);
+
+  await firebaseFile.save(file.buffer, {
+    metadata: {
+      contentType: file.mimetype,
+      metadata: {
+        firebaseStorageDownloadTokens: downloadToken,
+      },
+    },
+  });
+
+  const bucketName = services.bucket.name;
+  const encodedPath = encodeURIComponent(storagePath);
+  const url = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedPath}?alt=media&token=${downloadToken}`;
+
+  return {
+    storagePath,
+    url,
+  };
+}
+
 function createListHandlers(key) {
   return {
-    list: (_req, res) => res.json(readStore()[key]),
-    create: (req, res) => {
+    list: asyncHandler(async (_req, res) => {
+      const store = await readStore();
+      res.json(store[key]);
+    }),
+    create: asyncHandler(async (req, res) => {
       const item = { id: `${key}_${nanoid(8)}`, ...req.body };
-      const store = updateStore((current) => {
+      const store = await updateStore((current) => {
         current[key].push(item);
         return current;
       });
       broadcast("portfolio:update", sanitizeStore(store));
       res.status(201).json(item);
-    },
-    update: (req, res) => {
+    }),
+    update: asyncHandler(async (req, res) => {
       const { id } = req.params;
       let updated = null;
-      const store = updateStore((current) => {
+      const store = await updateStore((current) => {
         current[key] = current[key].map((item) => {
           if (item.id !== id) return item;
           updated = { ...item, ...req.body };
@@ -68,47 +106,32 @@ function createListHandlers(key) {
       });
       broadcast("portfolio:update", sanitizeStore(store));
       res.json(updated);
-    },
-    remove: (req, res) => {
-      const store = updateStore((current) => {
+    }),
+    remove: asyncHandler(async (req, res) => {
+      const store = await updateStore((current) => {
         current[key] = current[key].filter((item) => item.id !== req.params.id);
         return current;
       });
       broadcast("portfolio:update", sanitizeStore(store));
       res.json({ success: true });
-    },
+    }),
   };
 }
-
-const storage = multer.diskStorage({
-  destination: uploadsDir,
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const base = path.basename(file.originalname, ext).replace(/\s+/g, "-").toLowerCase();
-    cb(null, `${base}-${Date.now()}${ext}`);
-  },
-});
-
-const upload = multer({ storage });
 
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
 app.get("/health", (_req, res) => {
-  res.json({ ok: true });
+  res.json({
+    ok: true,
+    firebaseConfigured: getFirebaseConfig().configured,
+  });
 });
 
-app.get("/uploads/:name", (req, res) => {
-  const filePath = path.join(uploadsDir, path.basename(req.params.name));
-  if (!fs.existsSync(filePath)) {
-    return res.status(404).json({ message: "File not found" });
-  }
-  return res.sendFile(filePath);
-});
-
-app.get("/api/portfolio/public", (_req, res) => {
-  res.json(sanitizeStore(readStore()));
-});
+app.get("/api/portfolio/public", asyncHandler(async (_req, res) => {
+  const store = await readStore();
+  res.json(sanitizeStore(store));
+}));
 
 app.get("/api/events", (req, res) => {
   res.setHeader("Content-Type", "text/event-stream");
@@ -128,9 +151,9 @@ app.get("/api/events", (req, res) => {
   });
 });
 
-app.post("/api/auth/login", async (req, res) => {
+app.post("/api/auth/login", asyncHandler(async (req, res) => {
   const { username, password } = req.body;
-  const store = readStore();
+  const store = await readStore();
   if (username !== store.adminUser.username) {
     return res.status(401).json({ message: "Invalid credentials" });
   }
@@ -142,7 +165,7 @@ app.post("/api/auth/login", async (req, res) => {
     token: signToken({ username }),
     user: { username },
   });
-});
+}));
 
 app.get("/api/auth/me", authMiddleware, (req, res) => {
   res.json({ user: { username: req.user.username } });
@@ -152,44 +175,47 @@ app.post("/api/auth/logout", authMiddleware, (_req, res) => {
   res.json({ success: true });
 });
 
-app.get("/api/dashboard/stats", authMiddleware, (_req, res) => {
-  res.json(dashboardStats(readStore()));
-});
+app.get("/api/dashboard/stats", authMiddleware, asyncHandler(async (_req, res) => {
+  const store = await readStore();
+  res.json(dashboardStats(store));
+}));
 
-app.get("/api/admin/content", authMiddleware, (_req, res) => {
-  res.json(sanitizeStore(readStore()));
-});
+app.get("/api/admin/content", authMiddleware, asyncHandler(async (_req, res) => {
+  const store = await readStore();
+  res.json(sanitizeStore(store));
+}));
 
-app.put("/api/profile", authMiddleware, (req, res) => {
-  const store = updateStore((current) => {
+app.put("/api/profile", authMiddleware, asyncHandler(async (req, res) => {
+  const store = await updateStore((current) => {
     current.profile = { ...current.profile, ...req.body };
     return current;
   });
   broadcast("portfolio:update", sanitizeStore(store));
   res.json(store.profile);
-});
+}));
 
-app.put("/api/theme", authMiddleware, (req, res) => {
-  const store = updateStore((current) => {
+app.put("/api/theme", authMiddleware, asyncHandler(async (req, res) => {
+  const store = await updateStore((current) => {
     current.theme = { ...current.theme, ...req.body };
     return current;
   });
   broadcast("portfolio:update", sanitizeStore(store));
   res.json(store.theme);
-});
+}));
 
-app.get("/api/settings", authMiddleware, (_req, res) => {
-  res.json(readStore().settings);
-});
+app.get("/api/settings", authMiddleware, asyncHandler(async (_req, res) => {
+  const store = await readStore();
+  res.json(store.settings);
+}));
 
-app.put("/api/settings", authMiddleware, (req, res) => {
-  const store = updateStore((current) => {
+app.put("/api/settings", authMiddleware, asyncHandler(async (req, res) => {
+  const store = await updateStore((current) => {
     current.settings = { ...current.settings, ...req.body };
     return current;
   });
   broadcast("portfolio:update", sanitizeStore(store));
   res.json(store.settings);
-});
+}));
 
 const skillsApi = createListHandlers("skills");
 const experiencesApi = createListHandlers("experiences");
@@ -216,48 +242,60 @@ app.post("/api/achievements", authMiddleware, achievementsApi.create);
 app.put("/api/achievements/:id", authMiddleware, achievementsApi.update);
 app.delete("/api/achievements/:id", authMiddleware, achievementsApi.remove);
 
-app.get("/api/media", authMiddleware, (_req, res) => {
-  res.json(readStore().media);
-});
+app.get("/api/media", authMiddleware, asyncHandler(async (_req, res) => {
+  const store = await readStore();
+  res.json(store.media);
+}));
 
-app.post("/api/media/upload", authMiddleware, upload.single("file"), (req, res) => {
-  const file = req.file;
+app.post("/api/media/upload", authMiddleware, upload.single("file"), asyncHandler(async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "No file uploaded" });
+  }
+
+  const uploaded = await uploadToFirebaseStorage(req.file);
   const media = {
     id: `media_${nanoid(8)}`,
-    name: file.filename,
-    url: `/uploads/${file.filename}`,
-    type: file.mimetype,
+    name: req.file.originalname,
+    url: uploaded.url,
+    type: req.file.mimetype,
     createdAt: new Date().toISOString(),
+    storagePath: uploaded.storagePath,
   };
-  const store = updateStore((current) => {
+
+  const store = await updateStore((current) => {
     current.media.unshift(media);
     return current;
   });
   broadcast("portfolio:update", sanitizeStore(store));
   res.status(201).json(media);
-});
+}));
 
-app.delete("/api/media/:id", authMiddleware, (req, res) => {
-  const store = readStore();
+app.delete("/api/media/:id", authMiddleware, asyncHandler(async (req, res) => {
+  const store = await readStore();
   const media = store.media.find((item) => item.id === req.params.id);
   if (!media) return res.status(404).json({ message: "Not found" });
 
-  const filePath = path.join(uploadsDir, path.basename(media.url));
-  if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+  if (media.storagePath) {
+    const services = getFirebaseServices();
+    if (services.configured && services.bucket) {
+      await services.bucket.file(media.storagePath).delete({ ignoreNotFound: true });
+    }
+  }
 
-  const next = updateStore((current) => {
+  const next = await updateStore((current) => {
     current.media = current.media.filter((item) => item.id !== req.params.id);
     return current;
   });
   broadcast("portfolio:update", sanitizeStore(next));
   res.json({ success: true });
-});
+}));
 
-app.get("/api/messages", authMiddleware, (_req, res) => {
-  res.json(readStore().messages);
-});
+app.get("/api/messages", authMiddleware, asyncHandler(async (_req, res) => {
+  const store = await readStore();
+  res.json(store.messages);
+}));
 
-app.post("/api/contact", (req, res) => {
+app.post("/api/contact", asyncHandler(async (req, res) => {
   const message = {
     id: `message_${nanoid(8)}`,
     name: req.body.name,
@@ -265,20 +303,25 @@ app.post("/api/contact", (req, res) => {
     message: req.body.message,
     createdAt: new Date().toISOString(),
   };
-  const next = updateStore((current) => {
+  const next = await updateStore((current) => {
     current.messages.unshift(message);
     return current;
   });
   broadcast("messages:update", { count: next.messages.length });
   res.status(201).json({ success: true });
-});
+}));
 
-app.delete("/api/messages/:id", authMiddleware, (req, res) => {
-  updateStore((current) => {
+app.delete("/api/messages/:id", authMiddleware, asyncHandler(async (req, res) => {
+  await updateStore((current) => {
     current.messages = current.messages.filter((item) => item.id !== req.params.id);
     return current;
   });
   res.json({ success: true });
+}));
+
+app.use((error, _req, res, _next) => {
+  console.error(error);
+  res.status(500).json({ message: error.message || "Internal server error" });
 });
 
 if (require.main === module) {

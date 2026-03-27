@@ -9,7 +9,7 @@
     "headline": "Assistant Accountant | Meta Ads | SEO | Web Developer",
     "subheadline": "Multi-skilled professional helping businesses grow financially and digitally",
     "aboutHtml": "<p>I am a motivated and detail-oriented professional with practical experience in Tally Prime, vendor ledger handling, purchase entries, pharmacy billing operations, and day-to-day business record support.</p><p>I combine accounting discipline with a strong interest in digital tools, web technology, and business growth.</p>",
-    "image": "/uploads/amit-kumar-shaw.jpeg"
+    "image": "/media/amit-kumar-shaw.jpeg"
   },
   "theme": {
     "primaryColor": "#7c9cff",
@@ -50,7 +50,7 @@
       "id": "project_1",
       "title": "Hospital Website",
       "description": "A real website project created to present healthcare services in a clean, trustworthy, and user-friendly format for local business visibility.",
-      "image": "/uploads/hospital-project.jpeg",
+      "image": "/media/hospital-project.jpeg",
       "liveLink": "https://website-for-hospaccx.vercel.app/",
       "tags": ["HTML", "CSS", "Responsive UI", "SEO Basics"],
       "featured": true
@@ -83,23 +83,26 @@
     {
       "id": "media_1",
       "name": "amit-kumar-shaw.jpeg",
-      "url": "/uploads/amit-kumar-shaw.jpeg",
+      "url": "/media/amit-kumar-shaw.jpeg",
       "type": "image/jpeg",
-      "createdAt": "2026-03-27T00:00:00.000Z"
+      "createdAt": "2026-03-27T00:00:00.000Z",
+      "storagePath": null
     },
     {
       "id": "media_2",
       "name": "hospital-project.jpeg",
-      "url": "/uploads/hospital-project.jpeg",
+      "url": "/media/hospital-project.jpeg",
       "type": "image/jpeg",
-      "createdAt": "2026-03-27T00:00:00.000Z"
+      "createdAt": "2026-03-27T00:00:00.000Z",
+      "storagePath": null
     },
     {
       "id": "media_3",
       "name": "whatsapp.png",
-      "url": "/uploads/whatsapp.png",
+      "url": "/media/whatsapp.png",
       "type": "image/png",
-      "createdAt": "2026-03-27T00:00:00.000Z"
+      "createdAt": "2026-03-27T00:00:00.000Z",
+      "storagePath": null
     }
   ]
 }
