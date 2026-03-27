@@ -1130,6 +1130,10 @@ td {
     rgba(10, 16, 28, 0.78);
 }
 
+.contact-copy-wide {
+  min-height: 100%;
+}
+
 .contact-copy h3 {
   margin: 0;
   font-size: clamp(1.8rem, 3vw, 2.8rem);
@@ -1179,6 +1183,9 @@ td {
 .preview-only-card {
   display: grid;
   gap: 10px;
+  margin-top: 10px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .portfolio-footer {

@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { apiFetch } from "../lib/api";
 
 const categoryMeta = {
   Accounting: {
@@ -80,8 +79,6 @@ function StatCounter({ label, value, suffix, enabled }) {
 
 export default function PortfolioView({ data, preview = false }) {
   const frameRef = useRef(null);
-  const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
-  const [sending, setSending] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
 
   const groupedSkills = useMemo(() => {
@@ -165,20 +162,6 @@ export default function PortfolioView({ data, preview = false }) {
 
   if (!data) {
     return <div className="empty-state">Loading portfolio...</div>;
-  }
-
-  async function submitMessage(event) {
-    event.preventDefault();
-    setSending(true);
-    try {
-      await apiFetch("/api/contact", {
-        method: "POST",
-        body: JSON.stringify(contactForm),
-      });
-      setContactForm({ name: "", email: "", message: "" });
-    } finally {
-      setSending(false);
-    }
   }
 
   const themeStyle = {
@@ -482,63 +465,27 @@ export default function PortfolioView({ data, preview = false }) {
       </section>
 
       <section className="portfolio-section" id="contact" data-section-id="contact" data-reveal>
-        <div className="contact-grid">
-          <article className="contact-copy">
-            <p className="portfolio-kicker">Contact</p>
-            <h3>Let&apos;s Build Something That Looks Professional And Works Hard</h3>
-            <p>
-              Open to opportunities where financial accuracy, digital visibility, and practical web execution can create
-              stronger business results.
-            </p>
-            <div className="contact-list">
-              <a href={`mailto:${data.settings.email}`}>{data.settings.email}</a>
-              <a href={`tel:${data.settings.phone.replace(/\s+/g, "")}`}>{data.settings.phone}</a>
-              <a href={data.settings.whatsappLink} target="_blank" rel="noreferrer">
-                WhatsApp Conversation
-              </a>
-            </div>
-          </article>
-          {!preview ? (
-            <form className="contact-form public-contact-form" onSubmit={submitMessage}>
-              <label>
-                Name
-                <input
-                  placeholder="Your name"
-                  value={contactForm.name}
-                  onChange={(event) => setContactForm((current) => ({ ...current, name: event.target.value }))}
-                  required
-                />
-              </label>
-              <label>
-                Email
-                <input
-                  placeholder="you@example.com"
-                  type="email"
-                  value={contactForm.email}
-                  onChange={(event) => setContactForm((current) => ({ ...current, email: event.target.value }))}
-                  required
-                />
-              </label>
-              <label className="full-span">
-                Message
-                <textarea
-                  placeholder="Tell me about your project or role."
-                  value={contactForm.message}
-                  onChange={(event) => setContactForm((current) => ({ ...current, message: event.target.value }))}
-                  required
-                />
-              </label>
-              <button type="submit" className="primary-button portfolio-button full-span">
-                {sending ? "Sending..." : "Send Message"}
-              </button>
-            </form>
-          ) : (
-            <article className="contact-form preview-only-card">
+        <article className="contact-copy contact-copy-wide">
+          <p className="portfolio-kicker">Contact</p>
+          <h3>Let&apos;s Build Something That Looks Professional And Works Hard</h3>
+          <p>
+            Open to opportunities where financial accuracy, digital visibility, and practical web execution can create
+            stronger business results.
+          </p>
+          <div className="contact-list">
+            <a href={`mailto:${data.settings.email}`}>{data.settings.email}</a>
+            <a href={`tel:${data.settings.phone.replace(/\s+/g, "")}`}>{data.settings.phone}</a>
+            <a href={data.settings.whatsappLink} target="_blank" rel="noreferrer">
+              WhatsApp Conversation
+            </a>
+          </div>
+          {preview ? (
+            <div className="preview-only-card">
               <strong>Live Preview Active</strong>
               <p>Profile, skills, projects, colors, and media changes from the admin panel appear here instantly.</p>
-            </article>
-          )}
-        </div>
+            </div>
+          ) : null}
+        </article>
       </section>
 
       <footer className="portfolio-footer" data-reveal>
