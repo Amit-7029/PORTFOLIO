@@ -80,6 +80,7 @@ function StatCounter({ label, value, suffix, enabled }) {
 export default function PortfolioView({ data, preview = false }) {
   const frameRef = useRef(null);
   const [activeSection, setActiveSection] = useState("hero");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const groupedSkills = useMemo(() => {
     if (!data?.skills) return [];
@@ -160,6 +161,19 @@ export default function PortfolioView({ data, preview = false }) {
     };
   }, [data, preview]);
 
+  useEffect(() => {
+    if (preview) return undefined;
+
+    function handleResize() {
+      if (window.innerWidth > 768) {
+        setMenuOpen(false);
+      }
+    }
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [preview]);
+
   if (!data) {
     return <div className="empty-state">Loading portfolio...</div>;
   }
@@ -201,6 +215,10 @@ export default function PortfolioView({ data, preview = false }) {
     ["contact", "Contact"],
   ];
 
+  function closeMenu() {
+    setMenuOpen(false);
+  }
+
   return (
     <div
       ref={frameRef}
@@ -220,14 +238,28 @@ export default function PortfolioView({ data, preview = false }) {
             <small>Portfolio System</small>
           </span>
         </a>
-        <nav className="portfolio-nav" aria-label="Section navigation">
+        <button
+          type="button"
+          className={`portfolio-menu-toggle ${menuOpen ? "is-open" : ""}`}
+          aria-expanded={menuOpen}
+          aria-label="Toggle navigation menu"
+          onClick={() => setMenuOpen((current) => !current)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+        <nav className={`portfolio-nav ${menuOpen ? "is-open" : ""}`} aria-label="Section navigation">
           {navItems.map(([id, label]) => (
-            <a key={id} href={`#${id}`} className={activeSection === id ? "is-active" : ""}>
+            <a key={id} href={`#${id}`} className={activeSection === id ? "is-active" : ""} onClick={closeMenu}>
               {label}
             </a>
           ))}
+          <a className="topbar-cta topbar-cta-mobile" href="#contact" onClick={closeMenu}>
+            Hire Me
+          </a>
         </nav>
-        <a className="topbar-cta" href="#contact">
+        <a className="topbar-cta topbar-cta-desktop" href="#contact">
           Hire Me
         </a>
       </header>
@@ -240,10 +272,10 @@ export default function PortfolioView({ data, preview = false }) {
           <p className="hero-summary">{data.profile.subheadline}</p>
           <p className="hero-detail">{aboutPreview}</p>
           <div className="hero-actions">
-            <a className="primary-button portfolio-button" href="#projects">
+            <a className="primary-button portfolio-button" href="#projects" onClick={closeMenu}>
               View Projects
             </a>
-            <a className="secondary-button portfolio-button" href="#contact">
+            <a className="secondary-button portfolio-button" href="#contact" onClick={closeMenu}>
               Hire Me
             </a>
           </div>

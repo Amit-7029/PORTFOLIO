@@ -514,6 +514,49 @@ td {
   min-width: 0;
 }
 
+.portfolio-menu-toggle {
+  display: none;
+  position: relative;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: inherit;
+}
+
+.portfolio-menu-toggle span {
+  position: absolute;
+  width: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.portfolio-menu-toggle span:nth-child(1) {
+  transform: translateY(-6px);
+}
+
+.portfolio-menu-toggle span:nth-child(3) {
+  transform: translateY(6px);
+}
+
+.portfolio-menu-toggle.is-open span:nth-child(1) {
+  transform: rotate(45deg);
+}
+
+.portfolio-menu-toggle.is-open span:nth-child(2) {
+  opacity: 0;
+}
+
+.portfolio-menu-toggle.is-open span:nth-child(3) {
+  transform: rotate(-45deg);
+}
+
 .brand-mark {
   width: 46px;
   height: 46px;
@@ -558,6 +601,10 @@ td {
   align-items: center;
   justify-content: center;
   gap: 8px;
+}
+
+.topbar-cta-mobile {
+  display: none;
 }
 
 .portfolio-nav a,
@@ -652,12 +699,14 @@ td {
   margin: 0;
   font-size: clamp(2.7rem, 5vw, 4.5rem);
   line-height: 0.96;
+  overflow-wrap: anywhere;
 }
 
 .portfolio-hero-panel h2 {
   margin: -6px 0 0;
   font-size: clamp(1.15rem, 2vw, 1.7rem);
   max-width: 720px;
+  overflow-wrap: anywhere;
 }
 
 .hero-summary {
@@ -1333,6 +1382,7 @@ td {
   font-family: "Plus Jakarta Sans", sans-serif;
   font-size: 1.08rem;
   letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
 }
 
 .contact-channel-card small {
@@ -1693,5 +1743,317 @@ td {
   .portfolio-whatsapp {
     right: 16px;
     bottom: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .public-page-shell {
+    padding: 18px;
+  }
+
+  .portfolio-frame {
+    gap: 18px;
+    padding: 18px;
+    border-radius: 28px;
+  }
+
+  .portfolio-noise {
+    opacity: 0.2;
+  }
+
+  .portfolio-topbar {
+    top: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 14px 16px;
+    backdrop-filter: blur(12px);
+  }
+
+  .portfolio-menu-toggle {
+    display: inline-flex;
+    margin-left: auto;
+  }
+
+  .topbar-cta-desktop {
+    display: none;
+  }
+
+  .topbar-cta-mobile {
+    display: inline-flex;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .portfolio-nav {
+    width: 100%;
+    display: grid;
+    gap: 10px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    margin-top: 0;
+    transition:
+      max-height 0.35s ease,
+      opacity 0.35s ease,
+      margin-top 0.35s ease;
+  }
+
+  .portfolio-nav.is-open {
+    max-height: 420px;
+    opacity: 1;
+    pointer-events: auto;
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .portfolio-nav a,
+  .topbar-cta-mobile {
+    width: 100%;
+    min-height: 46px;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .portfolio-section,
+  .portfolio-hero-panel,
+  .portfolio-footer {
+    padding: 20px;
+  }
+
+  .portfolio-hero-panel {
+    gap: 20px;
+  }
+
+  .portfolio-hero-panel h1 {
+    font-size: clamp(2.2rem, 10vw, 3rem);
+  }
+
+  .portfolio-hero-panel h2 {
+    font-size: clamp(1rem, 4.8vw, 1.28rem);
+  }
+
+  .hero-summary,
+  .hero-detail,
+  .section-copy,
+  .contact-copy p,
+  .featured-project-copy p,
+  .achievement-card p,
+  .project-side-card p,
+  .timeline-card p {
+    font-size: 0.96rem;
+  }
+
+  .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .portfolio-button,
+  .portfolio-frame .primary-button,
+  .portfolio-frame .secondary-button {
+    width: 100%;
+  }
+
+  .hero-highlights {
+    gap: 10px;
+  }
+
+  .hero-highlights span {
+    min-height: 40px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero-image-frame {
+    width: 100%;
+    min-height: auto;
+    padding: 12px;
+  }
+
+  .hero-glow {
+    filter: blur(44px);
+    opacity: 0.42;
+  }
+
+  .hero-visual {
+    width: 100%;
+  }
+
+  .portfolio-avatar {
+    max-width: 100%;
+    min-height: auto;
+    aspect-ratio: 4 / 5;
+  }
+
+  .hero-stats-grid,
+  .about-grid,
+  .journey-layout,
+  .skill-category-grid,
+  .projects-showcase,
+  .achievement-grid,
+  .contact-showcase,
+  .contact-channel-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .portfolio-section-head {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .skill-category-card,
+  .featured-project-card,
+  .project-side-card,
+  .achievement-card,
+  .portfolio-card,
+  .contact-copy {
+    padding: 20px;
+  }
+
+  .timeline-card {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .timeline-marker {
+    width: 48px;
+    height: 48px;
+  }
+
+  .contact-showcase {
+    gap: 18px;
+  }
+
+  .contact-copy {
+    backdrop-filter: blur(12px);
+  }
+
+  .contact-glow-orb {
+    filter: blur(34px);
+    opacity: 0.28;
+  }
+
+  .contact-signal {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .contact-channel-card {
+    padding: 16px 18px;
+  }
+
+  .portfolio-footer {
+    gap: 10px;
+  }
+
+  .portfolio-whatsapp {
+    min-width: 120px;
+    min-height: 48px;
+  }
+}
+
+@media (max-width: 480px) {
+  .public-page-shell {
+    padding: 16px;
+  }
+
+  .portfolio-frame {
+    gap: 16px;
+    padding: 16px;
+    border-radius: 24px;
+  }
+
+  .portfolio-topbar,
+  .portfolio-section,
+  .portfolio-hero-panel,
+  .portfolio-footer {
+    padding: 16px;
+    border-radius: 22px;
+  }
+
+  .brand-mark {
+    width: 42px;
+    height: 42px;
+  }
+
+  .brand-copy strong {
+    font-size: 0.88rem;
+  }
+
+  .brand-copy small,
+  .portfolio-kicker,
+  .contact-channel-label {
+    font-size: 0.7rem;
+  }
+
+  .portfolio-hero-panel h1 {
+    font-size: clamp(1.95rem, 11vw, 2.45rem);
+  }
+
+  .portfolio-hero-panel h2 {
+    font-size: 1rem;
+  }
+
+  .hero-summary,
+  .hero-detail,
+  .section-copy,
+  .contact-copy p,
+  .featured-project-copy p,
+  .achievement-card p,
+  .project-side-card p,
+  .timeline-card p,
+  .contact-channel-card small {
+    font-size: 0.9rem;
+  }
+
+  .stat-card {
+    padding: 18px;
+  }
+
+  .stat-card strong {
+    font-size: 1.7rem;
+  }
+
+  .skill-category-card,
+  .featured-project-card,
+  .project-side-card,
+  .achievement-card,
+  .portfolio-card,
+  .contact-copy,
+  .contact-channel-card {
+    padding: 16px;
+  }
+
+  .portfolio-frame .primary-button,
+  .portfolio-frame .secondary-button,
+  .topbar-cta-mobile,
+  .portfolio-whatsapp {
+    min-height: 46px;
+    font-size: 0.95rem;
+  }
+
+  .portfolio-topbar,
+  .contact-copy,
+  .portfolio-card,
+  .skill-category-card,
+  .timeline-card,
+  .featured-project-card,
+  .project-side-card,
+  .achievement-card {
+    backdrop-filter: none;
+  }
+
+  .hero-glow,
+  .contact-glow-orb {
+    display: none;
+  }
+
+  .portfolio-whatsapp {
+    right: 12px;
+    bottom: 12px;
   }
 }
