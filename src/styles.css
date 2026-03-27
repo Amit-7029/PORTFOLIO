@@ -594,6 +594,15 @@ td {
   border: 1px solid rgba(124, 156, 255, 0.34);
 }
 
+.portfolio-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 154px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
 .topbar-cta::before,
 .portfolio-button::before,
 .portfolio-whatsapp::before {
@@ -666,40 +675,93 @@ td {
 
 .hero-actions {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   flex-wrap: wrap;
 }
 
 .portfolio-frame .primary-button,
 .portfolio-frame .secondary-button {
   min-height: 50px;
-  padding: 0 18px;
+  padding: 0 22px;
 }
 
 .portfolio-frame .primary-button {
   background: linear-gradient(135deg, var(--portfolio-primary), #5d7cff);
-  box-shadow: 0 18px 35px rgba(95, 125, 255, 0.22);
+  box-shadow:
+    0 18px 35px rgba(95, 125, 255, 0.22),
+    0 0 0 rgba(124, 156, 255, 0.22);
+  animation: primaryGlowPulse 2.7s ease-in-out infinite;
 }
 
 .portfolio-frame .secondary-button {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.045);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.portfolio-frame .secondary-button:hover,
+.portfolio-frame .primary-button:hover {
+  transform: translateY(-2px) scale(1.015);
+}
+
+.hero-actions .secondary-button::after,
+.hero-actions .primary-button::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.09);
 }
 
 .hero-highlights {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
 }
 
 .hero-highlights span {
   display: inline-flex;
   align-items: center;
-  padding: 9px 12px;
+  justify-content: center;
+  min-height: 42px;
+  padding: 10px 16px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.05);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: #dfe5f4;
-  font-size: 0.84rem;
+  font-size: 0.86rem;
+  font-weight: 600;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 10px 22px rgba(0, 0, 0, 0.18);
+  transition:
+    transform 0.28s ease,
+    border-color 0.28s ease,
+    box-shadow 0.28s ease,
+    background-color 0.28s ease;
+  animation: chipBlinkGlow 3.4s ease-in-out infinite;
+}
+
+.hero-highlights span:nth-child(2) {
+  animation-delay: 0.35s;
+}
+
+.hero-highlights span:nth-child(3) {
+  animation-delay: 0.7s;
+}
+
+.hero-highlights span:nth-child(4) {
+  animation-delay: 1.05s;
+}
+
+.hero-highlights span:hover {
+  transform: translateY(-2px);
+  border-color: rgba(124, 156, 255, 0.3);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 12px 26px rgba(74, 104, 214, 0.18),
+    0 0 28px rgba(124, 156, 255, 0.14);
 }
 
 .hero-visual {
@@ -1348,6 +1410,37 @@ td {
   100% {
     opacity: 0;
     transform: scale(1.2);
+  }
+}
+
+@keyframes primaryGlowPulse {
+  0%,
+  100% {
+    box-shadow:
+      0 18px 35px rgba(95, 125, 255, 0.22),
+      0 0 0 rgba(124, 156, 255, 0.18);
+  }
+  50% {
+    box-shadow:
+      0 18px 38px rgba(95, 125, 255, 0.28),
+      0 0 28px rgba(124, 156, 255, 0.24);
+  }
+}
+
+@keyframes chipBlinkGlow {
+  0%,
+  100% {
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 10px 22px rgba(0, 0, 0, 0.18);
+  }
+  50% {
+    border-color: rgba(124, 156, 255, 0.28);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 12px 28px rgba(0, 0, 0, 0.2),
+      0 0 18px rgba(124, 156, 255, 0.16);
   }
 }
 
