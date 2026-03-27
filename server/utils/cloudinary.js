@@ -18,6 +18,11 @@ function parseCloudinaryUrl(value) {
   }
 }
 
+function isPlaceholder(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  return !normalized || normalized.includes("<your_") || normalized.includes("your_api_");
+}
+
 function getCloudinaryConfig() {
   const inlineConfig = parseCloudinaryUrl(process.env.CLOUDINARY_CLOUD_NAME);
   const cloudName = inlineConfig?.cloudName || process.env.CLOUDINARY_CLOUD_NAME;
@@ -25,7 +30,7 @@ function getCloudinaryConfig() {
   const apiSecret = inlineConfig?.apiSecret || process.env.CLOUDINARY_API_SECRET;
 
   return {
-    configured: Boolean(cloudName && apiKey && apiSecret),
+    configured: Boolean(cloudName && apiKey && apiSecret) && !isPlaceholder(cloudName) && !isPlaceholder(apiKey) && !isPlaceholder(apiSecret),
     cloudName,
     apiKey,
     apiSecret,
