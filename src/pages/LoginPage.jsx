@@ -50,7 +50,7 @@ export default function LoginPage() {
           {loading ? "Signing in..." : "Sign In"}
         </button>
         <small className="helper-text">
-          Firebase env status: {hasFirebaseConfig ? "configured" : "not configured yet"}
+          Firebase database env status: {hasFirebaseConfig ? "configured" : "not configured yet"}
         </small>
       </form>
     </div>

@@ -1,6 +1,5 @@
 const { initializeApp, cert, getApps, getApp } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
-const { getStorage } = require("firebase-admin/storage");
 
 function normalizePrivateKey(value) {
   return value ? value.replace(/\\n/g, "\n") : value;
@@ -10,16 +9,13 @@ function getFirebaseConfig() {
   const projectId = process.env.FIREBASE_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
   const privateKey = normalizePrivateKey(process.env.FIREBASE_PRIVATE_KEY);
-  const storageBucket =
-    process.env.FIREBASE_STORAGE_BUCKET || process.env.VITE_FIREBASE_STORAGE_BUCKET;
 
-  const configured = Boolean(projectId && clientEmail && privateKey && storageBucket);
+  const configured = Boolean(projectId && clientEmail && privateKey);
   return {
     configured,
     projectId,
     clientEmail,
     privateKey,
-    storageBucket,
   };
 }
 
@@ -37,7 +33,6 @@ function getFirebaseApp() {
       clientEmail: config.clientEmail,
       privateKey: config.privateKey,
     }),
-    storageBucket: config.storageBucket,
   });
 }
 
@@ -47,7 +42,6 @@ function getFirebaseServices() {
     return {
       app: null,
       db: null,
-      bucket: null,
       configured: false,
     };
   }
@@ -55,7 +49,6 @@ function getFirebaseServices() {
   return {
     app,
     db: getFirestore(app),
-    bucket: getStorage(app).bucket(),
     configured: true,
   };
 }

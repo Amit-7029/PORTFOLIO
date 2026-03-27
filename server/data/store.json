@@ -86,7 +86,8 @@
       "url": "/media/amit-kumar-shaw.jpeg",
       "type": "image/jpeg",
       "createdAt": "2026-03-27T00:00:00.000Z",
-      "storagePath": null
+      "provider": "static",
+      "publicId": null
     },
     {
       "id": "media_2",
@@ -94,7 +95,8 @@
       "url": "/media/hospital-project.jpeg",
       "type": "image/jpeg",
       "createdAt": "2026-03-27T00:00:00.000Z",
-      "storagePath": null
+      "provider": "static",
+      "publicId": null
     },
     {
       "id": "media_3",
@@ -102,7 +104,8 @@
       "url": "/media/whatsapp.png",
       "type": "image/png",
       "createdAt": "2026-03-27T00:00:00.000Z",
-      "storagePath": null
+      "provider": "static",
+      "publicId": null
     }
   ]
 }

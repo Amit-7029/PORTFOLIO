@@ -4,7 +4,8 @@ const multer = require("multer");
 const { nanoid } = require("nanoid");
 const { readStore, updateStore } = require("./utils/store");
 const { comparePassword, signToken, verifyToken } = require("./utils/auth");
-const { getFirebaseServices, getFirebaseConfig } = require("./utils/firebaseAdmin");
+const { getFirebaseConfig } = require("./utils/firebaseAdmin");
+const { getCloudinaryConfig, uploadBuffer, destroyAsset } = require("./utils/cloudinary");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -47,35 +48,8 @@ function asyncHandler(handler) {
   return (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
 }
 
-async function uploadToFirebaseStorage(file) {
-  const services = getFirebaseServices();
-  if (!services.configured || !services.bucket) {
-    throw new Error("Firebase Storage is not configured");
-  }
-
-  const ext = file.originalname.includes(".") ? file.originalname.split(".").pop() : "bin";
-  const safeName = file.originalname.replace(/\s+/g, "-").toLowerCase().replace(/[^a-z0-9._-]/g, "");
-  const storagePath = `portfolio-media/${Date.now()}-${safeName || `upload.${ext}`}`;
-  const downloadToken = nanoid(24);
-  const firebaseFile = services.bucket.file(storagePath);
-
-  await firebaseFile.save(file.buffer, {
-    metadata: {
-      contentType: file.mimetype,
-      metadata: {
-        firebaseStorageDownloadTokens: downloadToken,
-      },
-    },
-  });
-
-  const bucketName = services.bucket.name;
-  const encodedPath = encodeURIComponent(storagePath);
-  const url = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedPath}?alt=media&token=${downloadToken}`;
-
-  return {
-    storagePath,
-    url,
-  };
+async function uploadToCloudinary(file) {
+  return uploadBuffer(file);
 }
 
 function createListHandlers(key) {
@@ -125,6 +99,7 @@ app.get("/health", (_req, res) => {
   res.json({
     ok: true,
     firebaseConfigured: getFirebaseConfig().configured,
+    cloudinaryConfigured: getCloudinaryConfig().configured,
   });
 });
 
@@ -252,14 +227,19 @@ app.post("/api/media/upload", authMiddleware, upload.single("file"), asyncHandle
     return res.status(400).json({ message: "No file uploaded" });
   }
 
-  const uploaded = await uploadToFirebaseStorage(req.file);
+  if (!req.file.mimetype?.startsWith("image/")) {
+    return res.status(400).json({ message: "Only image uploads are supported" });
+  }
+
+  const uploaded = await uploadToCloudinary(req.file);
   const media = {
     id: `media_${nanoid(8)}`,
     name: req.file.originalname,
     url: uploaded.url,
     type: req.file.mimetype,
     createdAt: new Date().toISOString(),
-    storagePath: uploaded.storagePath,
+    provider: "cloudinary",
+    publicId: uploaded.publicId,
   };
 
   const store = await updateStore((current) => {
@@ -275,11 +255,8 @@ app.delete("/api/media/:id", authMiddleware, asyncHandler(async (req, res) => {
   const media = store.media.find((item) => item.id === req.params.id);
   if (!media) return res.status(404).json({ message: "Not found" });
 
-  if (media.storagePath) {
-    const services = getFirebaseServices();
-    if (services.configured && services.bucket) {
-      await services.bucket.file(media.storagePath).delete({ ignoreNotFound: true });
-    }
+  if (media.provider === "cloudinary" && media.publicId) {
+    await destroyAsset(media.publicId);
   }
 
   const next = await updateStore((current) => {
