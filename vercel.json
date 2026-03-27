@@ -2,11 +2,6 @@
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "functions": {
-    "api/[...all].js": {
-      "includeFiles": "server/data/**"
-    }
-  },
   "rewrites": [
     { "source": "/uploads/(.*)", "destination": "/api/uploads/$1" },
     { "source": "/admin/(.*)", "destination": "/index.html" },
