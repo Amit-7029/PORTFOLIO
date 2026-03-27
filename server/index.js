@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
-const { nanoid } = require("nanoid");
+const { randomUUID } = require("node:crypto");
 const { readStore, updateStore } = require("./utils/store");
 const { comparePassword, signToken, verifyToken } = require("./utils/auth");
 const { getFirebaseConfig } = require("./utils/firebaseAdmin");
@@ -12,6 +12,10 @@ const PORT = process.env.PORT || 4000;
 const clients = new Set();
 
 const upload = multer({ storage: multer.memoryStorage() });
+
+function createId(prefix) {
+  return `${prefix}_${randomUUID().replace(/-/g, "").slice(0, 10)}`;
+}
 
 function broadcast(type, payload) {
   const body = `event: ${type}\ndata: ${JSON.stringify(payload)}\n\n`;
@@ -59,7 +63,7 @@ function createListHandlers(key) {
       res.json(store[key]);
     }),
     create: asyncHandler(async (req, res) => {
-      const item = { id: `${key}_${nanoid(8)}`, ...req.body };
+      const item = { id: createId(key), ...req.body };
       const store = await updateStore((current) => {
         current[key].push(item);
         return current;
@@ -233,7 +237,7 @@ app.post("/api/media/upload", authMiddleware, upload.single("file"), asyncHandle
 
   const uploaded = await uploadToCloudinary(req.file);
   const media = {
-    id: `media_${nanoid(8)}`,
+    id: createId("media"),
     name: req.file.originalname,
     url: uploaded.url,
     type: req.file.mimetype,
@@ -274,7 +278,7 @@ app.get("/api/messages", authMiddleware, asyncHandler(async (_req, res) => {
 
 app.post("/api/contact", asyncHandler(async (req, res) => {
   const message = {
-    id: `message_${nanoid(8)}`,
+    id: createId("message"),
     name: req.body.name,
     email: req.body.email,
     message: req.body.message,
