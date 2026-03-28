@@ -3743,6 +3743,62 @@ td {
   }
 }
 
+.hero-eyebrow {
+  opacity: 1;
+  transform: none;
+  min-height: 1em;
+}
+
+.hero-showcase-shell .portfolio-hero-panel {
+  grid-template-columns: minmax(0, 1.16fr) minmax(300px, 0.84fr);
+  gap: 40px;
+}
+
+.hero-showcase-shell .hero-copy {
+  gap: 18px;
+  padding-top: 8px;
+}
+
+.hero-showcase-shell .hero-image-shell {
+  width: min(392px, 100%);
+}
+
+.hero-role-line {
+  max-width: 19ch;
+  color: var(--portfolio-text, #f6f7fb);
+  text-shadow: none;
+  line-height: 1.18;
+}
+
+.hero-role-text {
+  display: block;
+  text-wrap: balance;
+}
+
+.hero-summary {
+  max-width: 52ch;
+  font-size: 1.02rem;
+  line-height: 1.68;
+}
+
+.hero-detail {
+  max-width: 54ch;
+  line-height: 1.72;
+}
+
+@media (max-width: 960px) {
+  .hero-showcase-shell .portfolio-hero-panel {
+    gap: 28px;
+  }
+
+  .hero-role-line,
+  .hero-role-text,
+  .hero-summary,
+  .hero-detail {
+    max-width: none;
+  }
+}
+
 .portfolio-frame .portfolio-section + .portfolio-section {
   margin-top: clamp(18px, 3vw, 28px);
 }
