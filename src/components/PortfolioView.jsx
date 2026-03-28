@@ -871,6 +871,22 @@ export default function PortfolioView({ data, preview = false }) {
               </div>
               <span>{String(storySlides.length).padStart(2, "0")}</span>
             </div>
+            <div className="story-visual-stack" data-parallax-speed="0.05">
+              <article className="story-visual-card story-visual-card-main">
+                <img src="/media/ai-tools-showcase.png" alt="AI tools showcase" className="story-visual-image" loading="lazy" />
+                <div className="story-visual-overlay">
+                  <span>AI Research & Tools</span>
+                  <strong>Smart workflow support for faster execution</strong>
+                </div>
+              </article>
+              <article className="story-visual-card story-visual-card-floating">
+                <img src="/media/meta-showcase.webp" alt="Meta marketing showcase" className="story-visual-image" loading="lazy" />
+                <div className="story-visual-overlay story-visual-overlay-compact">
+                  <span>Meta Ads</span>
+                  <strong>Campaign-focused digital growth</strong>
+                </div>
+              </article>
+            </div>
           </div>
 
           <div className="project-slider-shell">
