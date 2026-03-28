@@ -22,7 +22,11 @@
     "animationSpeed": "medium",
     "parallaxEnabled": true,
     "glowEnabled": true,
+    "glowIntensity": "high",
     "scrollAnimationsEnabled": true,
+    "introAnimationEnabled": true,
+    "backgroundEffectsEnabled": true,
+    "imageZoomEnabled": true,
     "sliderAutoplayEnabled": true,
     "animationIntensity": "high"
   },

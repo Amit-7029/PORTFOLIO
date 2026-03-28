@@ -45,6 +45,12 @@ const intensityMap = {
   high: 1.16,
 };
 
+const glowIntensityMap = {
+  low: 0.76,
+  medium: 1,
+  high: 1.24,
+};
+
 function stripHtml(html) {
   return (html || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 }
@@ -255,22 +261,27 @@ export default function PortfolioView({ data, preview = false }) {
   );
 
   const motionEnabled = data?.theme?.animationsEnabled !== false;
+  const introAnimationEnabled = motionEnabled && data?.theme?.introAnimationEnabled !== false;
   const scrollAnimationsEnabled = motionEnabled && data?.theme?.scrollAnimationsEnabled !== false;
   const parallaxEnabled = motionEnabled && data?.theme?.parallaxEnabled !== false;
   const glowEnabled = motionEnabled && data?.theme?.glowEnabled !== false;
+  const backgroundEffectsEnabled = motionEnabled && data?.theme?.backgroundEffectsEnabled !== false;
+  const imageZoomEnabled = introAnimationEnabled && data?.theme?.imageZoomEnabled !== false;
   const speedFactor = speedMap[data?.theme?.animationSpeed] || 1;
   const autoplayDelay = autoplayMap[data?.theme?.animationSpeed] || 4200;
   const intensityFactor = intensityMap[data?.theme?.animationIntensity] || 1;
+  const glowFactor = glowIntensityMap[data?.theme?.glowIntensity] || 1;
 
   useEffect(() => {
-    if (preview || !motionEnabled) {
+    if (preview || !introAnimationEnabled) {
       setHeroReady(true);
       return undefined;
     }
 
-    const timeoutId = window.setTimeout(() => setHeroReady(true), 80);
+    setHeroReady(false);
+    const timeoutId = window.setTimeout(() => setHeroReady(true), 120);
     return () => window.clearTimeout(timeoutId);
-  }, [preview, motionEnabled]);
+  }, [preview, introAnimationEnabled, data?.profile?.name, data?.profile?.headline, data?.profile?.image]);
 
   useEffect(() => {
     if (!frameRef.current) return undefined;
@@ -415,7 +426,11 @@ export default function PortfolioView({ data, preview = false }) {
     "--motion-delay-step": `${0.085 * speedFactor}s`,
     "--motion-char-step": `${22 * speedFactor}ms`,
     "--motion-distance": `${18 * intensityFactor}px`,
+    "--intro-duration": `${1.1 * speedFactor}s`,
+    "--intro-zoom-scale": imageZoomEnabled ? `${1.14 + intensityFactor * 0.06}` : "1",
+    "--hero-float-distance": `${10 * intensityFactor}px`,
     "--glow-strength": glowEnabled ? intensityFactor.toFixed(2) : "0",
+    "--hero-glow-scale": glowEnabled ? (glowFactor * intensityFactor).toFixed(2) : "0",
   };
 
   const aboutPreview = stripHtml(data.profile.aboutHtml);
@@ -496,7 +511,9 @@ export default function PortfolioView({ data, preview = false }) {
         preview ? "is-preview" : ""
       } ${motionEnabled ? "" : "animations-off"} ${glowEnabled ? "" : "glow-muted"} ${
         scrollAnimationsEnabled ? "" : "scroll-effects-off"
-      } ${parallaxEnabled ? "" : "parallax-off"} ${data.theme.buttonStyle === "square" ? "buttons-square" : ""}`}
+      } ${parallaxEnabled ? "" : "parallax-off"} ${backgroundEffectsEnabled ? "" : "background-effects-off"} ${
+        imageZoomEnabled ? "" : "image-zoom-off"
+      } ${introAnimationEnabled ? "" : "intro-sequence-off"} ${data.theme.buttonStyle === "square" ? "buttons-square" : ""}`}
       style={themeStyle}
     >
       <div className="portfolio-noise" aria-hidden="true" />
@@ -538,7 +555,19 @@ export default function PortfolioView({ data, preview = false }) {
         </a>
       </header>
 
-      <section className={`portfolio-hero-panel ${heroReady ? "hero-ready" : ""}`} data-reveal>
+      <section className={`portfolio-hero-panel ${heroReady ? "hero-ready" : ""}`} data-reveal data-progress-zone>
+        <div className="hero-intro-curtain" aria-hidden="true" />
+        <div className="hero-ambient" aria-hidden="true">
+          <span className="hero-ambient-orb hero-ambient-orb-one" />
+          <span className="hero-ambient-orb hero-ambient-orb-two" />
+          <span className="hero-ambient-orb hero-ambient-orb-three" />
+          <div className="hero-particle-field">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <span key={`particle-${index}`} className="hero-particle" style={{ "--particle-index": index }} />
+            ))}
+          </div>
+        </div>
+
         <div className="hero-copy">
           <p className="portfolio-kicker hero-stagger">Current Profile</p>
           <h1 className="hero-title hero-stagger">
@@ -562,14 +591,29 @@ export default function PortfolioView({ data, preview = false }) {
               <span key={item}>{item}</span>
             ))}
           </div>
+          <a className="hero-scroll-indicator hero-stagger" href="#about" onPointerDown={triggerRipple}>
+            <span className="hero-scroll-label">Scroll to explore</span>
+            <span className="hero-scroll-arrow" aria-hidden="true">
+              <span />
+            </span>
+          </a>
         </div>
 
         <div className="hero-visual">
           <div className="hero-glow hero-glow-one" data-parallax-speed="0.22" aria-hidden="true" />
           <div className="hero-glow hero-glow-two" data-parallax-speed="0.12" aria-hidden="true" />
-          <div className="hero-image-frame" data-parallax-speed="0.16">
-            <div className="hero-image-grid" aria-hidden="true" />
-            <img src={data.profile.image} alt={data.profile.name} className="portfolio-avatar" />
+          <div className="hero-glow hero-glow-three" data-parallax-speed="0.18" aria-hidden="true" />
+          <div className="hero-image-shell">
+            <div className="hero-image-frame" data-parallax-speed="0.16">
+              <div className="hero-image-aura" aria-hidden="true" />
+              <div className="hero-image-rings" aria-hidden="true">
+                <span />
+                <span />
+              </div>
+              <div className="hero-image-grid" aria-hidden="true" />
+              <div className="hero-image-sheen" aria-hidden="true" />
+              <img src={data.profile.image} alt={data.profile.name} className="portfolio-avatar" />
+            </div>
           </div>
         </div>
       </section>

@@ -267,8 +267,18 @@ export default function AdminPage() {
                   <option value="high">High</option>
                 </select>
               </label>
+              <label>Glow Intensity
+                <select value={draft.theme.glowIntensity || "high"} onChange={(e) => updateDraft("theme", { glowIntensity: e.target.value })}>
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </label>
               <label className="toggle-field">Animations
                 <input type="checkbox" checked={draft.theme.animationsEnabled} onChange={(e) => updateDraft("theme", { animationsEnabled: e.target.checked })} />
+              </label>
+              <label className="toggle-field">Hero Intro
+                <input type="checkbox" checked={draft.theme.introAnimationEnabled ?? true} onChange={(e) => updateDraft("theme", { introAnimationEnabled: e.target.checked })} />
               </label>
               <label className="toggle-field">Parallax
                 <input type="checkbox" checked={draft.theme.parallaxEnabled ?? true} onChange={(e) => updateDraft("theme", { parallaxEnabled: e.target.checked })} />
@@ -276,8 +286,14 @@ export default function AdminPage() {
               <label className="toggle-field">Glow Effects
                 <input type="checkbox" checked={draft.theme.glowEnabled ?? true} onChange={(e) => updateDraft("theme", { glowEnabled: e.target.checked })} />
               </label>
+              <label className="toggle-field">Background Effects
+                <input type="checkbox" checked={draft.theme.backgroundEffectsEnabled ?? true} onChange={(e) => updateDraft("theme", { backgroundEffectsEnabled: e.target.checked })} />
+              </label>
               <label className="toggle-field">Scroll Animations
                 <input type="checkbox" checked={draft.theme.scrollAnimationsEnabled ?? true} onChange={(e) => updateDraft("theme", { scrollAnimationsEnabled: e.target.checked })} />
+              </label>
+              <label className="toggle-field">Image Zoom Intro
+                <input type="checkbox" checked={draft.theme.imageZoomEnabled ?? true} onChange={(e) => updateDraft("theme", { imageZoomEnabled: e.target.checked })} />
               </label>
               <label className="toggle-field">Slider Autoplay
                 <input type="checkbox" checked={draft.theme.sliderAutoplayEnabled ?? true} onChange={(e) => updateDraft("theme", { sliderAutoplayEnabled: e.target.checked })} />
