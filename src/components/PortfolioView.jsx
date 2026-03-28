@@ -395,6 +395,7 @@ export default function PortfolioView({ data, preview = false }) {
     const root = frameRef.current;
     const revealTargets = Array.from(root.querySelectorAll("[data-reveal]"));
     const sections = Array.from(root.querySelectorAll("[data-section-id]"));
+    const currentHash = typeof window !== "undefined" ? window.location.hash.replace("#", "") : "";
 
     if (preview || !scrollAnimationsEnabled) {
       revealTargets.forEach((target) => target.classList.add("is-visible"));
@@ -409,7 +410,7 @@ export default function PortfolioView({ data, preview = false }) {
           }
         });
       },
-      { threshold: 0.18, rootMargin: "0px 0px -10% 0px" },
+      { threshold: 0.08, rootMargin: "0px 0px -8% 0px" },
     );
 
     const sectionObserver = new IntersectionObserver(
@@ -426,7 +427,19 @@ export default function PortfolioView({ data, preview = false }) {
     );
 
     if (!preview && scrollAnimationsEnabled) {
-      revealTargets.forEach((target) => revealObserver.observe(target));
+      revealTargets.forEach((target) => {
+        const rect = target.getBoundingClientRect();
+        const targetId = target.getAttribute("id") || target.getAttribute("data-section-id") || "";
+        const isInInitialViewport = rect.top < window.innerHeight * 0.92 && rect.bottom > 0;
+        const isHashTarget = currentHash && currentHash === targetId;
+
+        if (isInInitialViewport || isHashTarget) {
+          target.classList.add("is-visible");
+          return;
+        }
+
+        revealObserver.observe(target);
+      });
     }
     sections.forEach((section) => sectionObserver.observe(section));
 
