@@ -1250,7 +1250,7 @@ td {
 .mini-achievement-list,
 .achievement-grid {
   display: grid;
-  gap: 16px;
+  gap: 20px;
 }
 
 .timeline-card {
@@ -1384,7 +1384,9 @@ td {
 
 .project-side-card {
   display: grid;
-  gap: 14px;
+  gap: 12px;
+  align-content: start;
+  min-height: 100%;
 }
 
 .project-side-icon {
@@ -1397,6 +1399,7 @@ td {
   color: var(--portfolio-primary);
   font-family: "Plus Jakarta Sans", sans-serif;
   font-weight: 800;
+  margin-bottom: 4px;
 }
 
 .achievement-grid {

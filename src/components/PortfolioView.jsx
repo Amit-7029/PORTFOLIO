@@ -297,9 +297,17 @@ export default function PortfolioView({ data, preview = false }) {
   }, [data]);
 
   const projectSidePanels = useMemo(() => {
+    const preferredOrder = ["Marketing", "Tech"];
+    const filtered = preferredOrder
+      .map((category) => groupedSkills.find((group) => group.category === category))
+      .filter(Boolean);
+
+    if (filtered.length) {
+      return filtered.slice(0, 2);
+    }
+
     return groupedSkills
-      .slice()
-      .sort((left, right) => right.average - left.average)
+      .filter((group) => !["AI Tools", "Analytics"].includes(group.category))
       .slice(0, 2);
   }, [groupedSkills]);
 
