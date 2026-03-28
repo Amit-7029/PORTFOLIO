@@ -222,39 +222,15 @@ function ProjectSlide({ slide, onRipple }) {
     );
   }
 
-  const storyPoints = (slide.tags || []).slice(0, 3).map((tag) => `Built with ${tag}`);
-
   return (
     <article className="story-slide-card">
       <div className="story-slide-media" data-parallax-speed="0.18">
         {slide.image ? <img src={slide.image} alt={slide.title} className="story-slide-image" loading="lazy" /> : null}
-        <div className="story-slide-media-overlay">
-          <span className="story-slide-eyebrow">{slide.eyebrow || "Project Spotlight"}</span>
-          <div className="story-slide-overlay-copy">
-            <strong>{slide.title}</strong>
-            <p>{slide.description}</p>
-          </div>
-          <div className="story-slide-overlay-tags">
-            {slide.tags.slice(0, 3).map((tag) => (
-              <span key={tag}>{tag}</span>
-            ))}
-          </div>
-        </div>
       </div>
-      <div className="story-slide-copy">
-        <span className="story-slide-label">Story Layer</span>
+        <div className="story-slide-copy">
+        <span className="story-slide-eyebrow">{slide.eyebrow || "Project Spotlight"}</span>
         <strong>{slide.title}</strong>
         <p>{slide.description}</p>
-        {storyPoints.length ? (
-          <div className="story-feature-list">
-            {storyPoints.map((point) => (
-              <div key={point} className="story-feature-item">
-                <span />
-                <p>{point}</p>
-              </div>
-            ))}
-          </div>
-        ) : null}
         <div className="tag-row">
           {slide.tags.map((tag) => (
             <span key={tag}>{tag}</span>
@@ -395,7 +371,6 @@ export default function PortfolioView({ data, preview = false }) {
     const root = frameRef.current;
     const revealTargets = Array.from(root.querySelectorAll("[data-reveal]"));
     const sections = Array.from(root.querySelectorAll("[data-section-id]"));
-    const currentHash = typeof window !== "undefined" ? window.location.hash.replace("#", "") : "";
 
     if (preview || !scrollAnimationsEnabled) {
       revealTargets.forEach((target) => target.classList.add("is-visible"));
@@ -410,7 +385,7 @@ export default function PortfolioView({ data, preview = false }) {
           }
         });
       },
-      { threshold: 0.08, rootMargin: "0px 0px -8% 0px" },
+      { threshold: 0.18, rootMargin: "0px 0px -10% 0px" },
     );
 
     const sectionObserver = new IntersectionObserver(
@@ -427,19 +402,7 @@ export default function PortfolioView({ data, preview = false }) {
     );
 
     if (!preview && scrollAnimationsEnabled) {
-      revealTargets.forEach((target) => {
-        const rect = target.getBoundingClientRect();
-        const targetId = target.getAttribute("id") || target.getAttribute("data-section-id") || "";
-        const isInInitialViewport = rect.top < window.innerHeight * 0.92 && rect.bottom > 0;
-        const isHashTarget = currentHash && currentHash === targetId;
-
-        if (isInInitialViewport || isHashTarget) {
-          target.classList.add("is-visible");
-          return;
-        }
-
-        revealObserver.observe(target);
-      });
+      revealTargets.forEach((target) => revealObserver.observe(target));
     }
     sections.forEach((section) => sectionObserver.observe(section));
 
@@ -795,26 +758,6 @@ export default function PortfolioView({ data, preview = false }) {
         </header>
 
         <div className={`portfolio-hero-panel is-visible ${heroReady ? "hero-ready" : ""}`}>
-          <div className="hero-visual">
-            <div className="hero-glow hero-glow-one" data-parallax-speed="0.22" aria-hidden="true" />
-            <div className="hero-glow hero-glow-two" data-parallax-speed="0.12" aria-hidden="true" />
-            <div className="hero-glow hero-glow-three" data-parallax-speed="0.18" aria-hidden="true" />
-            <div className="hero-image-shell">
-              <div className="hero-image-orbit hero-image-orbit-one" aria-hidden="true" />
-              <div className="hero-image-orbit hero-image-orbit-two" aria-hidden="true" />
-              <div className="hero-image-frame hero-image-frame-circle" data-parallax-speed="0.16">
-                <div className="hero-image-aura" aria-hidden="true" />
-                <div className="hero-image-rings" aria-hidden="true">
-                  <span />
-                  <span />
-                </div>
-                <div className="hero-image-grid" aria-hidden="true" />
-                <div className="hero-image-sheen" aria-hidden="true" />
-                <img src={data.profile.image} alt={data.profile.name} className="portfolio-avatar" />
-              </div>
-            </div>
-          </div>
-
           <div className="hero-copy">
             <p className="portfolio-kicker hero-stagger">{heroSection.introLabel || "Hello, I'm"}</p>
             <span className="hero-meta-chip hero-stagger">{heroSection.kicker || "Current Profile"}</span>
@@ -856,6 +799,24 @@ export default function PortfolioView({ data, preview = false }) {
                 <span />
               </span>
             </a>
+          </div>
+
+          <div className="hero-visual">
+            <div className="hero-glow hero-glow-one" data-parallax-speed="0.22" aria-hidden="true" />
+            <div className="hero-glow hero-glow-two" data-parallax-speed="0.12" aria-hidden="true" />
+            <div className="hero-glow hero-glow-three" data-parallax-speed="0.18" aria-hidden="true" />
+            <div className="hero-image-shell">
+              <div className="hero-image-frame hero-image-frame-portrait" data-parallax-speed="0.16">
+                <div className="hero-image-aura" aria-hidden="true" />
+                <div className="hero-image-rings" aria-hidden="true">
+                  <span />
+                  <span />
+                </div>
+                <div className="hero-image-grid" aria-hidden="true" />
+                <div className="hero-image-sheen" aria-hidden="true" />
+                <img src={data.profile.image} alt={data.profile.name} className="portfolio-avatar" />
+              </div>
+            </div>
           </div>
         </div>
 
