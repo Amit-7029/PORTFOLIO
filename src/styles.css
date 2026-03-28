@@ -2086,6 +2086,12 @@ td {
   transform: translate3d(0, 0, 0) scale(1);
 }
 
+.portfolio-frame:not(.intro-sequence-off):not(.is-preview) .hero-title .animated-text-unit,
+.portfolio-frame:not(.intro-sequence-off):not(.is-preview) .hero-headline-text .animated-text-unit {
+  animation: heroUnitIn var(--motion-base) cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(var(--unit-index) * var(--motion-char-step));
+}
+
 .hero-stagger {
   opacity: 0;
   transform: translate3d(0, var(--motion-distance), 0);
@@ -2121,6 +2127,38 @@ td {
 .hero-ready .hero-stagger {
   opacity: 1;
   transform: translate3d(0, 0, 0);
+}
+
+.portfolio-frame:not(.intro-sequence-off):not(.is-preview) .hero-copy .hero-stagger {
+  animation: heroStaggerIn var(--motion-base) cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.portfolio-frame:not(.intro-sequence-off):not(.is-preview) .hero-copy .hero-stagger:nth-child(1) {
+  animation-delay: calc(var(--motion-delay-step) * 1);
+}
+
+.portfolio-frame:not(.intro-sequence-off):not(.is-preview) .hero-copy .hero-stagger:nth-child(2) {
+  animation-delay: calc(var(--motion-delay-step) * 2);
+}
+
+.portfolio-frame:not(.intro-sequence-off):not(.is-preview) .hero-copy .hero-stagger:nth-child(3) {
+  animation-delay: calc(var(--motion-delay-step) * 3);
+}
+
+.portfolio-frame:not(.intro-sequence-off):not(.is-preview) .hero-copy .hero-stagger:nth-child(4) {
+  animation-delay: calc(var(--motion-delay-step) * 4);
+}
+
+.portfolio-frame:not(.intro-sequence-off):not(.is-preview) .hero-copy .hero-stagger:nth-child(5) {
+  animation-delay: calc(var(--motion-delay-step) * 5);
+}
+
+.portfolio-frame:not(.intro-sequence-off):not(.is-preview) .hero-copy .hero-stagger:nth-child(6) {
+  animation-delay: calc(var(--motion-delay-step) * 6);
+}
+
+.portfolio-frame:not(.intro-sequence-off):not(.is-preview) .hero-copy .hero-stagger:nth-child(7) {
+  animation-delay: calc(var(--motion-delay-step) * 7);
 }
 
 [data-parallax-speed] {
@@ -2345,6 +2383,50 @@ td {
   100% {
     opacity: 0;
     transform: scale(1);
+  }
+}
+
+@keyframes heroUnitIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 1em, 0) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes heroStaggerIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--motion-distance), 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes heroImageReveal {
+  from {
+    filter: blur(18px) saturate(0.96);
+    transform: scale(var(--intro-zoom-scale, 1.12));
+  }
+  to {
+    filter: blur(0) saturate(1);
+    transform: scale(1);
+  }
+}
+
+@keyframes heroCurtainOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.08);
   }
 }
 
@@ -2604,6 +2686,14 @@ td {
   transition:
     filter calc(var(--intro-duration) * 1.15) cubic-bezier(0.22, 1, 0.36, 1),
     transform calc(var(--intro-duration) * 1.15) cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.portfolio-frame:not(.intro-sequence-off):not(.is-preview) .portfolio-avatar {
+  animation: heroImageReveal calc(var(--intro-duration) * 1.15) cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.portfolio-frame:not(.intro-sequence-off):not(.is-preview) .hero-intro-curtain {
+  animation: heroCurtainOut calc(var(--intro-duration) * 1.1) ease forwards;
 }
 
 .hero-ready .portfolio-avatar,
