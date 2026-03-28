@@ -697,9 +697,9 @@ td {
   content: "";
   position: absolute;
   inset: -6% -8%;
-  background: linear-gradient(105deg, transparent 28%, rgba(255, 255, 255, 0.18) 46%, transparent 64%);
+  background: linear-gradient(105deg, transparent 24%, rgba(255, 255, 255, 0.36) 46%, transparent 68%);
   transform: translate3d(-135%, 0, 0) skewX(-14deg);
-  opacity: 0.9;
+  opacity: 1;
   mix-blend-mode: screen;
   pointer-events: none;
   animation: heroNameSweep 6.2s ease-in-out infinite;
@@ -707,15 +707,16 @@ td {
 
 .hero-name-text {
   position: relative;
-  color: #eef3ff;
+  color: #ffffff;
   text-shadow:
-    0 0 18px rgba(124, 156, 255, 0.2),
-    0 0 32px rgba(158, 124, 255, 0.12),
+    0 0 12px rgba(255, 255, 255, 0.18),
+    0 0 24px rgba(124, 156, 255, 0.16),
+    0 0 36px rgba(158, 124, 255, 0.12),
     0 12px 30px rgba(5, 9, 18, 0.34);
 }
 
 .hero-name-text .animated-text-unit {
-  filter: drop-shadow(0 0 8px rgba(124, 156, 255, 0.12));
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.14)) drop-shadow(0 0 10px rgba(124, 156, 255, 0.1));
 }
 
 .portfolio-kicker {
