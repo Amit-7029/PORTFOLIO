@@ -23,7 +23,7 @@ const sections = [
 ];
 
 const iconOptions = ["award", "certificate", "star", "bolt"];
-const cmsSectionKeys = ["hero", "about", "skills", "projects", "achievements", "contact", "footer"];
+const cmsSectionKeys = ["hero", "about", "skills", "experience", "projects", "achievements", "contact", "footer"];
 
 const contentFieldMap = {
   hero: [
@@ -49,6 +49,13 @@ const contentFieldMap = {
     { key: "highlightLabel", label: "Highlight Label" },
   ],
   skills: [
+    { key: "visible", label: "Visible", type: "toggle" },
+    { key: "navLabel", label: "Nav Label" },
+    { key: "kicker", label: "Kicker" },
+    { key: "title", label: "Title" },
+    { key: "description", label: "Description", type: "textarea" },
+  ],
+  experience: [
     { key: "visible", label: "Visible", type: "toggle" },
     { key: "navLabel", label: "Nav Label" },
     { key: "kicker", label: "Kicker" },
@@ -84,6 +91,14 @@ const contentFieldMap = {
     { key: "whatsappLabel", label: "WhatsApp Label" },
     { key: "whatsappTitle", label: "WhatsApp Title" },
     { key: "whatsappHint", label: "WhatsApp Hint", type: "textarea" },
+    { key: "formSubject", label: "Form Subject" },
+    { key: "formNameLabel", label: "Form Name Label" },
+    { key: "formNamePlaceholder", label: "Form Name Placeholder" },
+    { key: "formEmailLabel", label: "Form Email Label" },
+    { key: "formEmailPlaceholder", label: "Form Email Placeholder" },
+    { key: "formMessageLabel", label: "Form Message Label" },
+    { key: "formMessagePlaceholder", label: "Form Message Placeholder", type: "textarea" },
+    { key: "formButtonText", label: "Form Button Text" },
   ],
   footer: [
     { key: "visible", label: "Visible", type: "toggle" },

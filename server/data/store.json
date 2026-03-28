@@ -22,6 +22,7 @@
       "hero",
       "about",
       "skills",
+      "experience",
       "projects",
       "achievements",
       "contact",
@@ -177,7 +178,15 @@
       "phoneHint": "Direct call for quick coordination.",
       "whatsappLabel": "WhatsApp",
       "whatsappTitle": "Start Instant Chat",
-      "whatsappHint": "Fastest way to reach out for freelance or client work."
+      "whatsappHint": "Fastest way to reach out for freelance or client work.",
+      "formSubject": "Portfolio Inquiry",
+      "formNameLabel": "Name",
+      "formNamePlaceholder": "Your name",
+      "formEmailLabel": "Email",
+      "formEmailPlaceholder": "you@example.com",
+      "formMessageLabel": "Message",
+      "formMessagePlaceholder": "Tell me about your requirement",
+      "formButtonText": "Send Message"
     },
     "footer": {
       "visible": true,

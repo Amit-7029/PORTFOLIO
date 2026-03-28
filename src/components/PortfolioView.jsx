@@ -256,6 +256,8 @@ export default function PortfolioView({ data, preview = false }) {
   const [heroReady, setHeroReady] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [sliderPaused, setSliderPaused] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
   const [themeMode, setThemeMode] = useState(() => {
     if (typeof window !== "undefined") {
       const savedMode = window.localStorage.getItem("portfolio-theme-mode");
@@ -535,6 +537,7 @@ export default function PortfolioView({ data, preview = false }) {
   const heroSection = sectionConfig.hero || {};
   const aboutSection = sectionConfig.about || {};
   const skillsSection = sectionConfig.skills || {};
+  const experienceSection = sectionConfig.experience || {};
   const projectsSection = sectionConfig.projects || {};
   const achievementsSection = sectionConfig.achievements || {};
   const contactSection = sectionConfig.contact || {};
@@ -564,12 +567,18 @@ export default function PortfolioView({ data, preview = false }) {
     { key: "email", href: data.settings.email ? `mailto:${data.settings.email}` : "", label: "Email" },
   ].filter((item) => item.href);
 
-  const navItems = (siteConfig.sectionOrder || ["hero", "about", "skills", "projects", "achievements", "contact", "footer"])
-    .filter((id) => id !== "footer" && id !== "experience" && sectionConfig[id]?.visible !== false)
+  const defaultOrder = ["hero", "about", "skills", "experience", "projects", "achievements", "contact", "footer"];
+  const normalizedOrder = [...(siteConfig.sectionOrder || defaultOrder)];
+  if (sectionConfig.experience && !normalizedOrder.includes("experience")) {
+    const insertIndex = normalizedOrder.indexOf("projects");
+    if (insertIndex === -1) normalizedOrder.push("experience");
+    else normalizedOrder.splice(insertIndex, 0, "experience");
+  }
+
+  const navItems = normalizedOrder
+    .filter((id) => id !== "footer" && sectionConfig[id]?.visible !== false)
     .map((id) => [id, sectionConfig[id]?.navLabel || id]);
-  const orderedSectionIds = (siteConfig.sectionOrder || ["hero", "about", "skills", "projects", "achievements", "contact", "footer"]).filter(
-    (id) => id !== "experience",
-  );
+  const orderedSectionIds = normalizedOrder;
   const sectionHeadClassName = `portfolio-section-head ${siteConfig.sectionHeadingAlign === "center" ? "is-centered" : ""}`;
 
   function sectionOrderStyle(sectionId, offset = 0) {
@@ -579,6 +588,39 @@ export default function PortfolioView({ data, preview = false }) {
 
   function closeMenu() {
     setMenuOpen(false);
+  }
+
+  useEffect(() => {
+    if (preview) return undefined;
+
+    const onScroll = () => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+      const progress = Math.min(scrollTop / maxScroll, 1);
+      setScrollProgress(progress);
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [preview]);
+
+  function handleContactFieldChange(field, value) {
+    setContactForm((current) => ({ ...current, [field]: value }));
+  }
+
+  function handleContactSubmit(event) {
+    event.preventDefault();
+    const subject = encodeURIComponent(contactSection.formSubject || "Portfolio Inquiry");
+    const lines = [
+      `${contactSection.formNameLabel || "Name"}: ${contactForm.name}`,
+      `${contactSection.formEmailLabel || "Email"}: ${contactForm.email}`,
+      "",
+      `${contactSection.formMessageLabel || "Message"}:`,
+      contactForm.message,
+    ];
+    const body = encodeURIComponent(lines.join("\n"));
+    window.location.href = `mailto:${data.settings.email}?subject=${subject}&body=${body}`;
   }
 
   function goToSlide(index) {
@@ -633,6 +675,9 @@ export default function PortfolioView({ data, preview = false }) {
       } ${introAnimationEnabled ? "" : "intro-sequence-off"} ${data.theme.buttonStyle === "square" ? "buttons-square" : ""}`}
       style={themeStyle}
     >
+      <div className="scroll-progress-indicator" aria-hidden="true">
+        <span style={{ transform: `scaleX(${scrollProgress})` }} />
+      </div>
       <div className="portfolio-noise" aria-hidden="true" />
 
       {heroSection.visible !== false ? (
@@ -858,6 +903,32 @@ export default function PortfolioView({ data, preview = false }) {
       </section>
       ) : null}
 
+      {experienceSection.visible !== false ? (
+      <section className="portfolio-section" id="experience" data-section-id="experience" data-reveal style={sectionOrderStyle("experience")}>
+        <div className={sectionHeadClassName}>
+          <div>
+            <p className="portfolio-kicker">{experienceSection.kicker || "Experience"}</p>
+            <h3>{experienceSection.title || "Career Timeline"}</h3>
+          </div>
+          <p className="section-copy">{experienceSection.description}</p>
+        </div>
+        <div className="experience-timeline">
+          {data.experiences.map((item, index) => (
+            <article key={item.id} className="timeline-item" data-parallax-speed="0.06">
+              <span className="timeline-dot" aria-hidden="true" />
+              <div className="timeline-content">
+                <small>{item.duration}</small>
+                <strong>{item.role}</strong>
+                <span>{item.company}</span>
+                <p>{item.description}</p>
+              </div>
+              {index < data.experiences.length - 1 ? <span className="timeline-line" aria-hidden="true" /> : null}
+            </article>
+          ))}
+        </div>
+      </section>
+      ) : null}
+
       {projectsSection.visible !== false ? (
       <section className="portfolio-section portfolio-story-section" id="projects" data-section-id="projects" data-reveal data-progress-zone style={sectionOrderStyle("projects")}>
         <div className="portfolio-story-layout">
@@ -988,6 +1059,41 @@ export default function PortfolioView({ data, preview = false }) {
               <small>{contactSection.whatsappHint}</small>
             </a>
           </div>
+
+          <form className="contact-form-glass" onSubmit={handleContactSubmit}>
+            <label>
+              {contactSection.formNameLabel || "Name"}
+              <input
+                type="text"
+                value={contactForm.name}
+                onChange={(event) => handleContactFieldChange("name", event.target.value)}
+                placeholder={contactSection.formNamePlaceholder || "Your name"}
+                required
+              />
+            </label>
+            <label>
+              {contactSection.formEmailLabel || "Email"}
+              <input
+                type="email"
+                value={contactForm.email}
+                onChange={(event) => handleContactFieldChange("email", event.target.value)}
+                placeholder={contactSection.formEmailPlaceholder || "you@example.com"}
+                required
+              />
+            </label>
+            <label className="full-span">
+              {contactSection.formMessageLabel || "Message"}
+              <textarea
+                value={contactForm.message}
+                onChange={(event) => handleContactFieldChange("message", event.target.value)}
+                placeholder={contactSection.formMessagePlaceholder || "Write your project details"}
+                required
+              />
+            </label>
+            <button type="submit" className="primary-button portfolio-button full-span" onPointerDown={triggerRipple}>
+              {contactSection.formButtonText || "Send Message"}
+            </button>
+          </form>
 
           {preview ? (
             <div className="preview-only-card">
