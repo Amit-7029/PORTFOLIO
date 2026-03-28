@@ -209,6 +209,7 @@ export default function PortfolioView({ data, preview = false }) {
   const sectionConfig = data?.sections || {};
   const categoryMeta = siteConfig.skillCategoryMeta || defaultCategoryMeta;
   const achievementLabels = siteConfig.achievementIconLabels || defaultAchievementLabels;
+  const showTopbarBrand = siteConfig.showBrand === true;
 
   const groupedSkills = useMemo(() => {
     if (!data?.skills) return [];
@@ -542,14 +543,18 @@ export default function PortfolioView({ data, preview = false }) {
     >
       <div className="portfolio-noise" aria-hidden="true" />
 
-      <header className="portfolio-topbar" data-reveal data-section-id="hero">
-        <a className="portfolio-brand" href="#hero" onClick={closeMenu}>
-          <span className="brand-mark">{siteConfig.brandMark || "AK"}</span>
-          <span className="brand-copy">
-            <strong>{data.profile.name}</strong>
-            {siteConfig.brandSubtitle ? <small>{siteConfig.brandSubtitle}</small> : null}
-          </span>
-        </a>
+      <header className={`portfolio-topbar ${showTopbarBrand ? "" : "is-brandless"}`} data-reveal data-section-id="hero">
+        {showTopbarBrand ? (
+          <a className="portfolio-brand" href="#hero" onClick={closeMenu}>
+            <span className="brand-mark">{siteConfig.brandMark || "AK"}</span>
+            <span className="brand-copy">
+              <strong>{data.profile.name}</strong>
+              {siteConfig.brandSubtitle ? <small>{siteConfig.brandSubtitle}</small> : null}
+            </span>
+          </a>
+        ) : (
+          <span className="topbar-balance" aria-hidden="true" />
+        )}
 
         <button
           type="button"

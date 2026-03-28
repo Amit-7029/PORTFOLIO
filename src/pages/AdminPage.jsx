@@ -511,6 +511,9 @@ export default function AdminPage() {
           <section className="admin-panel">
             <div className="panel-head"><div><p className="section-label">Site Builder</p><h2>Navigation, Layout & Order</h2></div></div>
             <div className="form-grid">
+              <label className="toggle-field">Show Navbar Brand
+                <input type="checkbox" checked={draft.siteConfig.showBrand ?? false} onChange={(e) => updateSiteConfig({ showBrand: e.target.checked })} />
+              </label>
               <label>Brand Mark<input value={draft.siteConfig.brandMark || ""} onChange={(e) => updateSiteConfig({ brandMark: e.target.value })} /></label>
               <label>Brand Subtitle<input value={draft.siteConfig.brandSubtitle || ""} onChange={(e) => updateSiteConfig({ brandSubtitle: e.target.value })} /></label>
               <label>Primary Nav Button Text<input value={draft.siteConfig.primaryNavButtonText || ""} onChange={(e) => updateSiteConfig({ primaryNavButtonText: e.target.value })} /></label>

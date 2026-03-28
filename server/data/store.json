@@ -12,6 +12,7 @@
     "image": "/media/amit-kumar-shaw.jpeg"
   },
   "siteConfig": {
+    "showBrand": false,
     "brandMark": "AK",
     "brandSubtitle": "",
     "primaryNavButtonText": "Hire Me",
