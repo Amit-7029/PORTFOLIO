@@ -264,13 +264,6 @@ export default function PortfolioView({ data, preview = false }) {
   const [sliderPaused, setSliderPaused] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
-  const [themeMode, setThemeMode] = useState(() => {
-    if (typeof window !== "undefined") {
-      const savedMode = window.localStorage.getItem("portfolio-theme-mode");
-      if (savedMode === "dark" || savedMode === "light") return savedMode;
-    }
-    return data?.theme?.backgroundMode || "dark";
-  });
   const siteConfig = data?.siteConfig || {};
   const sectionConfig = data?.sections || {};
   const categoryMeta = siteConfig.skillCategoryMeta || defaultCategoryMeta;
@@ -342,23 +335,6 @@ export default function PortfolioView({ data, preview = false }) {
   const autoplayDelay = autoplayMap[data?.theme?.animationSpeed] || 4200;
   const intensityFactor = intensityMap[data?.theme?.animationIntensity] || 1;
   const glowFactor = glowIntensityMap[data?.theme?.glowIntensity] || 1;
-
-  useEffect(() => {
-    if (preview) {
-      setThemeMode(data?.theme?.backgroundMode || "dark");
-      return;
-    }
-
-    const savedMode = window.localStorage.getItem("portfolio-theme-mode");
-    if (savedMode !== "dark" && savedMode !== "light") {
-      setThemeMode(data?.theme?.backgroundMode || "dark");
-    }
-  }, [preview, data?.theme?.backgroundMode]);
-
-  useEffect(() => {
-    if (preview) return;
-    window.localStorage.setItem("portfolio-theme-mode", themeMode);
-  }, [preview, themeMode]);
 
   useEffect(() => {
     if (preview || !introAnimationEnabled) {
@@ -515,7 +491,7 @@ export default function PortfolioView({ data, preview = false }) {
     return <div className="empty-state">Loading portfolio...</div>;
   }
 
-  const currentMode = themeMode || data.theme.backgroundMode || "dark";
+  const currentMode = "dark";
   const isLightMode = currentMode === "light";
   const primaryColor = data.theme.primaryColor;
   const secondaryColor = data.theme.secondaryColor;
@@ -732,36 +708,7 @@ export default function PortfolioView({ data, preview = false }) {
                 {label}
               </a>
             ))}
-            <div className="topbar-tools topbar-tools-mobile">
-              <button
-                type="button"
-                className="theme-toggle-button"
-                aria-label={`Switch to ${currentMode === "dark" ? "light" : "dark"} mode`}
-                onClick={() => setThemeMode((mode) => (mode === "dark" ? "light" : "dark"))}
-              >
-                <span className="theme-toggle-dot" />
-                <span>{currentMode === "dark" ? "Light" : "Dark"}</span>
-              </button>
-              <a className="topbar-cta topbar-cta-mobile" href={siteConfig.primaryNavButtonLink || "#contact"} onClick={closeMenu} onPointerDown={triggerRipple}>
-                {siteConfig.primaryNavButtonText || "Hire Me"}
-              </a>
-            </div>
           </nav>
-
-          <div className="topbar-tools topbar-tools-desktop">
-            <button
-              type="button"
-              className="theme-toggle-button"
-              aria-label={`Switch to ${currentMode === "dark" ? "light" : "dark"} mode`}
-              onClick={() => setThemeMode((mode) => (mode === "dark" ? "light" : "dark"))}
-            >
-              <span className="theme-toggle-dot" />
-              <span>{currentMode === "dark" ? "Light" : "Dark"}</span>
-            </button>
-            <a className="topbar-cta topbar-cta-desktop" href={siteConfig.primaryNavButtonLink || "#contact"} onPointerDown={triggerRipple}>
-              {siteConfig.primaryNavButtonText || "Hire Me"}
-            </a>
-          </div>
         </header>
 
         <div className={`portfolio-hero-panel is-visible ${heroReady ? "hero-ready" : ""}`}>

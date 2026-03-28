@@ -533,14 +533,14 @@ td {
 
 .portfolio-topbar.is-brandless .topbar-balance {
   display: block;
-  flex: 0 0 88px;
+  flex: 0 0 44px;
 }
 
 .portfolio-topbar.is-brandless .portfolio-nav {
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   margin-inline: auto;
-  padding: 6px 8px;
-  gap: 8px;
+  padding: 8px 10px;
+  gap: 10px;
   border-radius: 999px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02));
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -553,12 +553,8 @@ td {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
-  padding: 10px 14px;
-}
-
-.portfolio-topbar.is-brandless .topbar-cta-desktop {
-  flex: 0 0 auto;
+  min-height: 46px;
+  padding: 10px 18px;
 }
 
 .portfolio-menu-toggle {
@@ -644,54 +640,47 @@ td {
 
 .portfolio-nav {
   display: flex;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   flex-wrap: nowrap;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
 }
-
-.topbar-cta-mobile {
-  display: none;
-}
-
-.portfolio-nav a,
-.topbar-cta {
-  padding: 10px 14px;
+.portfolio-nav a {
+  position: relative;
+  overflow: hidden;
+  padding: 10px 16px;
   border-radius: 999px;
+  background: linear-gradient(135deg, rgba(124, 156, 255, 0.14), rgba(158, 124, 255, 0.14));
+  border: 1px solid rgba(124, 156, 255, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 12px 26px rgba(5, 10, 22, 0.2);
   transition:
     transform 0.28s ease,
     background-color 0.28s ease,
     border-color 0.28s ease,
-    color 0.28s ease;
-}
-
-.portfolio-nav a {
-  color: #93a0b8;
-  border: 1px solid transparent;
+    color 0.28s ease,
+    box-shadow 0.28s ease;
+  color: #d9e2f6;
   white-space: nowrap;
 }
 
 .portfolio-nav a.is-active,
 .portfolio-nav a:hover {
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(124, 156, 255, 0.22), rgba(158, 124, 255, 0.22));
+  border-color: rgba(124, 156, 255, 0.34);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 16px 32px rgba(8, 14, 28, 0.28),
+    0 0 24px rgba(124, 156, 255, 0.14);
 }
 
-.topbar-cta,
 .portfolio-button {
   position: relative;
   overflow: hidden;
-}
-
-.topbar-cta {
-  background: linear-gradient(135deg, rgba(124, 156, 255, 0.18), rgba(158, 124, 255, 0.18));
-  border: 1px solid rgba(124, 156, 255, 0.34);
-}
-
-.portfolio-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -700,7 +689,7 @@ td {
   letter-spacing: -0.01em;
 }
 
-.topbar-cta::before,
+.portfolio-nav a::before,
 .portfolio-button::before,
 .portfolio-whatsapp::before {
   content: "";
@@ -711,7 +700,8 @@ td {
   transition: transform 0.55s ease;
 }
 
-.topbar-cta:hover::before,
+.portfolio-nav a:hover::before,
+.portfolio-nav a.is-active::before,
 .portfolio-button:hover::before,
 .portfolio-whatsapp:hover::before {
   transform: translateX(150%);
@@ -1955,16 +1945,6 @@ td {
     display: none !important;
   }
 
-  .topbar-cta-desktop {
-    display: none;
-  }
-
-  .topbar-cta-mobile {
-    display: inline-flex;
-    width: 100%;
-    justify-content: center;
-  }
-
   .portfolio-nav {
     width: 100%;
     display: grid;
@@ -1998,8 +1978,7 @@ td {
     border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
 
-  .portfolio-nav a,
-  .topbar-cta-mobile {
+  .portfolio-nav a {
     width: 100%;
     min-height: 46px;
     justify-content: center;
@@ -3294,9 +3273,9 @@ td {
 @media (min-width: 961px) {
   .hero-showcase-shell .portfolio-topbar.is-brandless {
     display: grid;
-    grid-template-columns: 88px minmax(0, 1fr) auto;
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
     align-items: center;
-    column-gap: 18px;
+    column-gap: 12px;
   }
 
   .hero-showcase-shell .portfolio-topbar.is-brandless .portfolio-nav {
@@ -3307,66 +3286,23 @@ td {
 
 @media (max-width: 1320px) and (min-width: 961px) {
   .portfolio-topbar.is-brandless .portfolio-nav {
-    gap: 6px;
+    gap: 8px;
     padding: 5px 6px;
   }
 
-  .portfolio-topbar.is-brandless .portfolio-nav a,
-  .theme-toggle-button,
-  .topbar-cta {
+  .portfolio-topbar.is-brandless .portfolio-nav a {
     min-height: 42px;
     padding-inline: 12px;
     font-size: 0.96rem;
   }
 
   .portfolio-topbar.is-brandless .topbar-balance {
-    flex-basis: 64px;
+    flex-basis: 44px;
   }
 }
 
 .portfolio-topbar.is-brandless .topbar-balance {
-  flex: 0 0 110px;
-}
-
-.topbar-tools {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.topbar-tools-mobile {
-  display: none;
-}
-
-.theme-toggle-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 46px;
-  padding: 0 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--portfolio-text, #f6f7fb);
-  transition:
-    transform 0.28s ease,
-    border-color 0.28s ease,
-    box-shadow 0.28s ease,
-    background-color 0.28s ease;
-}
-
-.theme-toggle-button:hover {
-  transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--portfolio-glow, #39d7ff) 32%, rgba(255, 255, 255, 0.12));
-  box-shadow: 0 0 26px var(--portfolio-glow-soft, rgba(57, 215, 255, 0.18));
-}
-
-.theme-toggle-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: var(--portfolio-glow, #39d7ff);
-  box-shadow: 0 0 14px var(--portfolio-glow-strong, rgba(57, 215, 255, 0.4));
+  flex: 0 0 44px;
 }
 
 .hero-showcase-shell .portfolio-hero-panel {
@@ -3623,7 +3559,6 @@ td {
 
 .portfolio-frame.theme-light .hero-showcase-shell .portfolio-topbar,
 .portfolio-frame.theme-light .hero-stats-bar,
-.portfolio-frame.theme-light .theme-toggle-button,
 .portfolio-frame.theme-light .hero-social-link {
   background: rgba(255, 255, 255, 0.72);
 }
@@ -3671,22 +3606,6 @@ td {
     min-height: auto;
   }
 
-  .topbar-tools-desktop {
-    display: none;
-  }
-
-  .topbar-tools-mobile {
-    display: grid;
-    gap: 10px;
-    width: 100%;
-  }
-
-  .topbar-tools-mobile .theme-toggle-button,
-  .topbar-tools-mobile .topbar-cta-mobile {
-    width: 100%;
-    justify-content: center;
-  }
-
   .hero-image-frame-circle {
     width: min(300px, 100%);
   }
@@ -3719,9 +3638,7 @@ td {
 .portfolio-frame h2,
 .portfolio-frame h3,
 .portfolio-frame strong,
-.portfolio-frame .portfolio-nav a,
-.portfolio-frame .topbar-cta,
-.portfolio-frame .theme-toggle-button {
+.portfolio-frame .portfolio-nav a {
   font-family: Poppins, sans-serif !important;
 }
 
