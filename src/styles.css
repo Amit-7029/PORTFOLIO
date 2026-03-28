@@ -693,46 +693,16 @@ td {
   max-width: 100%;
 }
 
-.hero-title::after {
-  content: "";
-  position: absolute;
-  inset: -8% -10%;
-  background: linear-gradient(105deg, transparent 18%, rgba(255, 255, 255, 0.58) 46%, rgba(255, 255, 255, 0.18) 54%, transparent 72%);
-  transform: translate3d(-135%, 0, 0) skewX(-14deg);
-  opacity: 1;
-  mix-blend-mode: screen;
-  pointer-events: none;
-  filter: blur(1px);
-  animation: heroNameSweep 5.2s ease-in-out infinite;
-}
-
-.hero-title::before {
-  content: "";
-  position: absolute;
-  inset: -14% -12%;
-  border-radius: 24px;
-  background: radial-gradient(circle at 50% 54%, rgba(255, 255, 255, 0.2), transparent 58%);
-  filter: blur(22px);
-  opacity: 0.95;
-  pointer-events: none;
-}
-
 .hero-name-text {
   position: relative;
   color: #ffffff;
   text-shadow:
-    0 0 10px rgba(255, 255, 255, 0.34),
-    0 0 22px rgba(255, 255, 255, 0.22),
-    0 0 38px rgba(124, 156, 255, 0.2),
-    0 0 54px rgba(158, 124, 255, 0.14),
-    0 12px 30px rgba(5, 9, 18, 0.34);
+    0 0 10px rgba(255, 255, 255, 0.12),
+    0 10px 26px rgba(5, 9, 18, 0.28);
 }
 
 .hero-name-text .animated-text-unit {
-  filter:
-    drop-shadow(0 0 7px rgba(255, 255, 255, 0.22))
-    drop-shadow(0 0 14px rgba(124, 156, 255, 0.12))
-    drop-shadow(0 0 20px rgba(158, 124, 255, 0.08));
+  filter: none;
 }
 
 .portfolio-kicker {
