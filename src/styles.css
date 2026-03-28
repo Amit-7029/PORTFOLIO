@@ -686,6 +686,38 @@ td {
   gap: 18px;
 }
 
+.hero-title {
+  position: relative;
+  display: inline-block;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.hero-title::after {
+  content: "";
+  position: absolute;
+  inset: -6% -8%;
+  background: linear-gradient(105deg, transparent 28%, rgba(255, 255, 255, 0.18) 46%, transparent 64%);
+  transform: translate3d(-135%, 0, 0) skewX(-14deg);
+  opacity: 0.9;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: heroNameSweep 6.2s ease-in-out infinite;
+}
+
+.hero-name-text {
+  position: relative;
+  color: #eef3ff;
+  text-shadow:
+    0 0 18px rgba(124, 156, 255, 0.2),
+    0 0 32px rgba(158, 124, 255, 0.12),
+    0 12px 30px rgba(5, 9, 18, 0.34);
+}
+
+.hero-name-text .animated-text-unit {
+  filter: drop-shadow(0 0 8px rgba(124, 156, 255, 0.12));
+}
+
 .portfolio-kicker {
   margin: 0 0 10px;
   color: var(--portfolio-primary);
@@ -2807,6 +2839,23 @@ td {
     opacity: 0.8;
   }
   68%,
+  100% {
+    transform: translate3d(135%, 0, 0) skewX(-14deg);
+    opacity: 0;
+  }
+}
+
+@keyframes heroNameSweep {
+  0%,
+  18% {
+    transform: translate3d(-135%, 0, 0) skewX(-14deg);
+    opacity: 0;
+  }
+  28%,
+  52% {
+    opacity: 0.82;
+  }
+  70%,
   100% {
     transform: translate3d(135%, 0, 0) skewX(-14deg);
     opacity: 0;
