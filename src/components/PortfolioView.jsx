@@ -64,6 +64,32 @@ function stripHtml(html) {
     .trim();
 }
 
+function toRgba(color, alpha) {
+  if (!color) return `rgba(124, 156, 255, ${alpha})`;
+
+  if (color.startsWith("#")) {
+    let hex = color.slice(1);
+    if (hex.length === 3) {
+      hex = hex
+        .split("")
+        .map((char) => char + char)
+        .join("");
+    }
+
+    if (hex.length === 6) {
+      const bigint = Number.parseInt(hex, 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+  }
+
+  return color.startsWith("rgb(")
+    ? color.replace("rgb(", "rgba(").replace(")", `, ${alpha})`)
+    : color;
+}
+
 function slugify(value) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 }
@@ -139,17 +165,42 @@ function AnimatedText({ text, mode = "chars", className = "" }) {
   );
 }
 
-function StatCounter({ label, value, suffix, enabled }) {
-  const display = useCountUp(value, enabled);
+function HeroStat({ label, value, suffix = "", enabled }) {
+  const numericValue = Number.parseInt(value, 10);
+  const isNumeric = Number.isFinite(numericValue);
+  const display = useCountUp(isNumeric ? numericValue : 0, enabled && isNumeric);
 
   return (
-    <article className="stat-card">
+    <article className="hero-stat">
       <strong>
-        {display}
+        {isNumeric ? display : value}
         {suffix}
       </strong>
       <span>{label}</span>
     </article>
+  );
+}
+
+function SocialIcon({ type }) {
+  const icons = {
+    linkedin: (
+      <path d="M7.2 8.6h3.1V18H7.2V8.6Zm1.6-4.8a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Zm3.4 4.8h3v1.3h.1c.4-.8 1.4-1.6 2.9-1.6 3.1 0 3.7 2 3.7 4.7V18h-3.1v-4.4c0-1.1 0-2.4-1.5-2.4s-1.7 1.2-1.7 2.3V18h-3.1V8.6Z" />
+    ),
+    github: (
+      <path d="M12 2.8a9.2 9.2 0 0 0-2.9 17.9c.5.1.6-.2.6-.5V18c-2.6.6-3.2-1.1-3.2-1.1-.4-1.1-1.1-1.4-1.1-1.4-.9-.6.1-.6.1-.6 1 .1 1.6 1.1 1.6 1.1.9 1.5 2.4 1.1 2.9.8.1-.7.4-1.1.7-1.3-2.1-.2-4.4-1-4.4-4.7 0-1 .4-1.9 1.1-2.6-.1-.3-.5-1.2.1-2.5 0 0 .9-.3 2.9 1a10.1 10.1 0 0 1 5.3 0c2-1.3 2.9-1 2.9-1 .6 1.3.2 2.2.1 2.5.7.7 1.1 1.6 1.1 2.6 0 3.7-2.3 4.5-4.5 4.7.4.3.7 1 .7 2v2.9c0 .3.1.6.6.5A9.2 9.2 0 0 0 12 2.8Z" />
+    ),
+    whatsapp: (
+      <path d="M12 2.8a9.2 9.2 0 0 0-7.9 13.9L3 21l4.5-1.2A9.2 9.2 0 1 0 12 2.8Zm0 16.7c-1.4 0-2.7-.4-3.9-1.1l-.3-.2-2.7.7.7-2.6-.2-.3a7.2 7.2 0 1 1 6.4 3.5Zm3.9-5.3c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.6.1l-.4.5c-.1.2-.3.2-.5.1a6 6 0 0 1-1.8-1.1 6.8 6.8 0 0 1-1.3-1.6c-.1-.2 0-.3.1-.5l.4-.4c.1-.1.2-.3.3-.4.1-.1 0-.3 0-.5l-.7-1.6c-.2-.4-.4-.3-.6-.3h-.5c-.2 0-.5.1-.7.4-.2.2-.9.9-.9 2.2 0 1.3 1 2.6 1.1 2.8.1.2 2 3 4.8 4.2.7.3 1.3.5 1.7.6.7.2 1.3.2 1.8.1.5-.1 1.4-.6 1.6-1.2.2-.6.2-1.1.1-1.2-.1-.1-.3-.2-.5-.3Z" />
+    ),
+    email: (
+      <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v11a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 17.5v-11Zm2 0v.2l6 4.7 6-4.7v-.2a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0-.5.5Zm12 2.7-5.4 4.2a1 1 0 0 1-1.2 0L6 9.2v8.3c0 .3.2.5.5.5h11c.3 0 .5-.2.5-.5V9.2Z" />
+    ),
+  };
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      {icons[type] || icons.email}
+    </svg>
   );
 }
 
@@ -205,6 +256,13 @@ export default function PortfolioView({ data, preview = false }) {
   const [heroReady, setHeroReady] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [sliderPaused, setSliderPaused] = useState(false);
+  const [themeMode, setThemeMode] = useState(() => {
+    if (typeof window !== "undefined") {
+      const savedMode = window.localStorage.getItem("portfolio-theme-mode");
+      if (savedMode === "dark" || savedMode === "light") return savedMode;
+    }
+    return data?.theme?.backgroundMode || "dark";
+  });
   const siteConfig = data?.siteConfig || {};
   const sectionConfig = data?.sections || {};
   const categoryMeta = siteConfig.skillCategoryMeta || defaultCategoryMeta;
@@ -265,16 +323,6 @@ export default function PortfolioView({ data, preview = false }) {
     return [...projectSlides, ...supportSlides].slice(0, Math.max(3, projectSlides.length || 0));
   }, [data, groupedSkills, sectionConfig.projects?.projectEyebrow]);
 
-  const statTargets = useMemo(
-    () => [
-      { label: "Years Building Skills", value: Math.max(data?.experiences?.length || 0, 2), suffix: "+" },
-      { label: "Projects & Real Work", value: Math.max(data?.projects?.length || 0, 1), suffix: "+" },
-      { label: "Core Skills", value: data?.skills?.length || 0, suffix: "+" },
-      { label: "Achievements", value: data?.achievements?.length || 0, suffix: "" },
-    ],
-    [data],
-  );
-
   const motionEnabled = data?.theme?.animationsEnabled !== false;
   const introAnimationEnabled = motionEnabled && data?.theme?.introAnimationEnabled !== false;
   const scrollAnimationsEnabled = motionEnabled && data?.theme?.scrollAnimationsEnabled !== false;
@@ -286,6 +334,23 @@ export default function PortfolioView({ data, preview = false }) {
   const autoplayDelay = autoplayMap[data?.theme?.animationSpeed] || 4200;
   const intensityFactor = intensityMap[data?.theme?.animationIntensity] || 1;
   const glowFactor = glowIntensityMap[data?.theme?.glowIntensity] || 1;
+
+  useEffect(() => {
+    if (preview) {
+      setThemeMode(data?.theme?.backgroundMode || "dark");
+      return;
+    }
+
+    const savedMode = window.localStorage.getItem("portfolio-theme-mode");
+    if (savedMode !== "dark" && savedMode !== "light") {
+      setThemeMode(data?.theme?.backgroundMode || "dark");
+    }
+  }, [preview, data?.theme?.backgroundMode]);
+
+  useEffect(() => {
+    if (preview) return;
+    window.localStorage.setItem("portfolio-theme-mode", themeMode);
+  }, [preview, themeMode]);
 
   useEffect(() => {
     if (preview || !introAnimationEnabled) {
@@ -427,14 +492,24 @@ export default function PortfolioView({ data, preview = false }) {
     return <div className="empty-state">Loading portfolio...</div>;
   }
 
+  const currentMode = themeMode || data.theme.backgroundMode || "dark";
+  const isLightMode = currentMode === "light";
+  const primaryColor = data.theme.primaryColor;
+  const secondaryColor = data.theme.secondaryColor;
+  const glowColor = data.theme.glowColor || primaryColor;
+
   const themeStyle = {
-    "--portfolio-primary": data.theme.primaryColor,
-    "--portfolio-secondary": data.theme.secondaryColor,
-    "--portfolio-bg": data.theme.backgroundColor,
-    "--portfolio-text": data.theme.textColor || "#f6f7fb",
-    "--portfolio-muted": data.theme.mutedTextColor || "#91a1bf",
-    "--portfolio-surface": data.theme.surfaceColor || "rgba(10, 16, 28, 0.76)",
-    "--portfolio-border": data.theme.borderColor || "rgba(255, 255, 255, 0.08)",
+    "--portfolio-primary": primaryColor,
+    "--portfolio-secondary": secondaryColor,
+    "--portfolio-glow": glowColor,
+    "--portfolio-glow-soft": toRgba(glowColor, isLightMode ? 0.16 : 0.28),
+    "--portfolio-glow-strong": toRgba(glowColor, isLightMode ? 0.22 : 0.52),
+    "--portfolio-secondary-soft": toRgba(secondaryColor, isLightMode ? 0.12 : 0.22),
+    "--portfolio-bg": isLightMode ? "#edf4fb" : data.theme.backgroundColor,
+    "--portfolio-text": isLightMode ? "#081120" : data.theme.textColor || "#f6f7fb",
+    "--portfolio-muted": isLightMode ? "#5f6d86" : data.theme.mutedTextColor || "#91a1bf",
+    "--portfolio-surface": isLightMode ? "rgba(255, 255, 255, 0.72)" : data.theme.surfaceColor || "rgba(10, 16, 28, 0.76)",
+    "--portfolio-border": isLightMode ? "rgba(16, 21, 33, 0.08)" : data.theme.borderColor || "rgba(255, 255, 255, 0.08)",
     "--portfolio-font":
       data.theme.fontFamily === "Inter"
         ? "Inter, sans-serif"
@@ -472,6 +547,22 @@ export default function PortfolioView({ data, preview = false }) {
     data.skills?.[2]?.name,
     featuredProject?.title,
   ].filter((item, index, items) => item && items.indexOf(item) === index);
+
+  const heroStats = Array.isArray(heroSection.statsItems) && heroSection.statsItems.length
+    ? heroSection.statsItems
+    : [
+        { value: "2", suffix: "+", label: "Experience" },
+        { value: String(Math.max(data?.projects?.length || 1, 1)), suffix: "+", label: "Projects" },
+        { value: String(Math.max(data?.skills?.length || 7, 7)), suffix: "+", label: "Technologies" },
+        { value: "4", suffix: "+", label: "Clients" },
+      ];
+
+  const socialLinks = [
+    { key: "linkedin", href: data.settings.linkedinLink, label: "LinkedIn" },
+    { key: "github", href: data.settings.githubLink, label: "GitHub" },
+    { key: "whatsapp", href: data.settings.whatsappLink, label: "WhatsApp" },
+    { key: "email", href: data.settings.email ? `mailto:${data.settings.email}` : "", label: "Email" },
+  ].filter((item) => item.href);
 
   const navItems = (siteConfig.sectionOrder || ["hero", "about", "skills", "projects", "achievements", "contact", "footer"])
     .filter((id) => id !== "footer" && id !== "experience" && sectionConfig[id]?.visible !== false)
@@ -533,7 +624,7 @@ export default function PortfolioView({ data, preview = false }) {
   return (
     <div
       ref={frameRef}
-      className={`portfolio-frame ${data.theme.backgroundMode === "light" ? "theme-light" : "theme-dark"} ${
+      className={`portfolio-frame ${currentMode === "light" ? "theme-light" : "theme-dark"} ${
         preview ? "is-preview" : ""
       } ${motionEnabled ? "" : "animations-off"} ${glowEnabled ? "" : "glow-muted"} ${
         scrollAnimationsEnabled ? "" : "scroll-effects-off"
@@ -544,49 +635,8 @@ export default function PortfolioView({ data, preview = false }) {
     >
       <div className="portfolio-noise" aria-hidden="true" />
 
-      <header className={`portfolio-topbar ${showTopbarBrand ? "" : "is-brandless"}`} data-reveal data-section-id="hero">
-        {showTopbarBrand ? (
-          <a className="portfolio-brand" href="#hero" onClick={closeMenu}>
-            <span className="brand-mark">{siteConfig.brandMark || "AK"}</span>
-            <span className="brand-copy">
-              <strong>{data.profile.name}</strong>
-              {siteConfig.brandSubtitle ? <small>{siteConfig.brandSubtitle}</small> : null}
-            </span>
-          </a>
-        ) : (
-          <span className="topbar-balance" aria-hidden="true" />
-        )}
-
-        <button
-          type="button"
-          className={`portfolio-menu-toggle ${menuOpen ? "is-open" : ""}`}
-          aria-expanded={menuOpen}
-          aria-label="Toggle navigation menu"
-          onClick={() => setMenuOpen((current) => !current)}
-        >
-          <span />
-          <span />
-          <span />
-        </button>
-
-        <nav className={`portfolio-nav ${menuOpen ? "is-open" : ""}`} aria-label="Section navigation">
-          {navItems.map(([id, label]) => (
-            <a key={id} href={`#${id}`} className={activeSection === id ? "is-active" : ""} onClick={closeMenu}>
-              {label}
-            </a>
-          ))}
-          <a className="topbar-cta topbar-cta-mobile" href={siteConfig.primaryNavButtonLink || "#contact"} onClick={closeMenu} onPointerDown={triggerRipple}>
-            {siteConfig.primaryNavButtonText || "Hire Me"}
-          </a>
-        </nav>
-
-        <a className="topbar-cta topbar-cta-desktop" href={siteConfig.primaryNavButtonLink || "#contact"} onPointerDown={triggerRipple}>
-          {siteConfig.primaryNavButtonText || "Hire Me"}
-        </a>
-      </header>
-
       {heroSection.visible !== false ? (
-      <section className={`portfolio-hero-panel is-visible ${heroReady ? "hero-ready" : ""}`} data-progress-zone id="hero" style={sectionOrderStyle("hero", 0)}>
+      <section className={`hero-showcase-shell is-visible ${heroReady ? "hero-ready" : ""}`} data-progress-zone data-section-id="hero" id="hero" style={sectionOrderStyle("hero", 0)}>
         <div className="hero-intro-curtain" aria-hidden="true" />
         <div className="hero-ambient" aria-hidden="true">
           <span className="hero-ambient-orb hero-ambient-orb-one" />
@@ -599,68 +649,145 @@ export default function PortfolioView({ data, preview = false }) {
           </div>
         </div>
 
-        <div className="hero-copy">
-          <p className="portfolio-kicker hero-stagger">{heroSection.kicker || "Current Profile"}</p>
-          <h1 className="hero-title hero-stagger">
-            <AnimatedText text={data.profile.name} mode="chars" className="hero-name-text" />
-          </h1>
-          <h2 className="hero-stagger">
-            <AnimatedText text={data.profile.headline} mode="words" className="hero-headline-text" />
-          </h2>
-          <p className="hero-summary hero-stagger">{data.profile.subheadline}</p>
-          <p className="hero-detail hero-stagger">{heroSection.description || aboutPreview}</p>
-          <div className="hero-actions hero-stagger">
-            <a className="primary-button portfolio-button" href={heroSection.primaryButtonLink || "#projects"} onPointerDown={triggerRipple}>
-              {heroSection.primaryButtonText || "View Projects"}
+        <header className={`portfolio-topbar ${showTopbarBrand ? "" : "is-brandless"}`}>
+          {showTopbarBrand ? (
+            <a className="portfolio-brand" href="#hero" onClick={closeMenu}>
+              <span className="brand-mark">{siteConfig.brandMark || "AK"}</span>
+              <span className="brand-copy">
+                <strong>{data.profile.name}</strong>
+                {siteConfig.brandSubtitle ? <small>{siteConfig.brandSubtitle}</small> : null}
+              </span>
             </a>
-            <a className="secondary-button portfolio-button" href={heroSection.secondaryButtonLink || "#contact"} onPointerDown={triggerRipple}>
-              {heroSection.secondaryButtonText || "Hire Me"}
-            </a>
-          </div>
-          <div className="hero-highlights hero-stagger">
-            {topHighlights.map((item) => (
-              <span key={item}>{item}</span>
-            ))}
-          </div>
-          <a className="hero-scroll-indicator hero-stagger" href="#about" onPointerDown={triggerRipple}>
-            <span className="hero-scroll-label">{heroSection.scrollLabel || "Scroll to explore"}</span>
-            <span className="hero-scroll-arrow" aria-hidden="true">
-              <span />
-            </span>
-          </a>
-        </div>
+          ) : (
+            <span className="topbar-balance" aria-hidden="true" />
+          )}
 
-        <div className="hero-visual">
-          <div className="hero-glow hero-glow-one" data-parallax-speed="0.22" aria-hidden="true" />
-          <div className="hero-glow hero-glow-two" data-parallax-speed="0.12" aria-hidden="true" />
-          <div className="hero-glow hero-glow-three" data-parallax-speed="0.18" aria-hidden="true" />
-          <div className="hero-image-shell">
-            <div className="hero-image-frame" data-parallax-speed="0.16">
-              <div className="hero-image-aura" aria-hidden="true" />
-              <div className="hero-image-rings" aria-hidden="true">
-                <span />
-                <span />
+          <button
+            type="button"
+            className={`portfolio-menu-toggle ${menuOpen ? "is-open" : ""}`}
+            aria-expanded={menuOpen}
+            aria-label="Toggle navigation menu"
+            onClick={() => setMenuOpen((current) => !current)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+
+          <nav className={`portfolio-nav ${menuOpen ? "is-open" : ""}`} aria-label="Section navigation">
+            {navItems.map(([id, label]) => (
+              <a key={id} href={`#${id}`} className={activeSection === id ? "is-active" : ""} onClick={closeMenu}>
+                {label}
+              </a>
+            ))}
+            <div className="topbar-tools topbar-tools-mobile">
+              <button
+                type="button"
+                className="theme-toggle-button"
+                aria-label={`Switch to ${currentMode === "dark" ? "light" : "dark"} mode`}
+                onClick={() => setThemeMode((mode) => (mode === "dark" ? "light" : "dark"))}
+              >
+                <span className="theme-toggle-dot" />
+                <span>{currentMode === "dark" ? "Light" : "Dark"}</span>
+              </button>
+              <a className="topbar-cta topbar-cta-mobile" href={siteConfig.primaryNavButtonLink || "#contact"} onClick={closeMenu} onPointerDown={triggerRipple}>
+                {siteConfig.primaryNavButtonText || "Hire Me"}
+              </a>
+            </div>
+          </nav>
+
+          <div className="topbar-tools topbar-tools-desktop">
+            <button
+              type="button"
+              className="theme-toggle-button"
+              aria-label={`Switch to ${currentMode === "dark" ? "light" : "dark"} mode`}
+              onClick={() => setThemeMode((mode) => (mode === "dark" ? "light" : "dark"))}
+            >
+              <span className="theme-toggle-dot" />
+              <span>{currentMode === "dark" ? "Light" : "Dark"}</span>
+            </button>
+            <a className="topbar-cta topbar-cta-desktop" href={siteConfig.primaryNavButtonLink || "#contact"} onPointerDown={triggerRipple}>
+              {siteConfig.primaryNavButtonText || "Hire Me"}
+            </a>
+          </div>
+        </header>
+
+        <div className={`portfolio-hero-panel is-visible ${heroReady ? "hero-ready" : ""}`}>
+          <div className="hero-visual">
+            <div className="hero-glow hero-glow-one" data-parallax-speed="0.22" aria-hidden="true" />
+            <div className="hero-glow hero-glow-two" data-parallax-speed="0.12" aria-hidden="true" />
+            <div className="hero-glow hero-glow-three" data-parallax-speed="0.18" aria-hidden="true" />
+            <div className="hero-image-shell">
+              <div className="hero-image-orbit hero-image-orbit-one" aria-hidden="true" />
+              <div className="hero-image-orbit hero-image-orbit-two" aria-hidden="true" />
+              <div className="hero-image-frame hero-image-frame-circle" data-parallax-speed="0.16">
+                <div className="hero-image-aura" aria-hidden="true" />
+                <div className="hero-image-rings" aria-hidden="true">
+                  <span />
+                  <span />
+                </div>
+                <div className="hero-image-grid" aria-hidden="true" />
+                <div className="hero-image-sheen" aria-hidden="true" />
+                <img src={data.profile.image} alt={data.profile.name} className="portfolio-avatar" />
               </div>
-              <div className="hero-image-grid" aria-hidden="true" />
-              <div className="hero-image-sheen" aria-hidden="true" />
-              <img src={data.profile.image} alt={data.profile.name} className="portfolio-avatar" />
             </div>
           </div>
-        </div>
-      </section>
-      ) : null}
 
-      {heroSection.visible !== false ? (
-      <section className="hero-stats-grid" data-reveal style={sectionOrderStyle("hero", 1)}>
-        {statTargets.map((item) => (
-          <StatCounter
-            key={item.label}
-            label={item.label}
-            value={item.value}
-            suffix={item.suffix}
-            enabled={!preview && motionEnabled}
-          />
-        ))}
+          <div className="hero-copy">
+            <p className="portfolio-kicker hero-stagger">{heroSection.introLabel || "Hello, I'm"}</p>
+            <span className="hero-meta-chip hero-stagger">{heroSection.kicker || "Current Profile"}</span>
+            <h1 className="hero-title hero-stagger">
+              <AnimatedText text={data.profile.name} mode="chars" className="hero-name-text" />
+            </h1>
+            <h2 className="hero-stagger hero-role-line">
+              <AnimatedText text={data.profile.headline} mode="words" className="hero-headline-text" />
+            </h2>
+            <p className="hero-summary hero-stagger">{data.profile.subheadline}</p>
+            <p className="hero-detail hero-stagger">{heroSection.description || aboutPreview}</p>
+
+            {socialLinks.length ? (
+              <div className="hero-socials hero-stagger">
+                {socialLinks.map((item) => (
+                  <a key={item.key} className="hero-social-link" href={item.href} target={item.key === "email" ? undefined : "_blank"} rel={item.key === "email" ? undefined : "noreferrer"} aria-label={item.label}>
+                    <SocialIcon type={item.key} />
+                  </a>
+                ))}
+              </div>
+            ) : null}
+
+            <div className="hero-actions hero-stagger">
+              <a className="primary-button portfolio-button" href={heroSection.primaryButtonLink || "#projects"} onPointerDown={triggerRipple}>
+                {heroSection.primaryButtonText || "View Projects"}
+              </a>
+              <a className="secondary-button portfolio-button" href={heroSection.secondaryButtonLink || "#contact"} onPointerDown={triggerRipple}>
+                {heroSection.secondaryButtonText || "Hire Me"}
+              </a>
+            </div>
+            <div className="hero-highlights hero-stagger">
+              {topHighlights.map((item) => (
+                <span key={item}>{item}</span>
+              ))}
+            </div>
+            <a className="hero-scroll-indicator hero-stagger" href="#about" onPointerDown={triggerRipple}>
+              <span className="hero-scroll-label">{heroSection.scrollLabel || "Scroll to explore"}</span>
+              <span className="hero-scroll-arrow" aria-hidden="true">
+                <span />
+              </span>
+            </a>
+          </div>
+        </div>
+
+        <div className="hero-stats-bar">
+          {heroStats.slice(0, 4).map((item) => (
+            <HeroStat
+              key={`${item.label}-${item.value}`}
+              label={item.label}
+              value={item.value}
+              suffix={item.suffix || ""}
+              enabled={!preview && motionEnabled}
+            />
+          ))}
+        </div>
       </section>
       ) : null}
 

@@ -29,6 +29,7 @@ const contentFieldMap = {
   hero: [
     { key: "visible", label: "Visible", type: "toggle" },
     { key: "navLabel", label: "Nav Label" },
+    { key: "introLabel", label: "Intro Label" },
     { key: "kicker", label: "Kicker" },
     { key: "description", label: "Detail Text", type: "textarea" },
     { key: "primaryButtonText", label: "Primary Button Text" },
@@ -37,6 +38,7 @@ const contentFieldMap = {
     { key: "secondaryButtonLink", label: "Secondary Button Link" },
     { key: "scrollLabel", label: "Scroll Label" },
     { key: "highlightItems", label: "Highlight Items", type: "list" },
+    { key: "statsItems", label: "Hero Stats", type: "stats-list" },
   ],
   about: [
     { key: "visible", label: "Visible", type: "toggle" },
@@ -344,6 +346,37 @@ export default function AdminPage() {
       );
     }
 
+    if (field.type === "stats-list") {
+      return (
+        <label key={field.key} className="full-span">
+          {field.label}
+          <textarea
+            value={(Array.isArray(value) ? value : [])
+              .map((item) => `${item.value || ""}${item.suffix || ""} | ${item.label || ""}`)
+              .join("\n")}
+            onChange={(event) =>
+              updateSectionDraft(sectionKey, {
+                [field.key]: event.target.value
+                  .split("\n")
+                  .map((line) => line.trim())
+                  .filter(Boolean)
+                  .map((line) => {
+                    const [rawValue = "", rawLabel = ""] = line.split("|").map((item) => item.trim());
+                    const match = rawValue.match(/^(\d+)(.*)$/);
+                    return {
+                      value: match?.[1] || rawValue,
+                      suffix: match?.[2] || "",
+                      label: rawLabel,
+                    };
+                  }),
+              })
+            }
+            placeholder={"2+ | Experience\n8+ | Projects\n12+ | Technologies\n4+ | Clients"}
+          />
+        </label>
+      );
+    }
+
     return (
       <label key={field.key} className={field.key.toLowerCase().includes("link") ? "full-span" : ""}>
         {field.label}
@@ -409,6 +442,7 @@ export default function AdminPage() {
             <div className="form-grid">
               <label>Primary Color<input type="color" value={draft.theme.primaryColor} onChange={(e) => updateDraft("theme", { primaryColor: e.target.value })} /></label>
               <label>Secondary Color<input type="color" value={draft.theme.secondaryColor} onChange={(e) => updateDraft("theme", { secondaryColor: e.target.value })} /></label>
+              <label>Glow Color<input type="color" value={draft.theme.glowColor || draft.theme.primaryColor} onChange={(e) => updateDraft("theme", { glowColor: e.target.value })} /></label>
               <label>Background Mode
                 <select value={draft.theme.backgroundMode} onChange={(e) => updateDraft("theme", { backgroundMode: e.target.value })}>
                   <option value="dark">Dark</option>
@@ -644,6 +678,8 @@ export default function AdminPage() {
               <label>Phone<input value={draft.settings.phone} onChange={(e) => updateDraft("settings", { phone: e.target.value })} /></label>
               <label>Email<input value={draft.settings.email} onChange={(e) => updateDraft("settings", { email: e.target.value })} /></label>
               <label className="full-span">WhatsApp Link<input value={draft.settings.whatsappLink} onChange={(e) => updateDraft("settings", { whatsappLink: e.target.value })} /></label>
+              <label>LinkedIn Link<input value={draft.settings.linkedinLink || ""} onChange={(e) => updateDraft("settings", { linkedinLink: e.target.value })} /></label>
+              <label>GitHub Link<input value={draft.settings.githubLink || ""} onChange={(e) => updateDraft("settings", { githubLink: e.target.value })} /></label>
               <label>Contact Kicker<input value={draft.settings.contactKicker || ""} onChange={(e) => updateDraft("settings", { contactKicker: e.target.value })} /></label>
               <label>Availability Line<input value={draft.settings.contactAvailability || ""} onChange={(e) => updateDraft("settings", { contactAvailability: e.target.value })} /></label>
               <label className="full-span">Contact Title<input value={draft.settings.contactTitle || ""} onChange={(e) => updateDraft("settings", { contactTitle: e.target.value })} /></label>

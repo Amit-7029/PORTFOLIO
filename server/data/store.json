@@ -55,10 +55,11 @@
     }
   },
   "theme": {
-    "primaryColor": "#7c9cff",
-    "secondaryColor": "#9e7cff",
+    "primaryColor": "#39d7ff",
+    "secondaryColor": "#4b7cff",
+    "glowColor": "#39d7ff",
     "backgroundMode": "dark",
-    "backgroundColor": "#0a0a0b",
+    "backgroundColor": "#07111f",
     "fontFamily": "Inter",
     "buttonStyle": "rounded",
     "textColor": "#f6f7fb",
@@ -85,6 +86,7 @@
     "hero": {
       "visible": true,
       "navLabel": "Home",
+      "introLabel": "Hello, I'm",
       "kicker": "Current Profile",
       "description": "Practical business support with accounting discipline, digital growth thinking, and hands-on execution.",
       "primaryButtonText": "View Projects",
@@ -97,6 +99,28 @@
         "Web & App Developer",
         "Meta Ads",
         "Deep Research With AI"
+      ],
+      "statsItems": [
+        {
+          "value": "2",
+          "suffix": "+",
+          "label": "Experience"
+        },
+        {
+          "value": "8",
+          "suffix": "+",
+          "label": "Projects"
+        },
+        {
+          "value": "12",
+          "suffix": "+",
+          "label": "Technologies"
+        },
+        {
+          "value": "4",
+          "suffix": "+",
+          "label": "Clients"
+        }
       ]
     },
     "about": {
@@ -255,6 +279,8 @@
     "phone": "+91 7029829790",
     "email": "amitshaw909305@gmail.com",
     "whatsappLink": "https://wa.me/917029829790",
+    "linkedinLink": "",
+    "githubLink": "",
     "contactKicker": "Contact",
     "contactTitle": "Ready to support your business with polished execution",
     "contactDescription": "Reach out for accounting support, portfolio website work, or practical digital growth help. The section styling, title, and support copy can now be updated directly from the admin panel.",
