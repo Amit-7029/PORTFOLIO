@@ -555,7 +555,7 @@ export default function PortfolioView({ data, preview = false }) {
         </a>
       </header>
 
-      <section className={`portfolio-hero-panel ${heroReady ? "hero-ready" : ""}`} data-reveal data-progress-zone>
+      <section className={`portfolio-hero-panel is-visible ${heroReady ? "hero-ready" : ""}`} data-progress-zone>
         <div className="hero-intro-curtain" aria-hidden="true" />
         <div className="hero-ambient" aria-hidden="true">
           <span className="hero-ambient-orb hero-ambient-orb-one" />
