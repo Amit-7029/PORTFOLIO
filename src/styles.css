@@ -736,9 +736,8 @@ td {
 .hero-name-text {
   position: relative;
   color: #ffffff;
-  text-shadow:
-    0 0 10px rgba(255, 255, 255, 0.12),
-    0 10px 26px rgba(5, 9, 18, 0.28);
+  text-shadow: none;
+  font-weight: 800;
 }
 
 .hero-name-text .animated-text-unit {
@@ -3794,6 +3793,8 @@ td {
   opacity: 1;
   transform: none;
   min-height: 1em;
+  display: inline-block;
+  padding-left: 4px;
 }
 
 .hero-showcase-shell .portfolio-hero-panel {
@@ -3815,22 +3816,26 @@ td {
   color: var(--portfolio-text, #f6f7fb);
   text-shadow: none;
   line-height: 1.18;
+  font-weight: 700;
 }
 
 .hero-role-text {
   display: block;
   text-wrap: balance;
+  color: var(--portfolio-text, #f6f7fb);
 }
 
 .hero-summary {
   max-width: 52ch;
   font-size: 1.02rem;
   line-height: 1.68;
+  color: var(--portfolio-text, #f6f7fb);
 }
 
 .hero-detail {
   max-width: 54ch;
   line-height: 1.72;
+  color: color-mix(in srgb, var(--portfolio-text, #f6f7fb) 78%, #91a1bf 22%);
 }
 
 @media (max-width: 960px) {
