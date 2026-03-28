@@ -254,8 +254,33 @@ export default function AdminPage() {
                   <option value="square">Square</option>
                 </select>
               </label>
+              <label>Animation Speed
+                <select value={draft.theme.animationSpeed || "medium"} onChange={(e) => updateDraft("theme", { animationSpeed: e.target.value })}>
+                  <option value="slow">Slow</option>
+                  <option value="medium">Medium</option>
+                  <option value="fast">Fast</option>
+                </select>
+              </label>
+              <label>Animation Intensity
+                <select value={draft.theme.animationIntensity || "high"} onChange={(e) => updateDraft("theme", { animationIntensity: e.target.value })}>
+                  <option value="low">Low</option>
+                  <option value="high">High</option>
+                </select>
+              </label>
               <label className="toggle-field">Animations
                 <input type="checkbox" checked={draft.theme.animationsEnabled} onChange={(e) => updateDraft("theme", { animationsEnabled: e.target.checked })} />
+              </label>
+              <label className="toggle-field">Parallax
+                <input type="checkbox" checked={draft.theme.parallaxEnabled ?? true} onChange={(e) => updateDraft("theme", { parallaxEnabled: e.target.checked })} />
+              </label>
+              <label className="toggle-field">Glow Effects
+                <input type="checkbox" checked={draft.theme.glowEnabled ?? true} onChange={(e) => updateDraft("theme", { glowEnabled: e.target.checked })} />
+              </label>
+              <label className="toggle-field">Scroll Animations
+                <input type="checkbox" checked={draft.theme.scrollAnimationsEnabled ?? true} onChange={(e) => updateDraft("theme", { scrollAnimationsEnabled: e.target.checked })} />
+              </label>
+              <label className="toggle-field">Slider Autoplay
+                <input type="checkbox" checked={draft.theme.sliderAutoplayEnabled ?? true} onChange={(e) => updateDraft("theme", { sliderAutoplayEnabled: e.target.checked })} />
               </label>
             </div>
             <div className="panel-actions">

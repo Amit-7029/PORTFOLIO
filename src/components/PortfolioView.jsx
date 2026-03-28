@@ -28,8 +28,29 @@ const achievementLabels = {
   bolt: "Fast Learner",
 };
 
+const speedMap = {
+  slow: 1.25,
+  medium: 1,
+  fast: 0.78,
+};
+
+const autoplayMap = {
+  slow: 5200,
+  medium: 4200,
+  fast: 3000,
+};
+
+const intensityMap = {
+  low: 0.82,
+  high: 1.16,
+};
+
 function stripHtml(html) {
   return (html || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function slugify(value) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 }
 
 function useCountUp(target, enabled) {
@@ -59,8 +80,48 @@ function useCountUp(target, enabled) {
   return value;
 }
 
-function slugify(value) {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+function triggerRipple(event) {
+  const target = event.currentTarget;
+  if (!(target instanceof HTMLElement)) return;
+
+  const existing = target.querySelector(".ui-ripple");
+  if (existing) existing.remove();
+
+  const rect = target.getBoundingClientRect();
+  const ripple = document.createElement("span");
+  const size = Math.max(rect.width, rect.height) * 1.25;
+
+  ripple.className = "ui-ripple";
+  ripple.style.width = `${size}px`;
+  ripple.style.height = `${size}px`;
+  ripple.style.left = `${event.clientX - rect.left - size / 2}px`;
+  ripple.style.top = `${event.clientY - rect.top - size / 2}px`;
+
+  target.appendChild(ripple);
+  window.setTimeout(() => ripple.remove(), 650);
+}
+
+function AnimatedText({ text, mode = "chars", className = "" }) {
+  const tokens = mode === "words" ? text.split(" ") : Array.from(text);
+
+  return (
+    <span className={`animated-text ${className}`}>
+      {tokens.map((token, index) => {
+        const content =
+          mode === "words"
+            ? `${token}${index < tokens.length - 1 ? "\u00A0" : ""}`
+            : token === " "
+              ? "\u00A0"
+              : token;
+
+        return (
+          <span key={`${token}-${index}`} className="animated-text-unit" style={{ "--unit-index": index }}>
+            {content}
+          </span>
+        );
+      })}
+    </span>
+  );
 }
 
 function StatCounter({ label, value, suffix, enabled }) {
@@ -77,13 +138,62 @@ function StatCounter({ label, value, suffix, enabled }) {
   );
 }
 
+function ProjectSlide({ slide, onRipple }) {
+  if (slide.type === "capability") {
+    return (
+      <article className="story-slide-card story-slide-card-support">
+        <div className="story-slide-frame story-slide-frame-support" data-parallax-speed="0.16">
+          <span className="story-slide-eyebrow">{slide.eyebrow}</span>
+          <strong>{slide.title}</strong>
+          <p>{slide.description}</p>
+          <div className="tag-row">
+            {slide.tags.map((tag) => (
+              <span key={tag}>{tag}</span>
+            ))}
+          </div>
+        </div>
+      </article>
+    );
+  }
+
+  return (
+    <article className="story-slide-card">
+      <div className="story-slide-media" data-parallax-speed="0.18">
+        {slide.image ? <img src={slide.image} alt={slide.title} className="story-slide-image" loading="lazy" /> : null}
+      </div>
+      <div className="story-slide-copy">
+        <span className="story-slide-eyebrow">Project Spotlight</span>
+        <strong>{slide.title}</strong>
+        <p>{slide.description}</p>
+        <div className="tag-row">
+          {slide.tags.map((tag) => (
+            <span key={tag}>{tag}</span>
+          ))}
+        </div>
+        {slide.liveLink ? (
+          <a className="primary-button portfolio-button" href={slide.liveLink} target="_blank" rel="noreferrer" onPointerDown={onRipple}>
+            View Project
+          </a>
+        ) : null}
+      </div>
+    </article>
+  );
+}
+
 export default function PortfolioView({ data, preview = false }) {
   const frameRef = useRef(null);
+  const sliderViewportRef = useRef(null);
+  const pointerStateRef = useRef({ active: false, startX: 0, deltaX: 0 });
+
   const [activeSection, setActiveSection] = useState("hero");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [heroReady, setHeroReady] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [sliderPaused, setSliderPaused] = useState(false);
 
   const groupedSkills = useMemo(() => {
     if (!data?.skills) return [];
+
     const grouped = data.skills.reduce((acc, skill) => {
       acc[skill.category] = acc[skill.category] || [];
       acc[skill.category].push(skill);
@@ -111,6 +221,29 @@ export default function PortfolioView({ data, preview = false }) {
       .slice(0, 2);
   }, [groupedSkills]);
 
+  const storySlides = useMemo(() => {
+    const projectSlides = (data?.projects || []).map((project) => ({
+      type: "project",
+      id: project.id,
+      title: project.title,
+      description: project.description,
+      image: project.image,
+      liveLink: project.liveLink,
+      tags: project.tags || [],
+    }));
+
+    const supportSlides = groupedSkills.slice(0, 3).map((group) => ({
+      type: "capability",
+      id: `${group.id}-support`,
+      title: group.label || group.category,
+      eyebrow: group.eyebrow || "Capability",
+      description: group.description || "Practical strengths presented through measurable skill depth.",
+      tags: group.items.slice(0, 3).map((item) => item.name),
+    }));
+
+    return [...projectSlides, ...supportSlides].slice(0, Math.max(3, projectSlides.length || 0));
+  }, [data, groupedSkills]);
+
   const statTargets = useMemo(
     () => [
       { label: "Years Building Skills", value: Math.max(data?.experiences?.length || 0, 2), suffix: "+" },
@@ -121,12 +254,34 @@ export default function PortfolioView({ data, preview = false }) {
     [data],
   );
 
+  const motionEnabled = data?.theme?.animationsEnabled !== false;
+  const scrollAnimationsEnabled = motionEnabled && data?.theme?.scrollAnimationsEnabled !== false;
+  const parallaxEnabled = motionEnabled && data?.theme?.parallaxEnabled !== false;
+  const glowEnabled = motionEnabled && data?.theme?.glowEnabled !== false;
+  const speedFactor = speedMap[data?.theme?.animationSpeed] || 1;
+  const autoplayDelay = autoplayMap[data?.theme?.animationSpeed] || 4200;
+  const intensityFactor = intensityMap[data?.theme?.animationIntensity] || 1;
+
+  useEffect(() => {
+    if (preview || !motionEnabled) {
+      setHeroReady(true);
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => setHeroReady(true), 80);
+    return () => window.clearTimeout(timeoutId);
+  }, [preview, motionEnabled]);
+
   useEffect(() => {
     if (!frameRef.current) return undefined;
 
     const root = frameRef.current;
     const revealTargets = Array.from(root.querySelectorAll("[data-reveal]"));
     const sections = Array.from(root.querySelectorAll("[data-section-id]"));
+
+    if (preview || !scrollAnimationsEnabled) {
+      revealTargets.forEach((target) => target.classList.add("is-visible"));
+    }
 
     const revealObserver = new IntersectionObserver(
       (entries) => {
@@ -145,6 +300,7 @@ export default function PortfolioView({ data, preview = false }) {
         const visible = entries
           .filter((entry) => entry.isIntersecting)
           .sort((left, right) => right.intersectionRatio - left.intersectionRatio)[0];
+
         if (visible?.target?.dataset?.sectionId) {
           setActiveSection(visible.target.dataset.sectionId);
         }
@@ -152,14 +308,16 @@ export default function PortfolioView({ data, preview = false }) {
       { threshold: 0.35, rootMargin: "-20% 0px -45% 0px" },
     );
 
-    revealTargets.forEach((target) => revealObserver.observe(target));
+    if (!preview && scrollAnimationsEnabled) {
+      revealTargets.forEach((target) => revealObserver.observe(target));
+    }
     sections.forEach((section) => sectionObserver.observe(section));
 
     return () => {
       revealObserver.disconnect();
       sectionObserver.disconnect();
     };
-  }, [data, preview]);
+  }, [preview, scrollAnimationsEnabled, data]);
 
   useEffect(() => {
     if (preview) return undefined;
@@ -173,6 +331,71 @@ export default function PortfolioView({ data, preview = false }) {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [preview]);
+
+  useEffect(() => {
+    setCurrentSlide((current) => Math.max(0, Math.min(current, Math.max(storySlides.length - 1, 0))));
+  }, [storySlides.length]);
+
+  useEffect(() => {
+    if (preview || !motionEnabled || !data?.theme?.sliderAutoplayEnabled || sliderPaused || storySlides.length < 2) {
+      return undefined;
+    }
+
+    const timer = window.setInterval(() => {
+      setCurrentSlide((current) => (current + 1) % storySlides.length);
+    }, autoplayDelay);
+
+    return () => window.clearInterval(timer);
+  }, [preview, motionEnabled, data?.theme?.sliderAutoplayEnabled, sliderPaused, storySlides.length, autoplayDelay]);
+
+  useEffect(() => {
+    if (!frameRef.current) return undefined;
+
+    const root = frameRef.current;
+    const parallaxTargets = Array.from(root.querySelectorAll("[data-parallax-speed]"));
+    const progressTargets = Array.from(root.querySelectorAll("[data-progress-zone]"));
+
+    if (preview || !parallaxEnabled) {
+      parallaxTargets.forEach((node) => node.style.setProperty("--parallax-shift", "0px"));
+      progressTargets.forEach((node) => node.style.setProperty("--section-progress", "0"));
+      return undefined;
+    }
+
+    let rafId = 0;
+
+    const update = () => {
+      rafId = 0;
+      const viewportHeight = window.innerHeight || 1;
+
+      parallaxTargets.forEach((node) => {
+        const speed = Number(node.dataset.parallaxSpeed || 0);
+        const rect = node.getBoundingClientRect();
+        const distanceFromCenter = rect.top + rect.height / 2 - viewportHeight / 2;
+        const translate = -distanceFromCenter * speed * 0.14 * intensityFactor;
+        node.style.setProperty("--parallax-shift", `${translate.toFixed(2)}px`);
+      });
+
+      progressTargets.forEach((node) => {
+        const rect = node.getBoundingClientRect();
+        const progress = Math.max(0, Math.min(1, (viewportHeight - rect.top) / (viewportHeight + rect.height)));
+        node.style.setProperty("--section-progress", progress.toFixed(3));
+      });
+    };
+
+    const requestUpdate = () => {
+      if (!rafId) rafId = requestAnimationFrame(update);
+    };
+
+    requestUpdate();
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
+    };
+  }, [preview, parallaxEnabled, intensityFactor]);
 
   if (!data) {
     return <div className="empty-state">Loading portfolio...</div>;
@@ -188,24 +411,31 @@ export default function PortfolioView({ data, preview = false }) {
         : data.theme.fontFamily === "Manrope"
           ? "Manrope, sans-serif"
           : "Poppins, sans-serif",
+    "--motion-base": `${0.72 * speedFactor}s`,
+    "--motion-delay-step": `${0.085 * speedFactor}s`,
+    "--motion-char-step": `${22 * speedFactor}ms`,
+    "--motion-distance": `${18 * intensityFactor}px`,
+    "--glow-strength": glowEnabled ? intensityFactor.toFixed(2) : "0",
   };
 
   const aboutPreview = stripHtml(data.profile.aboutHtml);
   const contactSettings = {
     kicker: data.settings.contactKicker || "Contact",
-    title: data.settings.contactTitle || "Let&apos;s Build Something That Looks Professional And Works Hard",
+    title: data.settings.contactTitle || "Ready to support your business with polished execution",
     description:
       data.settings.contactDescription ||
       "Open to opportunities where financial accuracy, digital visibility, and practical web execution can create stronger business results.",
     availability:
       data.settings.contactAvailability || "Available for business support, portfolio websites, and growth-focused freelance work.",
   };
+
   const topHighlights = [
     data.skills?.[0]?.name,
     data.skills?.[1]?.name,
     data.skills?.[2]?.name,
     featuredProject?.title,
   ].filter(Boolean);
+
   const navItems = [
     ["hero", "Home"],
     ["about", "About"],
@@ -219,25 +449,67 @@ export default function PortfolioView({ data, preview = false }) {
     setMenuOpen(false);
   }
 
+  function goToSlide(index) {
+    setCurrentSlide(index);
+  }
+
+  function goToNextSlide() {
+    setCurrentSlide((current) => (current + 1) % storySlides.length);
+  }
+
+  function goToPreviousSlide() {
+    setCurrentSlide((current) => (current - 1 + storySlides.length) % storySlides.length);
+  }
+
+  function handleSliderPointerDown(event) {
+    if (storySlides.length < 2) return;
+    pointerStateRef.current = { active: true, startX: event.clientX, deltaX: 0 };
+    setSliderPaused(true);
+    sliderViewportRef.current?.setPointerCapture?.(event.pointerId);
+  }
+
+  function handleSliderPointerMove(event) {
+    if (!pointerStateRef.current.active || !sliderViewportRef.current) return;
+    const deltaX = event.clientX - pointerStateRef.current.startX;
+    pointerStateRef.current.deltaX = deltaX;
+    sliderViewportRef.current.style.setProperty("--drag-offset", `${deltaX}px`);
+  }
+
+  function handleSliderPointerUp(event) {
+    if (!pointerStateRef.current.active || !sliderViewportRef.current) return;
+
+    const { deltaX } = pointerStateRef.current;
+    pointerStateRef.current = { active: false, startX: 0, deltaX: 0 };
+    sliderViewportRef.current.style.setProperty("--drag-offset", "0px");
+    sliderViewportRef.current.releasePointerCapture?.(event.pointerId);
+    setSliderPaused(false);
+
+    if (Math.abs(deltaX) < 48) return;
+    if (deltaX < 0) goToNextSlide();
+    else goToPreviousSlide();
+  }
+
   return (
     <div
       ref={frameRef}
       className={`portfolio-frame ${data.theme.backgroundMode === "light" ? "theme-light" : "theme-dark"} ${
         preview ? "is-preview" : ""
-      } ${data.theme.animationsEnabled ? "" : "animations-off"} ${
-        data.theme.buttonStyle === "square" ? "buttons-square" : ""
-      }`}
+      } ${motionEnabled ? "" : "animations-off"} ${glowEnabled ? "" : "glow-muted"} ${
+        scrollAnimationsEnabled ? "" : "scroll-effects-off"
+      } ${parallaxEnabled ? "" : "parallax-off"} ${data.theme.buttonStyle === "square" ? "buttons-square" : ""}`}
       style={themeStyle}
     >
       <div className="portfolio-noise" aria-hidden="true" />
+
       <header className="portfolio-topbar" data-reveal data-section-id="hero" id="hero">
-        <a className="portfolio-brand" href="#hero">
+        <a className="portfolio-brand" href="#hero" onClick={closeMenu}>
           <span className="brand-mark">AK</span>
           <span className="brand-copy">
             <strong>{data.profile.name}</strong>
             <small>Portfolio System</small>
           </span>
         </a>
+
         <button
           type="button"
           className={`portfolio-menu-toggle ${menuOpen ? "is-open" : ""}`}
@@ -249,37 +521,43 @@ export default function PortfolioView({ data, preview = false }) {
           <span />
           <span />
         </button>
+
         <nav className={`portfolio-nav ${menuOpen ? "is-open" : ""}`} aria-label="Section navigation">
           {navItems.map(([id, label]) => (
             <a key={id} href={`#${id}`} className={activeSection === id ? "is-active" : ""} onClick={closeMenu}>
               {label}
             </a>
           ))}
-          <a className="topbar-cta topbar-cta-mobile" href="#contact" onClick={closeMenu}>
+          <a className="topbar-cta topbar-cta-mobile" href="#contact" onClick={closeMenu} onPointerDown={triggerRipple}>
             Hire Me
           </a>
         </nav>
-        <a className="topbar-cta topbar-cta-desktop" href="#contact">
+
+        <a className="topbar-cta topbar-cta-desktop" href="#contact" onPointerDown={triggerRipple}>
           Hire Me
         </a>
       </header>
 
-      <section className="portfolio-hero-panel" data-reveal>
+      <section className={`portfolio-hero-panel ${heroReady ? "hero-ready" : ""}`} data-reveal>
         <div className="hero-copy">
-          <p className="portfolio-kicker">Current Profile</p>
-          <h1>{data.profile.name}</h1>
-          <h2>{data.profile.headline}</h2>
-          <p className="hero-summary">{data.profile.subheadline}</p>
-          <p className="hero-detail">{aboutPreview}</p>
-          <div className="hero-actions">
-            <a className="primary-button portfolio-button" href="#projects" onClick={closeMenu}>
+          <p className="portfolio-kicker hero-stagger">Current Profile</p>
+          <h1 className="hero-title hero-stagger">
+            <AnimatedText text={data.profile.name} mode="chars" className="hero-name-text" />
+          </h1>
+          <h2 className="hero-stagger">
+            <AnimatedText text={data.profile.headline} mode="words" className="hero-headline-text" />
+          </h2>
+          <p className="hero-summary hero-stagger">{data.profile.subheadline}</p>
+          <p className="hero-detail hero-stagger">{aboutPreview}</p>
+          <div className="hero-actions hero-stagger">
+            <a className="primary-button portfolio-button" href="#projects" onPointerDown={triggerRipple}>
               View Projects
             </a>
-            <a className="secondary-button portfolio-button" href="#contact" onClick={closeMenu}>
+            <a className="secondary-button portfolio-button" href="#contact" onPointerDown={triggerRipple}>
               Hire Me
             </a>
           </div>
-          <div className="hero-highlights">
+          <div className="hero-highlights hero-stagger">
             {topHighlights.map((item) => (
               <span key={item}>{item}</span>
             ))}
@@ -287,9 +565,9 @@ export default function PortfolioView({ data, preview = false }) {
         </div>
 
         <div className="hero-visual">
-          <div className="hero-glow hero-glow-one" aria-hidden="true" />
-          <div className="hero-glow hero-glow-two" aria-hidden="true" />
-          <div className="hero-image-frame">
+          <div className="hero-glow hero-glow-one" data-parallax-speed="0.22" aria-hidden="true" />
+          <div className="hero-glow hero-glow-two" data-parallax-speed="0.12" aria-hidden="true" />
+          <div className="hero-image-frame" data-parallax-speed="0.16">
             <div className="hero-image-grid" aria-hidden="true" />
             <img src={data.profile.image} alt={data.profile.name} className="portfolio-avatar" />
           </div>
@@ -303,7 +581,7 @@ export default function PortfolioView({ data, preview = false }) {
             label={item.label}
             value={item.value}
             suffix={item.suffix}
-            enabled={!preview && data?.theme?.animationsEnabled !== false}
+            enabled={!preview && motionEnabled}
           />
         ))}
       </section>
@@ -320,10 +598,10 @@ export default function PortfolioView({ data, preview = false }) {
           </p>
         </div>
         <div className="about-grid">
-          <article className="portfolio-card about-story">
+          <article className="portfolio-card about-story" data-parallax-speed="0.08">
             <div dangerouslySetInnerHTML={{ __html: data.profile.aboutHtml }} />
           </article>
-          <article className="portfolio-card highlight-card">
+          <article className="portfolio-card highlight-card" data-parallax-speed="0.12">
             <span className="detail-label">Focus Areas</span>
             <div className="highlight-list">
               {topHighlights.map((item, index) => (
@@ -350,7 +628,7 @@ export default function PortfolioView({ data, preview = false }) {
         </div>
         <div className="skill-category-grid">
           {groupedSkills.map((group) => (
-            <article key={group.category} className="skill-category-card">
+            <article key={group.category} className="skill-category-card" data-parallax-speed="0.09">
               <div className="skill-category-head">
                 <span className="skill-glyph">{group.glyph || "00"}</span>
                 <div>
@@ -391,7 +669,7 @@ export default function PortfolioView({ data, preview = false }) {
         <div className="journey-layout">
           <div className="timeline-stack">
             {data.experiences.map((item, index) => (
-              <article key={item.id} className="timeline-card">
+              <article key={item.id} className="timeline-card" data-parallax-speed="0.06">
                 <span className="timeline-marker">{`0${index + 1}`}</span>
                 <div className="timeline-body">
                   <small>{item.duration}</small>
@@ -403,7 +681,7 @@ export default function PortfolioView({ data, preview = false }) {
             ))}
           </div>
           <div className="journey-side">
-            <article className="portfolio-card journey-note">
+            <article className="portfolio-card journey-note" data-parallax-speed="0.09">
               <span className="detail-label">Working Style</span>
               <strong>Process-minded, calm under pressure, and focused on useful outcomes.</strong>
               <p>
@@ -411,7 +689,7 @@ export default function PortfolioView({ data, preview = false }) {
                 reporting, and digital presentation into one dependable workflow.
               </p>
             </article>
-            <article className="portfolio-card journey-note">
+            <article className="portfolio-card journey-note" data-parallax-speed="0.11">
               <span className="detail-label">Recognition</span>
               <div className="mini-achievement-list">
                 {data.achievements.map((item) => (
@@ -426,60 +704,79 @@ export default function PortfolioView({ data, preview = false }) {
         </div>
       </section>
 
-      <section className="portfolio-section" id="projects" data-section-id="projects" data-reveal>
-        <div className="portfolio-section-head">
-          <div>
+      <section className="portfolio-section portfolio-story-section" id="projects" data-section-id="projects" data-reveal data-progress-zone>
+        <div className="portfolio-story-layout">
+          <div className="portfolio-story-copy" data-parallax-speed="0.08">
             <p className="portfolio-kicker">Featured Projects</p>
             <h3>Execution That Looks Polished And Business-Ready</h3>
-          </div>
-          <p className="section-copy">
-            Selected work presented in a premium product-style layout, combining clean structure, clarity, and
-            conversion-oriented design.
-          </p>
-        </div>
-        <div className="projects-showcase">
-          {featuredProject ? (
-            <article className="featured-project-card">
-              {featuredProject.image ? (
-                <div className="featured-project-media">
-                  <img src={featuredProject.image} alt={featuredProject.title} className="project-image" />
-                </div>
-              ) : null}
-              <div className="featured-project-copy">
-                <div className="tag-row">
-                  {(featuredProject.tags || []).map((tag) => (
-                    <span key={tag}>{tag}</span>
-                  ))}
-                </div>
-                <strong>{featuredProject.title}</strong>
-                <p>{featuredProject.description}</p>
-                {featuredProject.liveLink ? (
-                  <a className="primary-button portfolio-button" href={featuredProject.liveLink} target="_blank" rel="noreferrer">
-                    View Live Site
-                  </a>
-                ) : null}
+            <p className="section-copy">
+              Scroll-aware project storytelling, premium motion, and a draggable slider combine product-style presentation
+              with recruiter-friendly clarity.
+            </p>
+            <div className="story-progress-row">
+              <span>{String(currentSlide + 1).padStart(2, "0")}</span>
+              <div className="story-progress-track">
+                <div className="story-progress-fill" style={{ width: `${((currentSlide + 1) / Math.max(storySlides.length, 1)) * 100}%` }} />
               </div>
-            </article>
-          ) : (
-            <article className="featured-project-card empty-project-card">
-              <strong>No featured project yet</strong>
-              <p>Add a project from the admin panel to populate this showcase.</p>
-            </article>
-          )}
+              <span>{String(storySlides.length).padStart(2, "0")}</span>
+            </div>
+          </div>
 
-          <div className="project-side-stack">
-            {projectSidePanels.map((panel) => (
-              <article key={panel.category} className="project-side-card">
-                <span className="project-side-icon">{panel.glyph || "00"}</span>
-                <strong>{panel.label || panel.category}</strong>
-                <p>{panel.description || "Capabilities shown here update from the skills manager."}</p>
-                <div className="tag-row">
-                  {panel.items.slice(0, 3).map((skill) => (
-                    <span key={skill.id}>{skill.name}</span>
-                  ))}
-                </div>
-              </article>
-            ))}
+          <div className="project-slider-shell">
+            <div
+              ref={sliderViewportRef}
+              className="project-slider-viewport"
+              onPointerDown={handleSliderPointerDown}
+              onPointerMove={handleSliderPointerMove}
+              onPointerUp={handleSliderPointerUp}
+              onPointerCancel={handleSliderPointerUp}
+              onMouseEnter={() => setSliderPaused(true)}
+              onMouseLeave={() => setSliderPaused(false)}
+            >
+              <div
+                className="project-slider-track"
+                style={{ transform: `translate3d(calc(-${currentSlide * 100}% + var(--drag-offset, 0px)), 0, 0)` }}
+              >
+                {storySlides.map((slide) => (
+                  <ProjectSlide key={slide.id} slide={slide} onRipple={triggerRipple} />
+                ))}
+              </div>
+            </div>
+
+            <div className="project-slider-controls">
+              <button type="button" className="slider-arrow" onClick={goToPreviousSlide} onPointerDown={triggerRipple} aria-label="Previous slide">
+                Prev
+              </button>
+              <div className="slider-dots">
+                {storySlides.map((slide, index) => (
+                  <button
+                    key={slide.id}
+                    type="button"
+                    className={`slider-dot ${index === currentSlide ? "is-active" : ""}`}
+                    onClick={() => goToSlide(index)}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                ))}
+              </div>
+              <button type="button" className="slider-arrow" onClick={goToNextSlide} onPointerDown={triggerRipple} aria-label="Next slide">
+                Next
+              </button>
+            </div>
+
+            <div className="project-side-stack">
+              {projectSidePanels.map((panel) => (
+                <article key={panel.category} className="project-side-card" data-parallax-speed="0.07">
+                  <span className="project-side-icon">{panel.glyph || "00"}</span>
+                  <strong>{panel.label || panel.category}</strong>
+                  <p>{panel.description || "Capabilities shown here update from the skills manager."}</p>
+                  <div className="tag-row">
+                    {panel.items.slice(0, 3).map((skill) => (
+                      <span key={skill.id}>{skill.name}</span>
+                    ))}
+                  </div>
+                </article>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -496,7 +793,7 @@ export default function PortfolioView({ data, preview = false }) {
         </div>
         <div className="achievement-grid">
           {data.achievements.map((item) => (
-            <article key={item.id} className="achievement-card">
+            <article key={item.id} className="achievement-card" data-parallax-speed="0.05">
               <span className="icon-pill">{achievementLabels[item.icon] || "Badge"}</span>
               <strong>{item.title}</strong>
               <p>{item.description}</p>
@@ -507,8 +804,8 @@ export default function PortfolioView({ data, preview = false }) {
 
       <section className="portfolio-section" id="contact" data-section-id="contact" data-reveal>
         <article className="contact-copy contact-copy-wide contact-showcase">
-          <div className="contact-glow-orb contact-glow-orb-one" aria-hidden="true" />
-          <div className="contact-glow-orb contact-glow-orb-two" aria-hidden="true" />
+          <div className="contact-glow-orb contact-glow-orb-one" data-parallax-speed="0.18" aria-hidden="true" />
+          <div className="contact-glow-orb contact-glow-orb-two" data-parallax-speed="0.12" aria-hidden="true" />
 
           <div className="contact-showcase-copy">
             <p className="portfolio-kicker">{contactSettings.kicker}</p>
@@ -516,22 +813,22 @@ export default function PortfolioView({ data, preview = false }) {
               <span className="contact-signal-dot" />
               <span>{contactSettings.availability}</span>
             </div>
-            <h3 dangerouslySetInnerHTML={{ __html: contactSettings.title }} />
+            <h3>{contactSettings.title}</h3>
             <p>{contactSettings.description}</p>
           </div>
 
           <div className="contact-channel-grid">
-            <a className="contact-channel-card" href={`mailto:${data.settings.email}`}>
+            <a className="contact-channel-card" href={`mailto:${data.settings.email}`} onPointerDown={triggerRipple}>
               <span className="contact-channel-label">Email</span>
               <strong>{data.settings.email}</strong>
               <small>Best for project discussion and formal communication.</small>
             </a>
-            <a className="contact-channel-card" href={`tel:${data.settings.phone.replace(/\s+/g, "")}`}>
+            <a className="contact-channel-card" href={`tel:${data.settings.phone.replace(/\s+/g, "")}`} onPointerDown={triggerRipple}>
               <span className="contact-channel-label">Phone</span>
               <strong>{data.settings.phone}</strong>
               <small>Direct call for quick coordination.</small>
             </a>
-            <a className="contact-channel-card contact-channel-card-accent" href={data.settings.whatsappLink} target="_blank" rel="noreferrer">
+            <a className="contact-channel-card contact-channel-card-accent" href={data.settings.whatsappLink} target="_blank" rel="noreferrer" onPointerDown={triggerRipple}>
               <span className="contact-channel-label">WhatsApp</span>
               <strong>Start Instant Chat</strong>
               <small>Fastest way to reach out for freelance or client work.</small>
@@ -555,7 +852,7 @@ export default function PortfolioView({ data, preview = false }) {
         <span>{data.settings.seoTitle}</span>
       </footer>
 
-      <a className="portfolio-whatsapp" href={data.settings.whatsappLink} target="_blank" rel="noreferrer">
+      <a className="portfolio-whatsapp" href={data.settings.whatsappLink} target="_blank" rel="noreferrer" onPointerDown={triggerRipple}>
         WhatsApp
       </a>
     </div>
