@@ -445,11 +445,15 @@ export default function PortfolioView({ data, preview = false }) {
   };
 
   const topHighlights = [
+    "Digital Marketing",
+    "Web & App Developer",
+    "Meta Ads",
+    "Deep Research With AI",
     data.skills?.[0]?.name,
     data.skills?.[1]?.name,
     data.skills?.[2]?.name,
     featuredProject?.title,
-  ].filter(Boolean);
+  ].filter((item, index, items) => item && items.indexOf(item) === index);
 
   const navItems = [
     ["hero", "Home"],
