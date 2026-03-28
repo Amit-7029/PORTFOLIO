@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-const categoryMeta = {
+const defaultCategoryMeta = {
   Accounting: {
     label: "Accounting",
     eyebrow: "Numbers & Control",
@@ -21,7 +21,7 @@ const categoryMeta = {
   },
 };
 
-const achievementLabels = {
+const defaultAchievementLabels = {
   award: "Award",
   certificate: "Certified",
   star: "Recognized",
@@ -167,8 +167,8 @@ function ProjectSlide({ slide, onRipple }) {
       <div className="story-slide-media" data-parallax-speed="0.18">
         {slide.image ? <img src={slide.image} alt={slide.title} className="story-slide-image" loading="lazy" /> : null}
       </div>
-      <div className="story-slide-copy">
-        <span className="story-slide-eyebrow">Project Spotlight</span>
+        <div className="story-slide-copy">
+        <span className="story-slide-eyebrow">{slide.eyebrow || "Project Spotlight"}</span>
         <strong>{slide.title}</strong>
         <p>{slide.description}</p>
         <div className="tag-row">
@@ -196,6 +196,10 @@ export default function PortfolioView({ data, preview = false }) {
   const [heroReady, setHeroReady] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [sliderPaused, setSliderPaused] = useState(false);
+  const siteConfig = data?.siteConfig || {};
+  const sectionConfig = data?.sections || {};
+  const categoryMeta = siteConfig.skillCategoryMeta || defaultCategoryMeta;
+  const achievementLabels = siteConfig.achievementIconLabels || defaultAchievementLabels;
 
   const groupedSkills = useMemo(() => {
     if (!data?.skills) return [];
@@ -211,9 +215,9 @@ export default function PortfolioView({ data, preview = false }) {
       id: slugify(category || `category-${index + 1}`),
       items,
       average: Math.round(items.reduce((sum, skill) => sum + Number(skill.level || 0), 0) / Math.max(items.length, 1)),
-      ...categoryMeta[category],
+      ...(categoryMeta[category] || {}),
     }));
-  }, [data]);
+  }, [data, categoryMeta]);
 
   const featuredProject = useMemo(() => {
     if (!data?.projects?.length) return null;
@@ -236,6 +240,7 @@ export default function PortfolioView({ data, preview = false }) {
       image: project.image,
       liveLink: project.liveLink,
       tags: project.tags || [],
+      eyebrow: sectionConfig.projects?.projectEyebrow || "Project Spotlight",
     }));
 
     const supportSlides = groupedSkills.slice(0, 3).map((group) => ({
@@ -248,7 +253,7 @@ export default function PortfolioView({ data, preview = false }) {
     }));
 
     return [...projectSlides, ...supportSlides].slice(0, Math.max(3, projectSlides.length || 0));
-  }, [data, groupedSkills]);
+  }, [data, groupedSkills, sectionConfig.projects?.projectEyebrow]);
 
   const statTargets = useMemo(
     () => [
@@ -416,12 +421,20 @@ export default function PortfolioView({ data, preview = false }) {
     "--portfolio-primary": data.theme.primaryColor,
     "--portfolio-secondary": data.theme.secondaryColor,
     "--portfolio-bg": data.theme.backgroundColor,
+    "--portfolio-text": data.theme.textColor || "#f6f7fb",
+    "--portfolio-muted": data.theme.mutedTextColor || "#91a1bf",
+    "--portfolio-surface": data.theme.surfaceColor || "rgba(10, 16, 28, 0.76)",
+    "--portfolio-border": data.theme.borderColor || "rgba(255, 255, 255, 0.08)",
     "--portfolio-font":
       data.theme.fontFamily === "Inter"
         ? "Inter, sans-serif"
         : data.theme.fontFamily === "Manrope"
           ? "Manrope, sans-serif"
           : "Poppins, sans-serif",
+    "--section-padding": `${data.theme.sectionPadding || 28}px`,
+    "--panel-radius": `${data.theme.cardRadius || 30}px`,
+    "--body-scale": data.theme.bodyScale || 1,
+    "--heading-scale": data.theme.headingScale || 1,
     "--motion-base": `${0.72 * speedFactor}s`,
     "--motion-delay-step": `${0.085 * speedFactor}s`,
     "--motion-char-step": `${22 * speedFactor}ms`,
@@ -434,35 +447,32 @@ export default function PortfolioView({ data, preview = false }) {
   };
 
   const aboutPreview = stripHtml(data.profile.aboutHtml);
-  const contactSettings = {
-    kicker: data.settings.contactKicker || "Contact",
-    title: data.settings.contactTitle || "Ready to support your business with polished execution",
-    description:
-      data.settings.contactDescription ||
-      "Open to opportunities where financial accuracy, digital visibility, and practical web execution can create stronger business results.",
-    availability:
-      data.settings.contactAvailability || "Available for business support, portfolio websites, and growth-focused freelance work.",
-  };
+  const heroSection = sectionConfig.hero || {};
+  const aboutSection = sectionConfig.about || {};
+  const skillsSection = sectionConfig.skills || {};
+  const experienceSection = sectionConfig.experience || {};
+  const projectsSection = sectionConfig.projects || {};
+  const achievementsSection = sectionConfig.achievements || {};
+  const contactSection = sectionConfig.contact || {};
+  const footerSection = sectionConfig.footer || {};
 
   const topHighlights = [
-    "Digital Marketing",
-    "Web & App Developer",
-    "Meta Ads",
-    "Deep Research With AI",
+    ...(heroSection.highlightItems || []),
     data.skills?.[0]?.name,
     data.skills?.[1]?.name,
     data.skills?.[2]?.name,
     featuredProject?.title,
   ].filter((item, index, items) => item && items.indexOf(item) === index);
 
-  const navItems = [
-    ["hero", "Home"],
-    ["about", "About"],
-    ["skills", "Skills"],
-    ["experience", "Journey"],
-    ["projects", "Projects"],
-    ["contact", "Contact"],
-  ];
+  const navItems = (siteConfig.sectionOrder || ["hero", "about", "skills", "experience", "projects", "achievements", "contact", "footer"])
+    .filter((id) => id !== "footer" && sectionConfig[id]?.visible !== false)
+    .map((id) => [id, sectionConfig[id]?.navLabel || id]);
+  const orderedSectionIds = siteConfig.sectionOrder || ["hero", "about", "skills", "experience", "projects", "achievements", "contact", "footer"];
+
+  function sectionOrderStyle(sectionId, offset = 0) {
+    const index = orderedSectionIds.indexOf(sectionId);
+    return { order: index === -1 ? 999 : index * 10 + offset };
+  }
 
   function closeMenu() {
     setMenuOpen(false);
@@ -522,12 +532,12 @@ export default function PortfolioView({ data, preview = false }) {
     >
       <div className="portfolio-noise" aria-hidden="true" />
 
-      <header className="portfolio-topbar" data-reveal data-section-id="hero" id="hero">
+      <header className="portfolio-topbar" data-reveal data-section-id="hero">
         <a className="portfolio-brand" href="#hero" onClick={closeMenu}>
-          <span className="brand-mark">AK</span>
+          <span className="brand-mark">{siteConfig.brandMark || "AK"}</span>
           <span className="brand-copy">
             <strong>{data.profile.name}</strong>
-            <small>Portfolio System</small>
+            <small>{siteConfig.brandSubtitle || "Portfolio System"}</small>
           </span>
         </a>
 
@@ -549,17 +559,18 @@ export default function PortfolioView({ data, preview = false }) {
               {label}
             </a>
           ))}
-          <a className="topbar-cta topbar-cta-mobile" href="#contact" onClick={closeMenu} onPointerDown={triggerRipple}>
-            Hire Me
+          <a className="topbar-cta topbar-cta-mobile" href={siteConfig.primaryNavButtonLink || "#contact"} onClick={closeMenu} onPointerDown={triggerRipple}>
+            {siteConfig.primaryNavButtonText || "Hire Me"}
           </a>
         </nav>
 
-        <a className="topbar-cta topbar-cta-desktop" href="#contact" onPointerDown={triggerRipple}>
-          Hire Me
+        <a className="topbar-cta topbar-cta-desktop" href={siteConfig.primaryNavButtonLink || "#contact"} onPointerDown={triggerRipple}>
+          {siteConfig.primaryNavButtonText || "Hire Me"}
         </a>
       </header>
 
-      <section className={`portfolio-hero-panel is-visible ${heroReady ? "hero-ready" : ""}`} data-progress-zone>
+      {heroSection.visible !== false ? (
+      <section className={`portfolio-hero-panel is-visible ${heroReady ? "hero-ready" : ""}`} data-progress-zone id="hero" style={sectionOrderStyle("hero", 0)}>
         <div className="hero-intro-curtain" aria-hidden="true" />
         <div className="hero-ambient" aria-hidden="true">
           <span className="hero-ambient-orb hero-ambient-orb-one" />
@@ -573,7 +584,7 @@ export default function PortfolioView({ data, preview = false }) {
         </div>
 
         <div className="hero-copy">
-          <p className="portfolio-kicker hero-stagger">Current Profile</p>
+          <p className="portfolio-kicker hero-stagger">{heroSection.kicker || "Current Profile"}</p>
           <h1 className="hero-title hero-stagger">
             <AnimatedText text={data.profile.name} mode="chars" className="hero-name-text" />
           </h1>
@@ -583,11 +594,11 @@ export default function PortfolioView({ data, preview = false }) {
           <p className="hero-summary hero-stagger">{data.profile.subheadline}</p>
           <p className="hero-detail hero-stagger">{aboutPreview}</p>
           <div className="hero-actions hero-stagger">
-            <a className="primary-button portfolio-button" href="#projects" onPointerDown={triggerRipple}>
-              View Projects
+            <a className="primary-button portfolio-button" href={heroSection.primaryButtonLink || "#projects"} onPointerDown={triggerRipple}>
+              {heroSection.primaryButtonText || "View Projects"}
             </a>
-            <a className="secondary-button portfolio-button" href="#contact" onPointerDown={triggerRipple}>
-              Hire Me
+            <a className="secondary-button portfolio-button" href={heroSection.secondaryButtonLink || "#contact"} onPointerDown={triggerRipple}>
+              {heroSection.secondaryButtonText || "Hire Me"}
             </a>
           </div>
           <div className="hero-highlights hero-stagger">
@@ -596,7 +607,7 @@ export default function PortfolioView({ data, preview = false }) {
             ))}
           </div>
           <a className="hero-scroll-indicator hero-stagger" href="#about" onPointerDown={triggerRipple}>
-            <span className="hero-scroll-label">Scroll to explore</span>
+            <span className="hero-scroll-label">{heroSection.scrollLabel || "Scroll to explore"}</span>
             <span className="hero-scroll-arrow" aria-hidden="true">
               <span />
             </span>
@@ -621,8 +632,10 @@ export default function PortfolioView({ data, preview = false }) {
           </div>
         </div>
       </section>
+      ) : null}
 
-      <section className="hero-stats-grid" data-reveal>
+      {heroSection.visible !== false ? (
+      <section className="hero-stats-grid" data-reveal style={sectionOrderStyle("hero", 1)}>
         {statTargets.map((item) => (
           <StatCounter
             key={item.label}
@@ -633,24 +646,23 @@ export default function PortfolioView({ data, preview = false }) {
           />
         ))}
       </section>
+      ) : null}
 
-      <section className="portfolio-section" id="about" data-section-id="about" data-reveal>
+      {aboutSection.visible !== false ? (
+      <section className="portfolio-section" id="about" data-section-id="about" data-reveal style={sectionOrderStyle("about")}>
         <div className="portfolio-section-head">
           <div>
-            <p className="portfolio-kicker">About</p>
-            <h3>Professional Summary</h3>
+            <p className="portfolio-kicker">{aboutSection.kicker || "About"}</p>
+            <h3>{aboutSection.title || "Professional Summary"}</h3>
           </div>
-          <p className="section-copy">
-            A practical business support profile combining accounting discipline, digital growth awareness, and hands-on
-            execution for real clients.
-          </p>
+          <p className="section-copy">{aboutSection.description}</p>
         </div>
         <div className="about-grid">
           <article className="portfolio-card about-story" data-parallax-speed="0.08">
             <div dangerouslySetInnerHTML={{ __html: data.profile.aboutHtml }} />
           </article>
           <article className="portfolio-card highlight-card" data-parallax-speed="0.12">
-            <span className="detail-label">Focus Areas</span>
+            <span className="detail-label">{aboutSection.highlightLabel || "Focus Areas"}</span>
             <div className="highlight-list">
               {topHighlights.map((item, index) => (
                 <div key={item} className="highlight-row">
@@ -662,17 +674,16 @@ export default function PortfolioView({ data, preview = false }) {
           </article>
         </div>
       </section>
+      ) : null}
 
-      <section className="portfolio-section" id="skills" data-section-id="skills" data-reveal>
+      {skillsSection.visible !== false ? (
+      <section className="portfolio-section" id="skills" data-section-id="skills" data-reveal style={sectionOrderStyle("skills")}>
         <div className="portfolio-section-head">
           <div>
-            <p className="portfolio-kicker">Core Competencies</p>
-            <h3>Multi-Skilled Capability Stack</h3>
+            <p className="portfolio-kicker">{skillsSection.kicker || "Core Competencies"}</p>
+            <h3>{skillsSection.title || "Multi-Skilled Capability Stack"}</h3>
           </div>
-          <p className="section-copy">
-            Structured across business operations, growth support, and technical execution so the portfolio feels like a
-            complete professional system.
-          </p>
+          <p className="section-copy">{skillsSection.description}</p>
         </div>
         <div className="skill-category-grid">
           {groupedSkills.map((group) => (
@@ -702,17 +713,16 @@ export default function PortfolioView({ data, preview = false }) {
           ))}
         </div>
       </section>
+      ) : null}
 
-      <section className="portfolio-section" id="experience" data-section-id="experience" data-reveal>
+      {experienceSection.visible !== false ? (
+      <section className="portfolio-section" id="experience" data-section-id="experience" data-reveal style={sectionOrderStyle("experience")}>
         <div className="portfolio-section-head">
           <div>
-            <p className="portfolio-kicker">Professional Journey</p>
-            <h3>Experience That Connects Accuracy With Growth</h3>
+            <p className="portfolio-kicker">{experienceSection.kicker || "Professional Journey"}</p>
+            <h3>{experienceSection.title || "Experience That Connects Accuracy With Growth"}</h3>
           </div>
-          <p className="section-copy">
-            From day-to-day financial handling to practical digital execution, the timeline reflects reliable, adaptable
-            business support.
-          </p>
+          <p className="section-copy">{experienceSection.description}</p>
         </div>
         <div className="journey-layout">
           <div className="timeline-stack">
@@ -730,15 +740,12 @@ export default function PortfolioView({ data, preview = false }) {
           </div>
           <div className="journey-side">
             <article className="portfolio-card journey-note" data-parallax-speed="0.09">
-              <span className="detail-label">Working Style</span>
-              <strong>Process-minded, calm under pressure, and focused on useful outcomes.</strong>
-              <p>
-                The strongest value here is not just skill range, but the ability to connect records, communication,
-                reporting, and digital presentation into one dependable workflow.
-              </p>
+              <span className="detail-label">{experienceSection.sideNoteLabel || "Working Style"}</span>
+              <strong>{experienceSection.sideNoteTitle}</strong>
+              <p>{experienceSection.sideNoteDescription}</p>
             </article>
             <article className="portfolio-card journey-note" data-parallax-speed="0.11">
-              <span className="detail-label">Recognition</span>
+              <span className="detail-label">{experienceSection.recognitionLabel || "Recognition"}</span>
               <div className="mini-achievement-list">
                 {data.achievements.map((item) => (
                   <div key={item.id} className="mini-achievement">
@@ -751,16 +758,15 @@ export default function PortfolioView({ data, preview = false }) {
           </div>
         </div>
       </section>
+      ) : null}
 
-      <section className="portfolio-section portfolio-story-section" id="projects" data-section-id="projects" data-reveal data-progress-zone>
+      {projectsSection.visible !== false ? (
+      <section className="portfolio-section portfolio-story-section" id="projects" data-section-id="projects" data-reveal data-progress-zone style={sectionOrderStyle("projects")}>
         <div className="portfolio-story-layout">
           <div className="portfolio-story-copy" data-parallax-speed="0.08">
-            <p className="portfolio-kicker">Featured Projects</p>
-            <h3>Execution That Looks Polished And Business-Ready</h3>
-            <p className="section-copy">
-              Scroll-aware project storytelling, premium motion, and a draggable slider combine product-style presentation
-              with recruiter-friendly clarity.
-            </p>
+            <p className="portfolio-kicker">{projectsSection.kicker || "Featured Projects"}</p>
+            <h3>{projectsSection.title || "Execution That Looks Polished And Business-Ready"}</h3>
+            <p className="section-copy">{projectsSection.description}</p>
             <div className="story-progress-row">
               <span>{String(currentSlide + 1).padStart(2, "0")}</span>
               <div className="story-progress-track">
@@ -828,16 +834,16 @@ export default function PortfolioView({ data, preview = false }) {
           </div>
         </div>
       </section>
+      ) : null}
 
-      <section className="portfolio-section" id="achievements" data-section-id="achievements" data-reveal>
+      {achievementsSection.visible !== false ? (
+      <section className="portfolio-section" id="achievements" data-section-id="achievements" data-reveal style={sectionOrderStyle("achievements")}>
         <div className="portfolio-section-head">
           <div>
-            <p className="portfolio-kicker">Achievements</p>
-            <h3>Recognition And Learning Milestones</h3>
+            <p className="portfolio-kicker">{achievementsSection.kicker || "Achievements"}</p>
+            <h3>{achievementsSection.title || "Recognition And Learning Milestones"}</h3>
           </div>
-          <p className="section-copy">
-            Proof of consistency, curiosity, and the ability to keep growing across business, tools, and execution.
-          </p>
+          <p className="section-copy">{achievementsSection.description}</p>
         </div>
         <div className="achievement-grid">
           {data.achievements.map((item) => (
@@ -849,37 +855,39 @@ export default function PortfolioView({ data, preview = false }) {
           ))}
         </div>
       </section>
+      ) : null}
 
-      <section className="portfolio-section" id="contact" data-section-id="contact" data-reveal>
+      {contactSection.visible !== false ? (
+      <section className="portfolio-section" id="contact" data-section-id="contact" data-reveal style={sectionOrderStyle("contact")}>
         <article className="contact-copy contact-copy-wide contact-showcase">
           <div className="contact-glow-orb contact-glow-orb-one" data-parallax-speed="0.18" aria-hidden="true" />
           <div className="contact-glow-orb contact-glow-orb-two" data-parallax-speed="0.12" aria-hidden="true" />
 
           <div className="contact-showcase-copy">
-            <p className="portfolio-kicker">{contactSettings.kicker}</p>
+            <p className="portfolio-kicker">{contactSection.kicker || "Contact"}</p>
             <div className="contact-signal">
               <span className="contact-signal-dot" />
-              <span>{contactSettings.availability}</span>
+              <span>{contactSection.availability}</span>
             </div>
-            <h3>{contactSettings.title}</h3>
-            <p>{contactSettings.description}</p>
+            <h3>{contactSection.title}</h3>
+            <p>{contactSection.description}</p>
           </div>
 
           <div className="contact-channel-grid">
             <a className="contact-channel-card" href={`mailto:${data.settings.email}`} onPointerDown={triggerRipple}>
-              <span className="contact-channel-label">Email</span>
+              <span className="contact-channel-label">{contactSection.emailLabel || "Email"}</span>
               <strong>{data.settings.email}</strong>
-              <small>Best for project discussion and formal communication.</small>
+              <small>{contactSection.emailHint}</small>
             </a>
             <a className="contact-channel-card" href={`tel:${data.settings.phone.replace(/\s+/g, "")}`} onPointerDown={triggerRipple}>
-              <span className="contact-channel-label">Phone</span>
+              <span className="contact-channel-label">{contactSection.phoneLabel || "Phone"}</span>
               <strong>{data.settings.phone}</strong>
-              <small>Direct call for quick coordination.</small>
+              <small>{contactSection.phoneHint}</small>
             </a>
             <a className="contact-channel-card contact-channel-card-accent" href={data.settings.whatsappLink} target="_blank" rel="noreferrer" onPointerDown={triggerRipple}>
-              <span className="contact-channel-label">WhatsApp</span>
-              <strong>Start Instant Chat</strong>
-              <small>Fastest way to reach out for freelance or client work.</small>
+              <span className="contact-channel-label">{contactSection.whatsappLabel || "WhatsApp"}</span>
+              <strong>{contactSection.whatsappTitle || "Start Instant Chat"}</strong>
+              <small>{contactSection.whatsappHint}</small>
             </a>
           </div>
 
@@ -891,14 +899,17 @@ export default function PortfolioView({ data, preview = false }) {
           ) : null}
         </article>
       </section>
+      ) : null}
 
-      <footer className="portfolio-footer" data-reveal>
+      {footerSection.visible !== false ? (
+      <footer className="portfolio-footer" data-reveal style={sectionOrderStyle("footer")}>
         <div>
           <strong>{data.profile.name}</strong>
           <p>{data.profile.headline}</p>
         </div>
-        <span>{data.settings.seoTitle}</span>
+        <span>{footerSection.seoFallback || data.settings.seoTitle}</span>
       </footer>
+      ) : null}
 
       <a className="portfolio-whatsapp" href={data.settings.whatsappLink} target="_blank" rel="noreferrer" onPointerDown={triggerRipple}>
         WhatsApp

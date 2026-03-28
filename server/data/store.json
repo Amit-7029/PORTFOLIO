@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-03-27T00:00:00.000Z",
+  "updatedAt": "2026-03-28T06:21:46.100Z",
   "adminUser": {
     "username": "admin",
     "passwordHash": "$2b$10$a.c7f1tlPfHSV8H/JQ7Qa.v7Yq9.noNRevX8gZxJbXt9IqOKYaQEa"
@@ -11,6 +11,48 @@
     "aboutHtml": "<p>I am a motivated and detail-oriented professional with practical experience in Tally Prime, vendor ledger handling, purchase entries, pharmacy billing operations, and day-to-day business record support.</p><p>I combine accounting discipline with a strong interest in digital tools, web technology, and business growth.</p>",
     "image": "/media/amit-kumar-shaw.jpeg"
   },
+  "siteConfig": {
+    "brandMark": "AK",
+    "brandSubtitle": "Portfolio System",
+    "primaryNavButtonText": "Hire Me",
+    "primaryNavButtonLink": "#contact",
+    "sectionOrder": [
+      "hero",
+      "about",
+      "skills",
+      "experience",
+      "projects",
+      "achievements",
+      "contact",
+      "footer"
+    ],
+    "achievementIconLabels": {
+      "award": "Award",
+      "certificate": "Certified",
+      "star": "Recognized",
+      "bolt": "Fast Learner"
+    },
+    "skillCategoryMeta": {
+      "Accounting": {
+        "label": "Accounting",
+        "eyebrow": "Numbers & Control",
+        "description": "Ledger accuracy, billing discipline, and dependable financial workflow support.",
+        "glyph": "01"
+      },
+      "Digital Marketing": {
+        "label": "Digital Marketing",
+        "eyebrow": "Reach & Growth",
+        "description": "Practical campaign thinking for Meta Ads, visibility, and SEO-oriented content structure.",
+        "glyph": "02"
+      },
+      "Technical": {
+        "label": "Technical",
+        "eyebrow": "Build & Improve",
+        "description": "Responsive websites, productivity systems, and AI-assisted execution for faster outcomes.",
+        "glyph": "03"
+      }
+    }
+  },
   "theme": {
     "primaryColor": "#7c9cff",
     "secondaryColor": "#9e7cff",
@@ -18,6 +60,14 @@
     "backgroundColor": "#0a0a0b",
     "fontFamily": "Inter",
     "buttonStyle": "rounded",
+    "textColor": "#f6f7fb",
+    "mutedTextColor": "#91a1bf",
+    "surfaceColor": "rgba(10, 16, 28, 0.76)",
+    "borderColor": "rgba(255, 255, 255, 0.08)",
+    "sectionPadding": 28,
+    "cardRadius": 30,
+    "bodyScale": 1,
+    "headingScale": 1,
     "animationsEnabled": true,
     "animationSpeed": "medium",
     "parallaxEnabled": true,
@@ -30,14 +80,128 @@
     "sliderAutoplayEnabled": true,
     "animationIntensity": "high"
   },
+  "sections": {
+    "hero": {
+      "visible": true,
+      "navLabel": "Home",
+      "kicker": "Current Profile",
+      "primaryButtonText": "View Projects",
+      "primaryButtonLink": "#projects",
+      "secondaryButtonText": "Hire Me",
+      "secondaryButtonLink": "#contact",
+      "scrollLabel": "Scroll to explore",
+      "highlightItems": [
+        "Digital Marketing",
+        "Web & App Developer",
+        "Meta Ads",
+        "Deep Research With AI"
+      ]
+    },
+    "about": {
+      "visible": true,
+      "navLabel": "About",
+      "kicker": "About",
+      "title": "Professional Summary",
+      "description": "A practical business support profile combining accounting discipline, digital growth awareness, and hands-on execution for real clients.",
+      "highlightLabel": "Focus Areas"
+    },
+    "skills": {
+      "visible": true,
+      "navLabel": "Skills",
+      "kicker": "Core Competencies",
+      "title": "Multi-Skilled Capability Stack",
+      "description": "Structured across business operations, growth support, and technical execution so the portfolio feels like a complete professional system."
+    },
+    "experience": {
+      "visible": true,
+      "navLabel": "Journey",
+      "kicker": "Professional Journey",
+      "title": "Experience That Connects Accuracy With Growth",
+      "description": "From day-to-day financial handling to practical digital execution, the timeline reflects reliable, adaptable business support.",
+      "sideNoteLabel": "Working Style",
+      "sideNoteTitle": "Process-minded, calm under pressure, and focused on useful outcomes.",
+      "sideNoteDescription": "The strongest value here is not just skill range, but the ability to connect records, communication, reporting, and digital presentation into one dependable workflow.",
+      "recognitionLabel": "Recognition"
+    },
+    "projects": {
+      "visible": true,
+      "navLabel": "Projects",
+      "kicker": "Featured Projects",
+      "title": "Execution That Looks Polished And Business-Ready",
+      "description": "Scroll-aware project storytelling, premium motion, and a draggable slider combine product-style presentation with recruiter-friendly clarity.",
+      "projectEyebrow": "Project Spotlight"
+    },
+    "achievements": {
+      "visible": true,
+      "navLabel": "Achievements",
+      "kicker": "Achievements",
+      "title": "Recognition And Learning Milestones",
+      "description": "Proof of consistency, curiosity, and the ability to keep growing across business, tools, and execution."
+    },
+    "contact": {
+      "visible": true,
+      "navLabel": "Contact",
+      "kicker": "Contact",
+      "availability": "Open for freelance work, business support roles, and growth-focused projects.",
+      "title": "Ready to support your business with polished execution",
+      "description": "Reach out for accounting support, portfolio website work, or practical digital growth help. The section styling, title, and support copy can now be updated directly from the admin panel.",
+      "emailLabel": "Email",
+      "emailHint": "Best for project discussion and formal communication.",
+      "phoneLabel": "Phone",
+      "phoneHint": "Direct call for quick coordination.",
+      "whatsappLabel": "WhatsApp",
+      "whatsappTitle": "Start Instant Chat",
+      "whatsappHint": "Fastest way to reach out for freelance or client work."
+    },
+    "footer": {
+      "visible": true,
+      "navLabel": "Footer",
+      "seoFallback": "Portfolio CMS"
+    }
+  },
   "skills": [
-    { "id": "skill_1", "category": "Accounting", "name": "Tally Prime", "level": 90 },
-    { "id": "skill_2", "category": "Accounting", "name": "Vendor Ledger", "level": 88 },
-    { "id": "skill_3", "category": "Digital Marketing", "name": "Meta Ads", "level": 80 },
-    { "id": "skill_4", "category": "Digital Marketing", "name": "SEO Optimization", "level": 75 },
-    { "id": "skill_5", "category": "Technical", "name": "Web Development", "level": 80 },
-    { "id": "skill_6", "category": "Technical", "name": "Excel", "level": 85 },
-    { "id": "skill_7", "category": "Technical", "name": "ChatGPT Tools", "level": 90 }
+    {
+      "id": "skill_1",
+      "category": "Accounting",
+      "name": "Tally Prime",
+      "level": 90
+    },
+    {
+      "id": "skill_2",
+      "category": "Accounting",
+      "name": "Vendor Ledger",
+      "level": 88
+    },
+    {
+      "id": "skill_3",
+      "category": "Digital Marketing",
+      "name": "Meta Ads",
+      "level": 80
+    },
+    {
+      "id": "skill_4",
+      "category": "Digital Marketing",
+      "name": "SEO Optimization",
+      "level": 75
+    },
+    {
+      "id": "skill_5",
+      "category": "Technical",
+      "name": "Web Development",
+      "level": 80
+    },
+    {
+      "id": "skill_6",
+      "category": "Technical",
+      "name": "Excel",
+      "level": 85
+    },
+    {
+      "id": "skill_7",
+      "category": "Technical",
+      "name": "ChatGPT Tools",
+      "level": 90
+    }
   ],
   "experiences": [
     {
@@ -62,7 +226,12 @@
       "description": "A real website project created to present healthcare services in a clean, trustworthy, and user-friendly format for local business visibility.",
       "image": "/media/hospital-project.jpeg",
       "liveLink": "https://website-for-hospaccx.vercel.app/",
-      "tags": ["HTML", "CSS", "Responsive UI", "SEO Basics"],
+      "tags": [
+        "HTML",
+        "CSS",
+        "Responsive UI",
+        "SEO Basics"
+      ],
       "featured": true
     }
   ],

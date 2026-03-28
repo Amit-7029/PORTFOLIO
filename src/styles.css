@@ -2922,3 +2922,70 @@ td {
     animation-duration: 8.5s;
   }
 }
+
+.portfolio-frame {
+  color: var(--portfolio-text, #f6f7fb);
+  font-size: calc(1rem * var(--body-scale, 1));
+}
+
+.portfolio-topbar,
+.portfolio-hero-panel,
+.stat-card,
+.portfolio-card,
+.skill-category-card,
+.timeline-card,
+.project-side-card,
+.achievement-card,
+.contact-copy,
+.portfolio-footer,
+.story-slide-card {
+  background: var(--portfolio-surface, rgba(10, 16, 28, 0.76));
+  border-color: var(--portfolio-border, rgba(255, 255, 255, 0.08));
+}
+
+.portfolio-hero-panel,
+.portfolio-section,
+.portfolio-footer {
+  padding: var(--section-padding, 28px);
+  border-radius: var(--panel-radius, 30px);
+}
+
+.portfolio-topbar,
+.stat-card,
+.portfolio-card,
+.skill-category-card,
+.timeline-card,
+.project-side-card,
+.achievement-card,
+.contact-copy,
+.portfolio-footer,
+.story-slide-card {
+  border-radius: var(--panel-radius, 30px);
+}
+
+.portfolio-frame p,
+.portfolio-frame span,
+.portfolio-frame small,
+.portfolio-frame .section-copy,
+.portfolio-frame .hero-detail,
+.portfolio-frame .timeline-card p,
+.portfolio-frame .contact-copy p,
+.portfolio-frame .project-side-card p,
+.portfolio-frame .achievement-card p {
+  color: var(--portfolio-muted, #91a1bf);
+}
+
+.portfolio-frame h1,
+.portfolio-frame h2,
+.portfolio-frame h3,
+.portfolio-frame strong,
+.portfolio-frame .brand-copy strong,
+.portfolio-frame .contact-channel-card strong {
+  color: var(--portfolio-text, #f6f7fb);
+}
+
+.portfolio-hero-panel h1,
+.portfolio-hero-panel h2,
+.portfolio-section h3 {
+  font-size: calc(1em * var(--heading-scale, 1));
+}

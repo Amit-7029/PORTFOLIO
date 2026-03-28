@@ -2,9 +2,10 @@ const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
 const { randomUUID } = require("node:crypto");
+const path = require("node:path");
 const { readStore, updateStore } = require("./utils/store");
 const { comparePassword, signToken, verifyToken } = require("./utils/auth");
-const { getFirebaseConfig } = require("./utils/firebaseAdmin");
+const { getFirebaseConfig, getFirebaseServices } = require("./utils/firebaseAdmin");
 const { getCloudinaryConfig, uploadBuffer, destroyAsset } = require("./utils/cloudinary");
 
 const app = express();
@@ -56,6 +57,36 @@ async function uploadToCloudinary(file) {
   return uploadBuffer(file);
 }
 
+async function uploadToFirebaseStorage(file) {
+  const services = getFirebaseServices();
+  if (!services.storageConfigured || !services.bucket) {
+    throw new Error("Firebase Storage is not configured");
+  }
+
+  const extension = path.extname(file.originalname || "") || ".bin";
+  const baseName = path
+    .basename(file.originalname || "upload", extension)
+    .replace(/[^a-zA-Z0-9-_]+/g, "-")
+    .slice(0, 60);
+  const storagePath = `portfolio-media/${Date.now()}-${baseName || "asset"}${extension}`;
+  const object = services.bucket.file(storagePath);
+
+  await object.save(file.buffer, {
+    metadata: { contentType: file.mimetype },
+    resumable: false,
+  });
+
+  const [url] = await object.getSignedUrl({
+    action: "read",
+    expires: "03-01-2500",
+  });
+
+  return {
+    url,
+    storagePath,
+  };
+}
+
 function createListHandlers(key) {
   return {
     list: asyncHandler(async (_req, res) => {
@@ -102,10 +133,12 @@ app.use(express.json({ limit: "10mb" }));
 app.get("/health", (_req, res) => {
   const firebase = getFirebaseConfig();
   const cloudinary = getCloudinaryConfig();
+  const firebaseServices = getFirebaseServices();
 
   res.json({
     ok: true,
     firebaseConfigured: firebase.configured,
+    firebaseStorageConfigured: firebaseServices.storageConfigured,
     cloudinaryConfigured: cloudinary.configured,
     persistenceMode: firebase.configured && cloudinary.configured ? "firestore-with-cloudinary-fallback" : firebase.configured ? "firestore" : cloudinary.configured ? "cloudinary" : "json-fallback",
   });
@@ -186,6 +219,24 @@ app.put("/api/theme", authMiddleware, asyncHandler(async (req, res) => {
   res.json(store.theme);
 }));
 
+app.put("/api/site-config", authMiddleware, asyncHandler(async (req, res) => {
+  const store = await updateStore((current) => {
+    current.siteConfig = { ...current.siteConfig, ...req.body };
+    return current;
+  });
+  broadcast("portfolio:update", sanitizeStore(store));
+  res.json(store.siteConfig);
+}));
+
+app.put("/api/sections", authMiddleware, asyncHandler(async (req, res) => {
+  const store = await updateStore((current) => {
+    current.sections = { ...current.sections, ...req.body };
+    return current;
+  });
+  broadcast("portfolio:update", sanitizeStore(store));
+  res.json(store.sections);
+}));
+
 app.get("/api/settings", authMiddleware, asyncHandler(async (_req, res) => {
   const store = await readStore();
   res.json(store.settings);
@@ -239,15 +290,29 @@ app.post("/api/media/upload", authMiddleware, upload.single("file"), asyncHandle
     return res.status(400).json({ message: "Only image uploads are supported" });
   }
 
-  const uploaded = await uploadToCloudinary(req.file);
+  let uploaded = null;
+  let provider = "firebase";
+
+  try {
+    uploaded = await uploadToFirebaseStorage(req.file);
+  } catch (error) {
+    const cloudinary = getCloudinaryConfig();
+    if (!cloudinary.configured) {
+      throw error;
+    }
+    uploaded = await uploadToCloudinary(req.file);
+    provider = "cloudinary";
+  }
+
   const media = {
     id: createId("media"),
     name: req.file.originalname,
     url: uploaded.url,
     type: req.file.mimetype,
     createdAt: new Date().toISOString(),
-    provider: "cloudinary",
-    publicId: uploaded.publicId,
+    provider,
+    publicId: uploaded.publicId || null,
+    storagePath: uploaded.storagePath || null,
   };
 
   const store = await updateStore((current) => {
@@ -262,6 +327,13 @@ app.delete("/api/media/:id", authMiddleware, asyncHandler(async (req, res) => {
   const store = await readStore();
   const media = store.media.find((item) => item.id === req.params.id);
   if (!media) return res.status(404).json({ message: "Not found" });
+
+  if (media.provider === "firebase" && media.storagePath) {
+    const services = getFirebaseServices();
+    if (services.storageConfigured && services.bucket) {
+      await services.bucket.file(media.storagePath).delete({ ignoreNotFound: true });
+    }
+  }
 
   if (media.provider === "cloudinary" && media.publicId) {
     await destroyAsset(media.publicId);

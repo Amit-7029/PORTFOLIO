@@ -11,6 +11,8 @@ const sections = [
   "dashboard",
   "profile",
   "theme",
+  "site",
+  "content",
   "skills",
   "projects",
   "experience",
@@ -21,6 +23,82 @@ const sections = [
 ];
 
 const iconOptions = ["award", "certificate", "star", "bolt"];
+const cmsSectionKeys = ["hero", "about", "skills", "experience", "projects", "achievements", "contact", "footer"];
+
+const contentFieldMap = {
+  hero: [
+    { key: "visible", label: "Visible", type: "toggle" },
+    { key: "navLabel", label: "Nav Label" },
+    { key: "kicker", label: "Kicker" },
+    { key: "primaryButtonText", label: "Primary Button Text" },
+    { key: "primaryButtonLink", label: "Primary Button Link" },
+    { key: "secondaryButtonText", label: "Secondary Button Text" },
+    { key: "secondaryButtonLink", label: "Secondary Button Link" },
+    { key: "scrollLabel", label: "Scroll Label" },
+    { key: "highlightItems", label: "Highlight Items", type: "list" },
+  ],
+  about: [
+    { key: "visible", label: "Visible", type: "toggle" },
+    { key: "navLabel", label: "Nav Label" },
+    { key: "kicker", label: "Kicker" },
+    { key: "title", label: "Title" },
+    { key: "description", label: "Description", type: "textarea" },
+    { key: "highlightLabel", label: "Highlight Label" },
+  ],
+  skills: [
+    { key: "visible", label: "Visible", type: "toggle" },
+    { key: "navLabel", label: "Nav Label" },
+    { key: "kicker", label: "Kicker" },
+    { key: "title", label: "Title" },
+    { key: "description", label: "Description", type: "textarea" },
+  ],
+  experience: [
+    { key: "visible", label: "Visible", type: "toggle" },
+    { key: "navLabel", label: "Nav Label" },
+    { key: "kicker", label: "Kicker" },
+    { key: "title", label: "Title" },
+    { key: "description", label: "Description", type: "textarea" },
+    { key: "sideNoteLabel", label: "Side Note Label" },
+    { key: "sideNoteTitle", label: "Side Note Title" },
+    { key: "sideNoteDescription", label: "Side Note Description", type: "textarea" },
+    { key: "recognitionLabel", label: "Recognition Label" },
+  ],
+  projects: [
+    { key: "visible", label: "Visible", type: "toggle" },
+    { key: "navLabel", label: "Nav Label" },
+    { key: "kicker", label: "Kicker" },
+    { key: "title", label: "Title" },
+    { key: "description", label: "Description", type: "textarea" },
+    { key: "projectEyebrow", label: "Project Eyebrow" },
+  ],
+  achievements: [
+    { key: "visible", label: "Visible", type: "toggle" },
+    { key: "navLabel", label: "Nav Label" },
+    { key: "kicker", label: "Kicker" },
+    { key: "title", label: "Title" },
+    { key: "description", label: "Description", type: "textarea" },
+  ],
+  contact: [
+    { key: "visible", label: "Visible", type: "toggle" },
+    { key: "navLabel", label: "Nav Label" },
+    { key: "kicker", label: "Kicker" },
+    { key: "availability", label: "Availability" },
+    { key: "title", label: "Title" },
+    { key: "description", label: "Description", type: "textarea" },
+    { key: "emailLabel", label: "Email Label" },
+    { key: "emailHint", label: "Email Hint", type: "textarea" },
+    { key: "phoneLabel", label: "Phone Label" },
+    { key: "phoneHint", label: "Phone Hint", type: "textarea" },
+    { key: "whatsappLabel", label: "WhatsApp Label" },
+    { key: "whatsappTitle", label: "WhatsApp Title" },
+    { key: "whatsappHint", label: "WhatsApp Hint", type: "textarea" },
+  ],
+  footer: [
+    { key: "visible", label: "Visible", type: "toggle" },
+    { key: "navLabel", label: "Nav Label" },
+    { key: "seoFallback", label: "Footer Text" },
+  ],
+};
 
 function createEmpty(section) {
   switch (section) {
@@ -48,6 +126,7 @@ export default function AdminPage() {
   const [messages, setMessages] = useState([]);
   const [pendingDelete, setPendingDelete] = useState(null);
   const [dragging, setDragging] = useState(false);
+  const [draggedSectionId, setDraggedSectionId] = useState(null);
 
   useEffect(() => {
     async function init() {
@@ -76,6 +155,29 @@ export default function AdminPage() {
     setDraft((current) => ({ ...current, [path]: { ...current[path], ...value } }));
   }
 
+  function updateSectionDraft(sectionKey, value) {
+    setDraft((current) => ({
+      ...current,
+      sections: {
+        ...current.sections,
+        [sectionKey]: {
+          ...current.sections[sectionKey],
+          ...value,
+        },
+      },
+    }));
+  }
+
+  function updateSiteConfig(value) {
+    setDraft((current) => ({
+      ...current,
+      siteConfig: {
+        ...current.siteConfig,
+        ...value,
+      },
+    }));
+  }
+
   async function persist(path, payload) {
     const data = await apiFetch(`/api/${path}`, {
       method: "PUT",
@@ -86,6 +188,18 @@ export default function AdminPage() {
     const dashboard = await apiFetch("/api/dashboard/stats");
     setStats(dashboard);
     toast({ title: "Saved", message: `${path} updated successfully.`, type: "success" });
+  }
+
+  async function persistMapped(path, stateKey, payload) {
+    const data = await apiFetch(`/api/${path}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    });
+    setDraft((current) => ({ ...current, [stateKey]: data }));
+    setPortfolio((current) => ({ ...current, [stateKey]: data }));
+    const dashboard = await apiFetch("/api/dashboard/stats");
+    setStats(dashboard);
+    toast({ title: "Saved", message: `${stateKey} updated successfully.`, type: "success" });
   }
 
   async function saveListItem(key, item) {
@@ -163,6 +277,25 @@ export default function AdminPage() {
     navigate("/admin/login");
   }
 
+  function moveSection(sectionKey, targetIndex) {
+    setDraft((current) => {
+      const order = [...(current.siteConfig?.sectionOrder || cmsSectionKeys)];
+      const sourceIndex = order.indexOf(sectionKey);
+      if (sourceIndex === -1 || targetIndex < 0 || targetIndex >= order.length) {
+        return current;
+      }
+      order.splice(sourceIndex, 1);
+      order.splice(targetIndex, 0, sectionKey);
+      return {
+        ...current,
+        siteConfig: {
+          ...current.siteConfig,
+          sectionOrder: order,
+        },
+      };
+    });
+  }
+
   const cards = useMemo(
     () => [
       { label: "Total Projects", value: stats?.totalProjects ?? 0 },
@@ -175,6 +308,58 @@ export default function AdminPage() {
 
   if (!draft) {
     return <div className="screen-center">Loading admin...</div>;
+  }
+
+  function renderDynamicField(sectionKey, field) {
+    const value = draft.sections?.[sectionKey]?.[field.key];
+
+    if (field.type === "toggle") {
+      return (
+        <label key={field.key} className="toggle-field">
+          {field.label}
+          <input
+            type="checkbox"
+            checked={Boolean(value)}
+            onChange={(event) => updateSectionDraft(sectionKey, { [field.key]: event.target.checked })}
+          />
+        </label>
+      );
+    }
+
+    if (field.type === "textarea") {
+      return (
+        <label key={field.key} className="full-span">
+          {field.label}
+          <textarea value={value || ""} onChange={(event) => updateSectionDraft(sectionKey, { [field.key]: event.target.value })} />
+        </label>
+      );
+    }
+
+    if (field.type === "list") {
+      return (
+        <label key={field.key} className="full-span">
+          {field.label}
+          <input
+            value={Array.isArray(value) ? value.join(", ") : ""}
+            onChange={(event) =>
+              updateSectionDraft(sectionKey, {
+                [field.key]: event.target.value
+                  .split(",")
+                  .map((item) => item.trim())
+                  .filter(Boolean),
+              })
+            }
+          />
+        </label>
+      );
+    }
+
+    return (
+      <label key={field.key} className={field.key.toLowerCase().includes("link") ? "full-span" : ""}>
+        {field.label}
+        <input value={value || ""} onChange={(event) => updateSectionDraft(sectionKey, { [field.key]: event.target.value })} />
+      </label>
+    );
   }
 
   const renderSection = () => {
@@ -241,6 +426,8 @@ export default function AdminPage() {
                 </select>
               </label>
               <label>Background Color<input type="color" value={draft.theme.backgroundColor} onChange={(e) => updateDraft("theme", { backgroundColor: e.target.value })} /></label>
+              <label>Text Color<input type="color" value={draft.theme.textColor || "#f6f7fb"} onChange={(e) => updateDraft("theme", { textColor: e.target.value })} /></label>
+              <label>Muted Text Color<input type="color" value={draft.theme.mutedTextColor || "#91a1bf"} onChange={(e) => updateDraft("theme", { mutedTextColor: e.target.value })} /></label>
               <label>Font Family
                 <select value={draft.theme.fontFamily} onChange={(e) => updateDraft("theme", { fontFamily: e.target.value })}>
                   <option value="Inter">Inter</option>
@@ -248,11 +435,25 @@ export default function AdminPage() {
                   <option value="Poppins">Poppins</option>
                 </select>
               </label>
+              <label>Surface Color<input value={draft.theme.surfaceColor || "rgba(10, 16, 28, 0.76)"} onChange={(e) => updateDraft("theme", { surfaceColor: e.target.value })} /></label>
+              <label>Border Color<input value={draft.theme.borderColor || "rgba(255, 255, 255, 0.08)"} onChange={(e) => updateDraft("theme", { borderColor: e.target.value })} /></label>
               <label>Button Style
                 <select value={draft.theme.buttonStyle} onChange={(e) => updateDraft("theme", { buttonStyle: e.target.value })}>
                   <option value="rounded">Rounded</option>
                   <option value="square">Square</option>
                 </select>
+              </label>
+              <label>Section Padding
+                <input type="number" value={draft.theme.sectionPadding || 28} onChange={(e) => updateDraft("theme", { sectionPadding: Number(e.target.value) || 0 })} />
+              </label>
+              <label>Card Radius
+                <input type="number" value={draft.theme.cardRadius || 30} onChange={(e) => updateDraft("theme", { cardRadius: Number(e.target.value) || 0 })} />
+              </label>
+              <label>Body Scale
+                <input type="number" step="0.05" value={draft.theme.bodyScale || 1} onChange={(e) => updateDraft("theme", { bodyScale: Number(e.target.value) || 1 })} />
+              </label>
+              <label>Heading Scale
+                <input type="number" step="0.05" value={draft.theme.headingScale || 1} onChange={(e) => updateDraft("theme", { headingScale: Number(e.target.value) || 1 })} />
               </label>
               <label>Animation Speed
                 <select value={draft.theme.animationSpeed || "medium"} onChange={(e) => updateDraft("theme", { animationSpeed: e.target.value })}>
@@ -301,6 +502,74 @@ export default function AdminPage() {
             </div>
             <div className="panel-actions">
               <button className="primary-button" onClick={() => persist("theme", draft.theme)}>Save Theme</button>
+            </div>
+          </section>
+        );
+      case "site":
+        return (
+          <section className="admin-panel">
+            <div className="panel-head"><div><p className="section-label">Site Builder</p><h2>Navigation, Layout & Order</h2></div></div>
+            <div className="form-grid">
+              <label>Brand Mark<input value={draft.siteConfig.brandMark || ""} onChange={(e) => updateSiteConfig({ brandMark: e.target.value })} /></label>
+              <label>Brand Subtitle<input value={draft.siteConfig.brandSubtitle || ""} onChange={(e) => updateSiteConfig({ brandSubtitle: e.target.value })} /></label>
+              <label>Primary Nav Button Text<input value={draft.siteConfig.primaryNavButtonText || ""} onChange={(e) => updateSiteConfig({ primaryNavButtonText: e.target.value })} /></label>
+              <label>Primary Nav Button Link<input value={draft.siteConfig.primaryNavButtonLink || ""} onChange={(e) => updateSiteConfig({ primaryNavButtonLink: e.target.value })} /></label>
+            </div>
+            <div className="stack-list" style={{ marginTop: "20px" }}>
+              {(draft.siteConfig.sectionOrder || cmsSectionKeys).map((sectionKey, index) => (
+                <article
+                  key={sectionKey}
+                  className="editor-card"
+                  draggable
+                  onDragStart={() => setDraggedSectionId(sectionKey)}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={() => {
+                    if (!draggedSectionId || draggedSectionId === sectionKey) return;
+                    const targetIndex = (draft.siteConfig.sectionOrder || cmsSectionKeys).indexOf(sectionKey);
+                    moveSection(draggedSectionId, targetIndex);
+                    setDraggedSectionId(null);
+                  }}
+                  onDragEnd={() => setDraggedSectionId(null)}
+                >
+                  <div className="panel-head" style={{ marginBottom: 0 }}>
+                    <div>
+                      <p className="section-label">{`Section ${String(index + 1).padStart(2, "0")}`}</p>
+                      <h2 style={{ fontSize: "1.1rem" }}>{sectionKey}</h2>
+                    </div>
+                    <div className="quick-actions">
+                      <button type="button" className="ghost-button" onClick={() => moveSection(sectionKey, index - 1)}>Up</button>
+                      <button type="button" className="ghost-button" onClick={() => moveSection(sectionKey, index + 1)}>Down</button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <div className="panel-actions">
+              <button className="primary-button" onClick={() => persistMapped("site-config", "siteConfig", draft.siteConfig)}>Save Site Config</button>
+            </div>
+          </section>
+        );
+      case "content":
+        return (
+          <section className="admin-panel">
+            <div className="panel-head"><div><p className="section-label">Content</p><h2>All Section Content</h2></div></div>
+            <div className="stack-list">
+              {(draft.siteConfig.sectionOrder || cmsSectionKeys).map((sectionKey) => (
+                <article key={sectionKey} className="editor-card">
+                  <div className="panel-head">
+                    <div>
+                      <p className="section-label">Section</p>
+                      <h2 style={{ fontSize: "1.15rem" }}>{sectionKey}</h2>
+                    </div>
+                  </div>
+                  <div className="form-grid">
+                    {(contentFieldMap[sectionKey] || []).map((field) => renderDynamicField(sectionKey, field))}
+                  </div>
+                </article>
+              ))}
+            </div>
+            <div className="panel-actions">
+              <button className="primary-button" onClick={() => persistMapped("sections", "sections", draft.sections)}>Save Section Content</button>
             </div>
           </section>
         );
