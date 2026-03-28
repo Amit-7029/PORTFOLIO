@@ -774,12 +774,12 @@ td {
 
 .portfolio-hero-panel h2 {
   margin: -6px 0 0;
-  font-size: clamp(1.15rem, 2vw, 1.7rem);
-  max-width: 720px;
+  font-size: clamp(0.98rem, 1.4vw, 1.28rem);
+  max-width: 100%;
   overflow-wrap: anywhere;
   font-family: Poppins, sans-serif;
   font-weight: 700;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.035em;
   color: var(--portfolio-text, #f6f7fb);
   text-shadow: none;
 }
@@ -3832,8 +3832,9 @@ td {
   max-width: none;
   color: var(--portfolio-text, #f6f7fb);
   text-shadow: none;
-  line-height: 1.18;
+  line-height: 1.15;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .hero-role-heading {
@@ -3860,10 +3861,13 @@ td {
   }
 
   .hero-role-line,
-  .hero-role-text,
   .hero-summary,
   .hero-detail {
     max-width: none;
+  }
+
+  .hero-role-line {
+    white-space: normal;
   }
 }
 
