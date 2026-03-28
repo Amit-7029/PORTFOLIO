@@ -23,7 +23,7 @@ const sections = [
 ];
 
 const iconOptions = ["award", "certificate", "star", "bolt"];
-const cmsSectionKeys = ["hero", "about", "skills", "experience", "projects", "achievements", "contact", "footer"];
+const cmsSectionKeys = ["hero", "about", "skills", "projects", "achievements", "contact", "footer"];
 
 const contentFieldMap = {
   hero: [
@@ -52,17 +52,6 @@ const contentFieldMap = {
     { key: "kicker", label: "Kicker" },
     { key: "title", label: "Title" },
     { key: "description", label: "Description", type: "textarea" },
-  ],
-  experience: [
-    { key: "visible", label: "Visible", type: "toggle" },
-    { key: "navLabel", label: "Nav Label" },
-    { key: "kicker", label: "Kicker" },
-    { key: "title", label: "Title" },
-    { key: "description", label: "Description", type: "textarea" },
-    { key: "sideNoteLabel", label: "Side Note Label" },
-    { key: "sideNoteTitle", label: "Side Note Title" },
-    { key: "sideNoteDescription", label: "Side Note Description", type: "textarea" },
-    { key: "recognitionLabel", label: "Recognition Label" },
   ],
   projects: [
     { key: "visible", label: "Visible", type: "toggle" },

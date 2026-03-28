@@ -460,7 +460,6 @@ export default function PortfolioView({ data, preview = false }) {
   const heroSection = sectionConfig.hero || {};
   const aboutSection = sectionConfig.about || {};
   const skillsSection = sectionConfig.skills || {};
-  const experienceSection = sectionConfig.experience || {};
   const projectsSection = sectionConfig.projects || {};
   const achievementsSection = sectionConfig.achievements || {};
   const contactSection = sectionConfig.contact || {};
@@ -474,10 +473,12 @@ export default function PortfolioView({ data, preview = false }) {
     featuredProject?.title,
   ].filter((item, index, items) => item && items.indexOf(item) === index);
 
-  const navItems = (siteConfig.sectionOrder || ["hero", "about", "skills", "experience", "projects", "achievements", "contact", "footer"])
-    .filter((id) => id !== "footer" && sectionConfig[id]?.visible !== false)
+  const navItems = (siteConfig.sectionOrder || ["hero", "about", "skills", "projects", "achievements", "contact", "footer"])
+    .filter((id) => id !== "footer" && id !== "experience" && sectionConfig[id]?.visible !== false)
     .map((id) => [id, sectionConfig[id]?.navLabel || id]);
-  const orderedSectionIds = siteConfig.sectionOrder || ["hero", "about", "skills", "experience", "projects", "achievements", "contact", "footer"];
+  const orderedSectionIds = (siteConfig.sectionOrder || ["hero", "about", "skills", "projects", "achievements", "contact", "footer"]).filter(
+    (id) => id !== "experience",
+  );
   const sectionHeadClassName = `portfolio-section-head ${siteConfig.sectionHeadingAlign === "center" ? "is-centered" : ""}`;
 
   function sectionOrderStyle(sectionId, offset = 0) {
@@ -726,51 +727,6 @@ export default function PortfolioView({ data, preview = false }) {
               </div>
             </article>
           ))}
-        </div>
-      </section>
-      ) : null}
-
-      {experienceSection.visible !== false ? (
-      <section className="portfolio-section" id="experience" data-section-id="experience" data-reveal style={sectionOrderStyle("experience")}>
-        <div className={sectionHeadClassName}>
-          <div>
-            <p className="portfolio-kicker">{experienceSection.kicker || "Professional Journey"}</p>
-            <h3>{experienceSection.title || "Experience That Connects Accuracy With Growth"}</h3>
-          </div>
-          <p className="section-copy">{experienceSection.description}</p>
-        </div>
-        <div className="journey-layout">
-          <div className="timeline-stack">
-            {data.experiences.map((item, index) => (
-              <article key={item.id} className="timeline-card" data-parallax-speed="0.06">
-                <span className="timeline-marker">{`0${index + 1}`}</span>
-                <div className="timeline-body">
-                  <small>{item.duration}</small>
-                  <strong>{item.role}</strong>
-                  <span>{item.company}</span>
-                  <p>{item.description}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-          <div className="journey-side">
-            <article className="portfolio-card journey-note" data-parallax-speed="0.09">
-              <span className="detail-label">{experienceSection.sideNoteLabel || "Working Style"}</span>
-              <strong>{experienceSection.sideNoteTitle}</strong>
-              <p>{experienceSection.sideNoteDescription}</p>
-            </article>
-            <article className="portfolio-card journey-note" data-parallax-speed="0.11">
-              <span className="detail-label">{experienceSection.recognitionLabel || "Recognition"}</span>
-              <div className="mini-achievement-list">
-                {data.achievements.map((item) => (
-                  <div key={item.id} className="mini-achievement">
-                    <span>{achievementLabels[item.icon] || "Highlight"}</span>
-                    <strong>{item.title}</strong>
-                  </div>
-                ))}
-              </div>
-            </article>
-          </div>
         </div>
       </section>
       ) : null}
