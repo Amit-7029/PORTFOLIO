@@ -1,23 +1,29 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 const defaultCategoryMeta = {
-  Accounting: {
-    label: "Accounting",
-    eyebrow: "Numbers & Control",
-    description: "Ledger accuracy, billing discipline, and dependable financial workflow support.",
+  Marketing: {
+    label: "Marketing",
+    eyebrow: "Reach & Conversion",
+    description: "Campaign execution, audience targeting, and social growth support built around real business outcomes.",
     glyph: "01",
   },
-  "Digital Marketing": {
-    label: "Digital Marketing",
-    eyebrow: "Reach & Growth",
-    description: "Practical campaign thinking for Meta Ads, visibility, and SEO-oriented content structure.",
+  Tech: {
+    label: "Tech",
+    eyebrow: "Web & Build",
+    description: "Professional websites, responsive layouts, and digital assets that improve trust and usability.",
     glyph: "02",
   },
-  Technical: {
-    label: "Technical",
-    eyebrow: "Build & Improve",
-    description: "Responsive websites, productivity systems, and AI-assisted execution for faster outcomes.",
+  Analytics: {
+    label: "Analytics",
+    eyebrow: "Data & Reporting",
+    description: "Excel-based analysis, structured reporting, and business-friendly data support for clearer decisions.",
     glyph: "03",
+  },
+  "AI Tools": {
+    label: "AI Tools",
+    eyebrow: "Research & Speed",
+    description: "AI-assisted research, idea development, and productivity workflows for faster, smarter execution.",
+    glyph: "04",
   },
 };
 
@@ -551,6 +557,7 @@ export default function PortfolioView({ data, preview = false }) {
   const aboutPreview = stripHtml(data.profile.aboutHtml);
   const heroSection = sectionConfig.hero || {};
   const aboutSection = sectionConfig.about || {};
+  const servicesSection = sectionConfig.services || {};
   const skillsSection = sectionConfig.skills || {};
   const experienceSection = sectionConfig.experience || {};
   const projectsSection = sectionConfig.projects || {};
@@ -582,7 +589,7 @@ export default function PortfolioView({ data, preview = false }) {
     { key: "email", href: data.settings.email ? `mailto:${data.settings.email}` : "", label: "Email" },
   ].filter((item) => item.href);
 
-  const defaultOrder = ["hero", "about", "skills", "experience", "projects", "achievements", "contact", "footer"];
+  const defaultOrder = ["hero", "about", "services", "skills", "experience", "projects", "achievements", "contact", "footer"];
   const normalizedOrder = [...(siteConfig.sectionOrder || defaultOrder)];
   if (sectionConfig.experience && !normalizedOrder.includes("experience")) {
     const insertIndex = normalizedOrder.indexOf("projects");
@@ -858,6 +865,27 @@ export default function PortfolioView({ data, preview = false }) {
               ))}
             </div>
           </article>
+        </div>
+      </section>
+      ) : null}
+
+      {servicesSection.visible !== false ? (
+      <section className="portfolio-section" id="services" data-section-id="services" data-reveal style={sectionOrderStyle("services")}>
+        <div className={sectionHeadClassName}>
+          <div>
+            <p className="portfolio-kicker">{servicesSection.kicker || "Services"}</p>
+            <h3>{servicesSection.title || "What I Help Businesses With"}</h3>
+          </div>
+          <p className="section-copy">{servicesSection.description}</p>
+        </div>
+        <div className="services-grid">
+          {(data.services || []).map((service, index) => (
+            <article key={service.id || `${service.title}-${index}`} className="service-card" data-parallax-speed="0.07">
+              <span className="service-index">{String(index + 1).padStart(2, "0")}</span>
+              <strong>{service.title}</strong>
+              <p>{service.description}</p>
+            </article>
+          ))}
         </div>
       </section>
       ) : null}

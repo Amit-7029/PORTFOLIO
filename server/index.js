@@ -252,6 +252,7 @@ app.put("/api/settings", authMiddleware, asyncHandler(async (req, res) => {
 }));
 
 const skillsApi = createListHandlers("skills");
+const servicesApi = createListHandlers("services");
 const experiencesApi = createListHandlers("experiences");
 const projectsApi = createListHandlers("projects");
 const achievementsApi = createListHandlers("achievements");
@@ -260,6 +261,11 @@ app.get("/api/skills", authMiddleware, skillsApi.list);
 app.post("/api/skills", authMiddleware, skillsApi.create);
 app.put("/api/skills/:id", authMiddleware, skillsApi.update);
 app.delete("/api/skills/:id", authMiddleware, skillsApi.remove);
+
+app.get("/api/services", authMiddleware, servicesApi.list);
+app.post("/api/services", authMiddleware, servicesApi.create);
+app.put("/api/services/:id", authMiddleware, servicesApi.update);
+app.delete("/api/services/:id", authMiddleware, servicesApi.remove);
 
 app.get("/api/experiences", authMiddleware, experiencesApi.list);
 app.post("/api/experiences", authMiddleware, experiencesApi.create);

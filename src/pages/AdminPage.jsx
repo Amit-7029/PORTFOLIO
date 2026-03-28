@@ -13,6 +13,7 @@ const sections = [
   "theme",
   "site",
   "content",
+  "services",
   "skills",
   "projects",
   "experience",
@@ -23,7 +24,7 @@ const sections = [
 ];
 
 const iconOptions = ["award", "certificate", "star", "bolt"];
-const cmsSectionKeys = ["hero", "about", "skills", "experience", "projects", "achievements", "contact", "footer"];
+const cmsSectionKeys = ["hero", "about", "services", "skills", "experience", "projects", "achievements", "contact", "footer"];
 
 const contentFieldMap = {
   hero: [
@@ -47,6 +48,13 @@ const contentFieldMap = {
     { key: "title", label: "Title" },
     { key: "description", label: "Description", type: "textarea" },
     { key: "highlightLabel", label: "Highlight Label" },
+  ],
+  services: [
+    { key: "visible", label: "Visible", type: "toggle" },
+    { key: "navLabel", label: "Nav Label" },
+    { key: "kicker", label: "Kicker" },
+    { key: "title", label: "Title" },
+    { key: "description", label: "Description", type: "textarea" },
   ],
   skills: [
     { key: "visible", label: "Visible", type: "toggle" },
@@ -109,8 +117,10 @@ const contentFieldMap = {
 
 function createEmpty(section) {
   switch (section) {
+    case "services":
+      return { title: "", description: "" };
     case "skills":
-      return { category: "Accounting", name: "", level: 50 };
+      return { category: "Marketing", name: "", level: 50 };
     case "projects":
       return { title: "", description: "", image: "", liveLink: "", tags: [], featured: false };
     case "experiences":
@@ -621,6 +631,8 @@ export default function AdminPage() {
             </div>
           </section>
         );
+      case "services":
+        return renderListSection("services", draft.services, ["title", "description"]);
       case "skills":
         return renderListSection("skills", draft.skills, ["category", "name", "level"]);
       case "projects":
@@ -741,9 +753,10 @@ export default function AdminPage() {
                       <label key={field}>
                         Category
                         <select value={item.category} onChange={(e) => updateListItem(key, item.id, field, e.target.value)}>
-                          <option>Accounting</option>
-                          <option>Digital Marketing</option>
-                          <option>Technical</option>
+                          <option>Marketing</option>
+                          <option>Tech</option>
+                          <option>Analytics</option>
+                          <option>AI Tools</option>
                         </select>
                       </label>
                     );
