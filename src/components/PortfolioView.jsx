@@ -527,6 +527,21 @@ export default function PortfolioView({ data, preview = false }) {
     };
   }, [preview, parallaxEnabled, intensityFactor]);
 
+  useEffect(() => {
+    if (preview) return undefined;
+
+    const onScroll = () => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+      const progress = Math.min(scrollTop / maxScroll, 1);
+      setScrollProgress(progress);
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [preview]);
+
   if (!data) {
     return <div className="empty-state">Loading portfolio...</div>;
   }
@@ -626,21 +641,6 @@ export default function PortfolioView({ data, preview = false }) {
   function closeMenu() {
     setMenuOpen(false);
   }
-
-  useEffect(() => {
-    if (preview) return undefined;
-
-    const onScroll = () => {
-      const scrollTop = window.scrollY || document.documentElement.scrollTop;
-      const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
-      const progress = Math.min(scrollTop / maxScroll, 1);
-      setScrollProgress(progress);
-    };
-
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [preview]);
 
   function handleContactFieldChange(field, value) {
     setContactForm((current) => ({ ...current, [field]: value }));
