@@ -527,6 +527,18 @@ export default function PortfolioView({ data, preview = false }) {
   const achievementsSection = sectionConfig.achievements || {};
   const contactSection = sectionConfig.contact || {};
   const footerSection = sectionConfig.footer || {};
+  const projectVisualCards = [
+    {
+      image: projectsSection.visualPrimaryImage || "/media/ai-tools-showcase.png",
+      label: projectsSection.visualPrimaryLabel || "AI Research & Tools",
+      title: projectsSection.visualPrimaryTitle || "Smart workflow support for faster execution",
+    },
+    {
+      image: projectsSection.visualSecondaryImage || "/media/meta-showcase.webp",
+      label: projectsSection.visualSecondaryLabel || "Meta Ads",
+      title: projectsSection.visualSecondaryTitle || "Campaign-focused digital growth",
+    },
+  ].filter((item) => item.image || item.label || item.title);
 
   const topHighlights = [
     ...(heroSection.highlightItems || []),
@@ -871,22 +883,22 @@ export default function PortfolioView({ data, preview = false }) {
               </div>
               <span>{String(storySlides.length).padStart(2, "0")}</span>
             </div>
-            <div className="story-visual-stack" data-parallax-speed="0.05">
-              <article className="story-visual-card story-visual-card-main">
-                <img src="/media/ai-tools-showcase.png" alt="AI tools showcase" className="story-visual-image" loading="lazy" />
-                <div className="story-visual-overlay">
-                  <span>AI Research & Tools</span>
-                  <strong>Smart workflow support for faster execution</strong>
-                </div>
-              </article>
-              <article className="story-visual-card story-visual-card-floating">
-                <img src="/media/meta-showcase.webp" alt="Meta marketing showcase" className="story-visual-image" loading="lazy" />
-                <div className="story-visual-overlay story-visual-overlay-compact">
-                  <span>Meta Ads</span>
-                  <strong>Campaign-focused digital growth</strong>
-                </div>
-              </article>
-            </div>
+            {projectVisualCards.length ? (
+              <div className="story-visual-stack" data-parallax-speed="0.05">
+                {projectVisualCards.map((card, index) => (
+                  <article
+                    key={`${card.label}-${index}`}
+                    className={`story-visual-card ${index === 0 ? "story-visual-card-main" : "story-visual-card-secondary"}`}
+                  >
+                    {card.image ? <img src={card.image} alt={card.label || `Project visual ${index + 1}`} className="story-visual-image" loading="lazy" /> : null}
+                    <div className={`story-visual-overlay ${index === 1 ? "story-visual-overlay-compact" : ""}`}>
+                      {card.label ? <span>{card.label}</span> : null}
+                      {card.title ? <strong>{card.title}</strong> : null}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : null}
           </div>
 
           <div className="project-slider-shell">

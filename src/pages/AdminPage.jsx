@@ -77,6 +77,12 @@ const contentFieldMap = {
     { key: "title", label: "Title" },
     { key: "description", label: "Description", type: "textarea" },
     { key: "projectEyebrow", label: "Project Eyebrow" },
+    { key: "visualPrimaryImage", label: "Primary Visual Image", type: "media-select" },
+    { key: "visualPrimaryLabel", label: "Primary Visual Label" },
+    { key: "visualPrimaryTitle", label: "Primary Visual Title" },
+    { key: "visualSecondaryImage", label: "Secondary Visual Image", type: "media-select" },
+    { key: "visualSecondaryLabel", label: "Secondary Visual Label" },
+    { key: "visualSecondaryTitle", label: "Secondary Visual Title" },
   ],
   achievements: [
     { key: "visible", label: "Visible", type: "toggle" },
@@ -398,6 +404,24 @@ export default function AdminPage() {
             }
             placeholder={"2+ | Experience\n8+ | Projects\n12+ | Technologies\n4+ | Clients"}
           />
+        </label>
+      );
+    }
+
+    if (field.type === "media-select") {
+      return (
+        <label key={field.key} className="full-span">
+          {field.label}
+          <select value={value || ""} onChange={(event) => updateSectionDraft(sectionKey, { [field.key]: event.target.value })}>
+            <option value="">No image</option>
+            {media.map((mediaItem) => (
+              <option key={mediaItem.id} value={mediaItem.url}>
+                {mediaItem.name}
+              </option>
+            ))}
+            <option value="/media/ai-tools-showcase.png">ai-tools-showcase.png</option>
+            <option value="/media/meta-showcase.webp">meta-showcase.webp</option>
+          </select>
         </label>
       );
     }

@@ -166,7 +166,13 @@
       "kicker": "Portfolio",
       "title": "Case Study Built Around Real Business Value",
       "description": "A focused project showcase that explains the business problem, the solution delivered, and the real outcome created.",
-      "projectEyebrow": "Case Study"
+      "projectEyebrow": "Case Study",
+      "visualPrimaryImage": "/media/ai-tools-showcase.png",
+      "visualPrimaryLabel": "AI Research & Tools",
+      "visualPrimaryTitle": "Smart workflow support for faster execution",
+      "visualSecondaryImage": "/media/meta-showcase.webp",
+      "visualSecondaryLabel": "Meta Ads",
+      "visualSecondaryTitle": "Campaign-focused digital growth"
     },
     "achievements": {
       "visible": true,

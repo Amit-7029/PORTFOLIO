@@ -2411,8 +2411,9 @@ td {
 
 .story-visual-stack {
   position: relative;
+  display: grid;
+  gap: 18px;
   margin-top: 14px;
-  min-height: 420px;
 }
 
 .story-visual-card {
@@ -2428,17 +2429,9 @@ td {
     0 26px 60px rgba(0, 0, 0, 0.28);
 }
 
-.story-visual-card-main {
-  min-height: 420px;
-}
-
-.story-visual-card-floating {
-  position: absolute;
-  right: -6px;
-  bottom: -18px;
-  width: min(240px, 48%);
-  min-height: 170px;
-  border-radius: 24px;
+.story-visual-card-main,
+.story-visual-card-secondary {
+  min-height: 260px;
 }
 
 .story-visual-image {
@@ -2711,12 +2704,9 @@ td {
     transform: none;
   }
 
-  .story-visual-stack {
-    min-height: 360px;
-  }
-
-  .story-visual-card-main {
-    min-height: 360px;
+  .story-visual-card-main,
+  .story-visual-card-secondary {
+    min-height: 240px;
   }
 }
 
@@ -2743,18 +2733,9 @@ td {
     justify-content: center;
   }
 
-  .story-visual-stack {
-    min-height: 0;
-  }
-
-  .story-visual-card-main {
-    min-height: 280px;
-  }
-
-  .story-visual-card-floating {
-    right: 12px;
-    bottom: 12px;
-    width: min(220px, 56%);
+  .story-visual-card-main,
+  .story-visual-card-secondary {
+    min-height: 220px;
   }
 }
 
@@ -2784,15 +2765,10 @@ td {
   }
 
   .story-visual-card-main {
-    min-height: 240px;
+    min-height: 180px;
   }
 
-  .story-visual-card-floating {
-    position: relative;
-    right: auto;
-    bottom: auto;
-    width: 100%;
-    margin-top: 14px;
+  .story-visual-card-secondary {
     min-height: 180px;
   }
 
