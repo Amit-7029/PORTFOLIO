@@ -533,13 +533,14 @@ td {
 
 .portfolio-topbar.is-brandless .topbar-balance {
   display: block;
-  flex: 0 0 148px;
+  flex: 0 0 88px;
 }
 
 .portfolio-topbar.is-brandless .portfolio-nav {
+  flex: 1 1 auto;
   margin-inline: auto;
-  padding: 6px;
-  gap: 10px;
+  padding: 6px 8px;
+  gap: 8px;
   border-radius: 999px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02));
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -553,7 +554,7 @@ td {
   align-items: center;
   justify-content: center;
   min-height: 44px;
-  padding: 10px 16px;
+  padding: 10px 14px;
 }
 
 .portfolio-topbar.is-brandless .topbar-cta-desktop {
@@ -643,7 +644,8 @@ td {
 
 .portfolio-nav {
   display: flex;
-  flex-wrap: wrap;
+  flex: 1 1 auto;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: center;
   gap: 8px;
@@ -668,6 +670,7 @@ td {
 .portfolio-nav a {
   color: #93a0b8;
   border: 1px solid transparent;
+  white-space: nowrap;
 }
 
 .portfolio-nav a.is-active,
@@ -3286,6 +3289,39 @@ td {
 
 .hero-showcase-shell .portfolio-topbar.is-brandless {
   padding: 14px 18px;
+}
+
+@media (min-width: 961px) {
+  .hero-showcase-shell .portfolio-topbar.is-brandless {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 18px;
+  }
+
+  .hero-showcase-shell .portfolio-topbar.is-brandless .portfolio-nav {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 1320px) and (min-width: 961px) {
+  .portfolio-topbar.is-brandless .portfolio-nav {
+    gap: 6px;
+    padding: 5px 6px;
+  }
+
+  .portfolio-topbar.is-brandless .portfolio-nav a,
+  .theme-toggle-button,
+  .topbar-cta {
+    min-height: 42px;
+    padding-inline: 12px;
+    font-size: 0.96rem;
+  }
+
+  .portfolio-topbar.is-brandless .topbar-balance {
+    flex-basis: 64px;
+  }
 }
 
 .portfolio-topbar.is-brandless .topbar-balance {
