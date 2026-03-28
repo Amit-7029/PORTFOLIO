@@ -737,7 +737,10 @@ td {
   position: relative;
   color: #ffffff;
   text-shadow: none;
-  font-weight: 800;
+  font-family: Poppins, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.055em;
+  line-height: 0.96;
 }
 
 .hero-name-text .animated-text-unit {
@@ -758,6 +761,11 @@ td {
   font-size: clamp(2.7rem, 5vw, 4.5rem);
   line-height: 0.96;
   overflow-wrap: anywhere;
+  font-family: Poppins, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.055em;
+  color: var(--portfolio-text, #f6f7fb);
+  text-shadow: none;
 }
 
 .portfolio-hero-panel h2 {
@@ -765,6 +773,11 @@ td {
   font-size: clamp(1.15rem, 2vw, 1.7rem);
   max-width: 720px;
   overflow-wrap: anywhere;
+  font-family: Poppins, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  color: var(--portfolio-text, #f6f7fb);
+  text-shadow: none;
 }
 
 .hero-summary {
@@ -3823,6 +3836,9 @@ td {
   display: block;
   text-wrap: balance;
   color: var(--portfolio-text, #f6f7fb);
+  font-family: Poppins, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.05em;
 }
 
 .hero-summary {
