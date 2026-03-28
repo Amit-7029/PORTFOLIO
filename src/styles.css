@@ -733,6 +733,10 @@ td {
   max-width: 100%;
 }
 
+.hero-heading-plain {
+  display: block;
+}
+
 .hero-name-text {
   position: relative;
   color: #ffffff;
@@ -3825,20 +3829,16 @@ td {
 }
 
 .hero-role-line {
-  max-width: 19ch;
+  max-width: none;
   color: var(--portfolio-text, #f6f7fb);
   text-shadow: none;
   line-height: 1.18;
   font-weight: 700;
 }
 
-.hero-role-text {
+.hero-role-heading {
   display: block;
   text-wrap: balance;
-  color: var(--portfolio-text, #f6f7fb);
-  font-family: Poppins, sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.05em;
 }
 
 .hero-summary {

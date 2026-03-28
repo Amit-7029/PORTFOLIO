@@ -715,12 +715,8 @@ export default function PortfolioView({ data, preview = false }) {
           <div className="hero-copy">
             <p className="portfolio-kicker hero-eyebrow">{heroSection.introLabel || "Hello, I'm"}</p>
             <span className="hero-meta-chip">{heroSection.kicker || "Current Profile"}</span>
-            <h1 className="hero-title hero-stagger">
-              <AnimatedText text={data.profile.name} mode="chars" className="hero-name-text" />
-            </h1>
-            <h2 className="hero-stagger hero-role-line">
-              <span className="hero-role-text">{data.profile.headline}</span>
-            </h2>
+            <h1 className="hero-title hero-stagger hero-heading-plain">{data.profile.name}</h1>
+            <h2 className="hero-stagger hero-role-line hero-role-heading">{data.profile.headline}</h2>
             <p className="hero-summary hero-stagger">{data.profile.subheadline}</p>
             <p className="hero-detail hero-stagger">{heroSection.description || aboutPreview}</p>
 
