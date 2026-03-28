@@ -695,9 +695,10 @@ td {
 
 .hero-name-text {
   position: relative;
-  color: #ffffff;
+  color: #d8e5ff;
   text-shadow:
-    0 0 10px rgba(255, 255, 255, 0.12),
+    0 0 10px rgba(216, 229, 255, 0.12),
+    0 0 18px rgba(124, 156, 255, 0.08),
     0 10px 26px rgba(5, 9, 18, 0.28);
 }
 
