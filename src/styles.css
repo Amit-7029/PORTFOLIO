@@ -2984,8 +2984,38 @@ td {
   color: var(--portfolio-text, #f6f7fb);
 }
 
-.portfolio-hero-panel h1,
-.portfolio-hero-panel h2,
+.portfolio-hero-panel h1 {
+  font-size: calc(clamp(2.7rem, 5vw, 4.5rem) * var(--heading-scale, 1));
+}
+
+.portfolio-hero-panel h2 {
+  font-size: calc(clamp(1.15rem, 2vw, 1.7rem) * var(--heading-scale, 1));
+}
+
 .portfolio-section h3 {
-  font-size: calc(1em * var(--heading-scale, 1));
+  font-size: calc(2.05rem * var(--heading-scale, 1));
+}
+
+@media (max-width: 768px) {
+  .portfolio-hero-panel h1 {
+    font-size: calc(clamp(2.2rem, 10vw, 3rem) * var(--heading-scale, 1));
+  }
+
+  .portfolio-hero-panel h2 {
+    font-size: calc(clamp(1rem, 4.8vw, 1.28rem) * var(--heading-scale, 1));
+  }
+}
+
+@media (max-width: 480px) {
+  .portfolio-hero-panel h1 {
+    font-size: calc(clamp(1.95rem, 11vw, 2.45rem) * var(--heading-scale, 1));
+  }
+
+  .portfolio-hero-panel h2 {
+    font-size: calc(1rem * var(--heading-scale, 1));
+  }
+
+  .portfolio-section h3 {
+    font-size: calc(1.55rem * var(--heading-scale, 1));
+  }
 }

@@ -30,6 +30,7 @@ const contentFieldMap = {
     { key: "visible", label: "Visible", type: "toggle" },
     { key: "navLabel", label: "Nav Label" },
     { key: "kicker", label: "Kicker" },
+    { key: "description", label: "Detail Text", type: "textarea" },
     { key: "primaryButtonText", label: "Primary Button Text" },
     { key: "primaryButtonLink", label: "Primary Button Link" },
     { key: "secondaryButtonText", label: "Secondary Button Text" },

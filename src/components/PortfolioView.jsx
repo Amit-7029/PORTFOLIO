@@ -52,7 +52,16 @@ const glowIntensityMap = {
 };
 
 function stripHtml(html) {
-  return (html || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  return (html || "")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&#39;/gi, "'")
+    .replace(/&quot;/gi, "\"")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function slugify(value) {
@@ -592,7 +601,7 @@ export default function PortfolioView({ data, preview = false }) {
             <AnimatedText text={data.profile.headline} mode="words" className="hero-headline-text" />
           </h2>
           <p className="hero-summary hero-stagger">{data.profile.subheadline}</p>
-          <p className="hero-detail hero-stagger">{aboutPreview}</p>
+          <p className="hero-detail hero-stagger">{heroSection.description || aboutPreview}</p>
           <div className="hero-actions hero-stagger">
             <a className="primary-button portfolio-button" href={heroSection.primaryButtonLink || "#projects"} onPointerDown={triggerRipple}>
               {heroSection.primaryButtonText || "View Projects"}
