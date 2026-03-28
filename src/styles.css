@@ -3924,7 +3924,7 @@ td {
 }
 
 .hero-showcase-shell .hero-copy {
-  gap: 18px;
+  gap: 20px;
   padding-top: 8px;
 }
 
@@ -3936,9 +3936,32 @@ td {
   max-width: none;
   color: var(--portfolio-text, #f6f7fb);
   text-shadow: none;
-  line-height: 1.15;
+  line-height: 1.28;
   font-weight: 700;
-  white-space: nowrap;
+  white-space: normal;
+  margin-top: 2px;
+}
+
+.hero-role-parts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  max-width: 780px;
+}
+
+.hero-role-part {
+  display: inline-flex;
+  align-items: center;
+}
+
+.hero-role-separator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: color-mix(in srgb, var(--portfolio-primary, #39d7ff) 78%, white 22%);
+  opacity: 0.82;
+  margin-right: -2px;
 }
 
 .hero-role-heading {
@@ -3949,7 +3972,7 @@ td {
 .hero-summary {
   max-width: 52ch;
   font-size: 1.02rem;
-  line-height: 1.68;
+  line-height: 1.72;
   color: var(--portfolio-text, #f6f7fb);
 }
 
@@ -3970,8 +3993,8 @@ td {
     max-width: none;
   }
 
-  .hero-role-line {
-    white-space: normal;
+  .hero-role-parts {
+    gap: 8px 10px;
   }
 }
 

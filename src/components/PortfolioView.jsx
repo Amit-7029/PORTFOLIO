@@ -563,6 +563,10 @@ export default function PortfolioView({ data, preview = false }) {
     { key: "whatsapp", href: data.settings.whatsappLink, label: "WhatsApp" },
     { key: "email", href: data.settings.email ? `mailto:${data.settings.email}` : "", label: "Email" },
   ].filter((item) => item.href);
+  const heroHeadlineParts = String(data.profile.headline || "")
+    .split("|")
+    .map((item) => item.trim())
+    .filter(Boolean);
 
   const defaultOrder = ["hero", "about", "services", "skills", "experience", "projects", "achievements", "contact", "footer"];
   const normalizedOrder = [...(siteConfig.sectionOrder || defaultOrder)];
@@ -687,7 +691,20 @@ export default function PortfolioView({ data, preview = false }) {
             <p className="portfolio-kicker hero-eyebrow">{heroSection.introLabel || "Hello, I'm"}</p>
             <span className="hero-meta-chip">{heroSection.kicker || "Current Profile"}</span>
             <h1 className="hero-title hero-stagger hero-heading-plain">{data.profile.name}</h1>
-            <h2 className="hero-stagger hero-role-line hero-role-heading">{data.profile.headline}</h2>
+            <h2 className="hero-stagger hero-role-line hero-role-heading">
+              {heroHeadlineParts.length ? (
+                <span className="hero-role-parts">
+                  {heroHeadlineParts.map((part, index) => (
+                    <React.Fragment key={`${part}-${index}`}>
+                      {index > 0 ? <span className="hero-role-separator" aria-hidden="true">|</span> : null}
+                      <span className="hero-role-part">{part}</span>
+                    </React.Fragment>
+                  ))}
+                </span>
+              ) : (
+                data.profile.headline
+              )}
+            </h2>
             <p className="hero-summary hero-stagger">{data.profile.subheadline}</p>
             <p className="hero-detail hero-stagger">{heroSection.description || aboutPreview}</p>
 
