@@ -515,6 +515,12 @@ export default function AdminPage() {
               <label>Brand Subtitle<input value={draft.siteConfig.brandSubtitle || ""} onChange={(e) => updateSiteConfig({ brandSubtitle: e.target.value })} /></label>
               <label>Primary Nav Button Text<input value={draft.siteConfig.primaryNavButtonText || ""} onChange={(e) => updateSiteConfig({ primaryNavButtonText: e.target.value })} /></label>
               <label>Primary Nav Button Link<input value={draft.siteConfig.primaryNavButtonLink || ""} onChange={(e) => updateSiteConfig({ primaryNavButtonLink: e.target.value })} /></label>
+              <label>Section Heading Align
+                <select value={draft.siteConfig.sectionHeadingAlign || "center"} onChange={(e) => updateSiteConfig({ sectionHeadingAlign: e.target.value })}>
+                  <option value="center">Center</option>
+                  <option value="left">Left</option>
+                </select>
+              </label>
             </div>
             <div className="stack-list" style={{ marginTop: "20px" }}>
               {(draft.siteConfig.sectionOrder || cmsSectionKeys).map((sectionKey, index) => (

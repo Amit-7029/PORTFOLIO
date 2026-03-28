@@ -13,9 +13,10 @@
   },
   "siteConfig": {
     "brandMark": "AK",
-    "brandSubtitle": "Portfolio System",
+    "brandSubtitle": "",
     "primaryNavButtonText": "Hire Me",
     "primaryNavButtonLink": "#contact",
+    "sectionHeadingAlign": "center",
     "sectionOrder": [
       "hero",
       "about",

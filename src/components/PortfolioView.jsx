@@ -477,6 +477,7 @@ export default function PortfolioView({ data, preview = false }) {
     .filter((id) => id !== "footer" && sectionConfig[id]?.visible !== false)
     .map((id) => [id, sectionConfig[id]?.navLabel || id]);
   const orderedSectionIds = siteConfig.sectionOrder || ["hero", "about", "skills", "experience", "projects", "achievements", "contact", "footer"];
+  const sectionHeadClassName = `portfolio-section-head ${siteConfig.sectionHeadingAlign === "center" ? "is-centered" : ""}`;
 
   function sectionOrderStyle(sectionId, offset = 0) {
     const index = orderedSectionIds.indexOf(sectionId);
@@ -546,7 +547,7 @@ export default function PortfolioView({ data, preview = false }) {
           <span className="brand-mark">{siteConfig.brandMark || "AK"}</span>
           <span className="brand-copy">
             <strong>{data.profile.name}</strong>
-            <small>{siteConfig.brandSubtitle || "Portfolio System"}</small>
+            {siteConfig.brandSubtitle ? <small>{siteConfig.brandSubtitle}</small> : null}
           </span>
         </a>
 
@@ -659,7 +660,7 @@ export default function PortfolioView({ data, preview = false }) {
 
       {aboutSection.visible !== false ? (
       <section className="portfolio-section" id="about" data-section-id="about" data-reveal style={sectionOrderStyle("about")}>
-        <div className="portfolio-section-head">
+        <div className={sectionHeadClassName}>
           <div>
             <p className="portfolio-kicker">{aboutSection.kicker || "About"}</p>
             <h3>{aboutSection.title || "Professional Summary"}</h3>
@@ -687,7 +688,7 @@ export default function PortfolioView({ data, preview = false }) {
 
       {skillsSection.visible !== false ? (
       <section className="portfolio-section" id="skills" data-section-id="skills" data-reveal style={sectionOrderStyle("skills")}>
-        <div className="portfolio-section-head">
+        <div className={sectionHeadClassName}>
           <div>
             <p className="portfolio-kicker">{skillsSection.kicker || "Core Competencies"}</p>
             <h3>{skillsSection.title || "Multi-Skilled Capability Stack"}</h3>
@@ -726,7 +727,7 @@ export default function PortfolioView({ data, preview = false }) {
 
       {experienceSection.visible !== false ? (
       <section className="portfolio-section" id="experience" data-section-id="experience" data-reveal style={sectionOrderStyle("experience")}>
-        <div className="portfolio-section-head">
+        <div className={sectionHeadClassName}>
           <div>
             <p className="portfolio-kicker">{experienceSection.kicker || "Professional Journey"}</p>
             <h3>{experienceSection.title || "Experience That Connects Accuracy With Growth"}</h3>
@@ -847,7 +848,7 @@ export default function PortfolioView({ data, preview = false }) {
 
       {achievementsSection.visible !== false ? (
       <section className="portfolio-section" id="achievements" data-section-id="achievements" data-reveal style={sectionOrderStyle("achievements")}>
-        <div className="portfolio-section-head">
+        <div className={sectionHeadClassName}>
           <div>
             <p className="portfolio-kicker">{achievementsSection.kicker || "Achievements"}</p>
             <h3>{achievementsSection.title || "Recognition And Learning Milestones"}</h3>

@@ -695,10 +695,9 @@ td {
 
 .hero-name-text {
   position: relative;
-  color: #d8e5ff;
+  color: #ffffff;
   text-shadow:
-    0 0 10px rgba(216, 229, 255, 0.12),
-    0 0 18px rgba(124, 156, 255, 0.08),
+    0 0 10px rgba(255, 255, 255, 0.12),
     0 10px 26px rgba(5, 9, 18, 0.28);
 }
 
@@ -927,6 +926,17 @@ td {
   gap: 20px;
   align-items: end;
   margin-bottom: 22px;
+}
+
+.portfolio-section-head.is-centered {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  text-align: center;
+}
+
+.portfolio-section-head.is-centered > div,
+.portfolio-section-head.is-centered > p {
+  max-width: 760px;
 }
 
 .section-copy,
