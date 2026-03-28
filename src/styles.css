@@ -2412,14 +2412,8 @@ td {
 }
 
 .project-slider-viewport {
-  --drag-offset: 0px;
   overflow: hidden;
   border-radius: 30px;
-  cursor: grab;
-}
-
-.project-slider-viewport:active {
-  cursor: grabbing;
 }
 
 .project-slider-track {
@@ -2447,6 +2441,11 @@ td {
 
 .story-slide-card-support {
   grid-template-columns: 1fr;
+}
+
+.story-slide-card-text {
+  grid-template-columns: 1fr;
+  min-height: 100%;
 }
 
 .story-slide-media,
@@ -2477,6 +2476,15 @@ td {
   display: grid;
   align-content: start;
   gap: 14px;
+}
+
+.story-slide-copy-text {
+  max-width: 820px;
+  gap: 16px;
+}
+
+.story-slide-copy-text p {
+  max-width: 68ch;
 }
 
 .story-slide-frame-support {

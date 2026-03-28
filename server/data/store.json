@@ -87,7 +87,7 @@
     "introAnimationEnabled": true,
     "backgroundEffectsEnabled": true,
     "imageZoomEnabled": true,
-    "sliderAutoplayEnabled": true,
+    "sliderAutoplayEnabled": false,
     "animationIntensity": "high"
   },
   "sections": {

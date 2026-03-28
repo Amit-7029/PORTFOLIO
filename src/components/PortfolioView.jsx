@@ -40,12 +40,6 @@ const speedMap = {
   fast: 0.78,
 };
 
-const autoplayMap = {
-  slow: 5200,
-  medium: 4200,
-  fast: 3000,
-};
-
 const intensityMap = {
   low: 0.82,
   high: 1.16,
@@ -98,6 +92,19 @@ function toRgba(color, alpha) {
 
 function slugify(value) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+}
+
+function normalizeExternalLink(value) {
+  if (!value) return "";
+
+  const trimmed = String(value).trim();
+  if (!trimmed) return "";
+
+  if (/^(https?:|mailto:|tel:|#)/i.test(trimmed)) {
+    return trimmed;
+  }
+
+  return `https://${trimmed.replace(/^\/+/, "")}`;
 }
 
 function useCountUp(target, enabled) {
@@ -228,12 +235,11 @@ function ProjectSlide({ slide, onRipple }) {
     );
   }
 
+  const projectHref = normalizeExternalLink(slide.liveLink);
+
   return (
-    <article className="story-slide-card">
-      <div className="story-slide-media" data-parallax-speed="0.18">
-        {slide.image ? <img src={slide.image} alt={slide.title} className="story-slide-image" loading="lazy" /> : null}
-      </div>
-        <div className="story-slide-copy">
+    <article className="story-slide-card story-slide-card-text">
+      <div className="story-slide-copy story-slide-copy-text">
         <span className="story-slide-eyebrow">{slide.eyebrow || "Project Spotlight"}</span>
         <strong>{slide.title}</strong>
         <p>{slide.description}</p>
@@ -242,8 +248,8 @@ function ProjectSlide({ slide, onRipple }) {
             <span key={tag}>{tag}</span>
           ))}
         </div>
-        {slide.liveLink ? (
-          <a className="primary-button portfolio-button" href={slide.liveLink} target="_blank" rel="noreferrer" onPointerDown={onRipple}>
+        {projectHref ? (
+          <a className="primary-button portfolio-button" href={projectHref} target="_blank" rel="noreferrer" onPointerDown={onRipple}>
             View Project
           </a>
         ) : null}
@@ -254,14 +260,11 @@ function ProjectSlide({ slide, onRipple }) {
 
 export default function PortfolioView({ data, preview = false }) {
   const frameRef = useRef(null);
-  const sliderViewportRef = useRef(null);
-  const pointerStateRef = useRef({ active: false, startX: 0, deltaX: 0 });
 
   const [activeSection, setActiveSection] = useState("hero");
   const [menuOpen, setMenuOpen] = useState(false);
   const [heroReady, setHeroReady] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [sliderPaused, setSliderPaused] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
   const siteConfig = data?.siteConfig || {};
@@ -301,7 +304,7 @@ export default function PortfolioView({ data, preview = false }) {
   }, [groupedSkills]);
 
   const storySlides = useMemo(() => {
-    const projectSlides = (data?.projects || []).map((project) => ({
+    return (data?.projects || []).map((project) => ({
       type: "project",
       id: project.id,
       title: project.title,
@@ -311,18 +314,7 @@ export default function PortfolioView({ data, preview = false }) {
       tags: project.tags || [],
       eyebrow: sectionConfig.projects?.projectEyebrow || "Project Spotlight",
     }));
-
-    const supportSlides = groupedSkills.slice(0, 3).map((group) => ({
-      type: "capability",
-      id: `${group.id}-support`,
-      title: group.label || group.category,
-      eyebrow: group.eyebrow || "Capability",
-      description: group.description || "Practical strengths presented through measurable skill depth.",
-      tags: group.items.slice(0, 3).map((item) => item.name),
-    }));
-
-    return [...projectSlides, ...supportSlides].slice(0, Math.max(3, projectSlides.length || 0));
-  }, [data, groupedSkills, sectionConfig.projects?.projectEyebrow]);
+  }, [data, sectionConfig.projects?.projectEyebrow]);
 
   const motionEnabled = data?.theme?.animationsEnabled !== false;
   const introAnimationEnabled = motionEnabled && data?.theme?.introAnimationEnabled !== false;
@@ -332,7 +324,6 @@ export default function PortfolioView({ data, preview = false }) {
   const backgroundEffectsEnabled = motionEnabled && data?.theme?.backgroundEffectsEnabled !== false;
   const imageZoomEnabled = introAnimationEnabled && data?.theme?.imageZoomEnabled !== false;
   const speedFactor = speedMap[data?.theme?.animationSpeed] || 1;
-  const autoplayDelay = autoplayMap[data?.theme?.animationSpeed] || 4200;
   const intensityFactor = intensityMap[data?.theme?.animationIntensity] || 1;
   const glowFactor = glowIntensityMap[data?.theme?.glowIntensity] || 1;
 
@@ -410,18 +401,6 @@ export default function PortfolioView({ data, preview = false }) {
   useEffect(() => {
     setCurrentSlide((current) => Math.max(0, Math.min(current, Math.max(storySlides.length - 1, 0))));
   }, [storySlides.length]);
-
-  useEffect(() => {
-    if (preview || !motionEnabled || !data?.theme?.sliderAutoplayEnabled || sliderPaused || storySlides.length < 2) {
-      return undefined;
-    }
-
-    const timer = window.setInterval(() => {
-      setCurrentSlide((current) => (current + 1) % storySlides.length);
-    }, autoplayDelay);
-
-    return () => window.clearInterval(timer);
-  }, [preview, motionEnabled, data?.theme?.sliderAutoplayEnabled, sliderPaused, storySlides.length, autoplayDelay]);
 
   useEffect(() => {
     if (!frameRef.current) return undefined;
@@ -616,34 +595,6 @@ export default function PortfolioView({ data, preview = false }) {
 
   function goToPreviousSlide() {
     setCurrentSlide((current) => (current - 1 + storySlides.length) % storySlides.length);
-  }
-
-  function handleSliderPointerDown(event) {
-    if (storySlides.length < 2) return;
-    pointerStateRef.current = { active: true, startX: event.clientX, deltaX: 0 };
-    setSliderPaused(true);
-    sliderViewportRef.current?.setPointerCapture?.(event.pointerId);
-  }
-
-  function handleSliderPointerMove(event) {
-    if (!pointerStateRef.current.active || !sliderViewportRef.current) return;
-    const deltaX = event.clientX - pointerStateRef.current.startX;
-    pointerStateRef.current.deltaX = deltaX;
-    sliderViewportRef.current.style.setProperty("--drag-offset", `${deltaX}px`);
-  }
-
-  function handleSliderPointerUp(event) {
-    if (!pointerStateRef.current.active || !sliderViewportRef.current) return;
-
-    const { deltaX } = pointerStateRef.current;
-    pointerStateRef.current = { active: false, startX: 0, deltaX: 0 };
-    sliderViewportRef.current.style.setProperty("--drag-offset", "0px");
-    sliderViewportRef.current.releasePointerCapture?.(event.pointerId);
-    setSliderPaused(false);
-
-    if (Math.abs(deltaX) < 48) return;
-    if (deltaX < 0) goToNextSlide();
-    else goToPreviousSlide();
   }
 
   return (
@@ -915,19 +866,10 @@ export default function PortfolioView({ data, preview = false }) {
           </div>
 
           <div className="project-slider-shell">
-            <div
-              ref={sliderViewportRef}
-              className="project-slider-viewport"
-              onPointerDown={handleSliderPointerDown}
-              onPointerMove={handleSliderPointerMove}
-              onPointerUp={handleSliderPointerUp}
-              onPointerCancel={handleSliderPointerUp}
-              onMouseEnter={() => setSliderPaused(true)}
-              onMouseLeave={() => setSliderPaused(false)}
-            >
+            <div className="project-slider-viewport">
               <div
                 className="project-slider-track"
-                style={{ transform: `translate3d(calc(-${currentSlide * 100}% + var(--drag-offset, 0px)), 0, 0)` }}
+                style={{ transform: `translate3d(-${currentSlide * 100}%, 0, 0)` }}
               >
                 {storySlides.map((slide) => (
                   <ProjectSlide key={slide.id} slide={slide} onRipple={triggerRipple} />
@@ -935,25 +877,27 @@ export default function PortfolioView({ data, preview = false }) {
               </div>
             </div>
 
-            <div className="project-slider-controls">
-              <button type="button" className="slider-arrow" onClick={goToPreviousSlide} onPointerDown={triggerRipple} aria-label="Previous slide">
-                Prev
-              </button>
-              <div className="slider-dots">
-                {storySlides.map((slide, index) => (
-                  <button
-                    key={slide.id}
-                    type="button"
-                    className={`slider-dot ${index === currentSlide ? "is-active" : ""}`}
-                    onClick={() => goToSlide(index)}
-                    aria-label={`Go to slide ${index + 1}`}
-                  />
-                ))}
+            {storySlides.length > 1 ? (
+              <div className="project-slider-controls">
+                <button type="button" className="slider-arrow" onClick={goToPreviousSlide} onPointerDown={triggerRipple} aria-label="Previous slide">
+                  Prev
+                </button>
+                <div className="slider-dots">
+                  {storySlides.map((slide, index) => (
+                    <button
+                      key={slide.id}
+                      type="button"
+                      className={`slider-dot ${index === currentSlide ? "is-active" : ""}`}
+                      onClick={() => goToSlide(index)}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
+                <button type="button" className="slider-arrow" onClick={goToNextSlide} onPointerDown={triggerRipple} aria-label="Next slide">
+                  Next
+                </button>
               </div>
-              <button type="button" className="slider-arrow" onClick={goToNextSlide} onPointerDown={triggerRipple} aria-label="Next slide">
-                Next
-              </button>
-            </div>
+            ) : null}
 
             <div className="project-side-stack">
               {projectSidePanels.map((panel) => (
