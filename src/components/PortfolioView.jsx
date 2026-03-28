@@ -222,15 +222,39 @@ function ProjectSlide({ slide, onRipple }) {
     );
   }
 
+  const storyPoints = (slide.tags || []).slice(0, 3).map((tag) => `Built with ${tag}`);
+
   return (
     <article className="story-slide-card">
       <div className="story-slide-media" data-parallax-speed="0.18">
         {slide.image ? <img src={slide.image} alt={slide.title} className="story-slide-image" loading="lazy" /> : null}
+        <div className="story-slide-media-overlay">
+          <span className="story-slide-eyebrow">{slide.eyebrow || "Project Spotlight"}</span>
+          <div className="story-slide-overlay-copy">
+            <strong>{slide.title}</strong>
+            <p>{slide.description}</p>
+          </div>
+          <div className="story-slide-overlay-tags">
+            {slide.tags.slice(0, 3).map((tag) => (
+              <span key={tag}>{tag}</span>
+            ))}
+          </div>
+        </div>
       </div>
-        <div className="story-slide-copy">
-        <span className="story-slide-eyebrow">{slide.eyebrow || "Project Spotlight"}</span>
+      <div className="story-slide-copy">
+        <span className="story-slide-label">Story Layer</span>
         <strong>{slide.title}</strong>
         <p>{slide.description}</p>
+        {storyPoints.length ? (
+          <div className="story-feature-list">
+            {storyPoints.map((point) => (
+              <div key={point} className="story-feature-item">
+                <span />
+                <p>{point}</p>
+              </div>
+            ))}
+          </div>
+        ) : null}
         <div className="tag-row">
           {slide.tags.map((tag) => (
             <span key={tag}>{tag}</span>
