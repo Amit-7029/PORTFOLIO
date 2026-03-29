@@ -697,11 +697,14 @@ export default function PortfolioView({ data, preview = false }) {
             {heroOverlayImages.length ? (
               <div className="hero-copy-background" aria-hidden="true">
                 {heroOverlayImages.map((image, index) => (
-                  <span
+                  <img
                     key={`${image}-${index}`}
                     className={`hero-copy-slide ${index === 0 ? "is-initial" : ""}`}
+                    src={image}
+                    alt=""
+                    loading="eager"
+                    aria-hidden="true"
                     style={{
-                      backgroundImage: `url(${image})`,
                       animationDelay: `${index * 5.5}s`,
                     }}
                   />
