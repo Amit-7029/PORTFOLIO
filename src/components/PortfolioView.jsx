@@ -353,8 +353,25 @@ export default function PortfolioView({ data, preview = false }) {
     const revealTargets = Array.from(root.querySelectorAll("[data-reveal]"));
     const sections = Array.from(root.querySelectorAll("[data-section-id]"));
 
+    function revealHashTarget() {
+      const hash = window.location.hash?.replace("#", "");
+      if (!hash) return;
+
+      const target = root.querySelector(`#${hash}`);
+      if (!(target instanceof HTMLElement)) return;
+
+      target.classList.add("is-visible");
+      const nestedRevealTargets = Array.from(target.querySelectorAll("[data-reveal]"));
+      nestedRevealTargets.forEach((node) => node.classList.add("is-visible"));
+
+      if (target.dataset?.sectionId) {
+        setActiveSection(target.dataset.sectionId);
+      }
+    }
+
     if (preview || !scrollAnimationsEnabled) {
       revealTargets.forEach((target) => target.classList.add("is-visible"));
+      revealHashTarget();
     }
 
     const revealObserver = new IntersectionObserver(
@@ -384,12 +401,15 @@ export default function PortfolioView({ data, preview = false }) {
 
     if (!preview && scrollAnimationsEnabled) {
       revealTargets.forEach((target) => revealObserver.observe(target));
+      revealHashTarget();
+      window.addEventListener("hashchange", revealHashTarget);
     }
     sections.forEach((section) => sectionObserver.observe(section));
 
     return () => {
       revealObserver.disconnect();
       sectionObserver.disconnect();
+      window.removeEventListener("hashchange", revealHashTarget);
     };
   }, [preview, scrollAnimationsEnabled, data]);
 
