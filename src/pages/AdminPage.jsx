@@ -293,14 +293,18 @@ export default function AdminPage() {
   }
 
   async function handleUpload(file) {
-    const formData = new FormData();
-    formData.append("file", file);
-    const uploaded = await apiFetch("/api/media/upload", {
-      method: "POST",
-      body: formData,
-    });
-    setMedia((current) => [uploaded, ...current]);
-    toast({ title: "Uploaded", message: "Media uploaded successfully.", type: "success" });
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const uploaded = await apiFetch("/api/media/upload", {
+        method: "POST",
+        body: formData,
+      });
+      setMedia((current) => [uploaded, ...current]);
+      toast({ title: "Uploaded", message: "Media uploaded successfully.", type: "success" });
+    } catch (error) {
+      toast({ title: "Upload failed", message: error.message || "Image upload failed.", type: "error" });
+    }
   }
 
   async function handleLogout() {

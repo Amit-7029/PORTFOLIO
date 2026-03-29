@@ -18,6 +18,11 @@ function createId(prefix) {
   return `${prefix}_${randomUUID().replace(/-/g, "").slice(0, 10)}`;
 }
 
+function fileToDataUrl(file) {
+  const mimeType = file?.mimetype || "application/octet-stream";
+  return `data:${mimeType};base64,${file.buffer.toString("base64")}`;
+}
+
 function broadcast(type, payload) {
   const body = `event: ${type}\ndata: ${JSON.stringify(payload)}\n\n`;
   for (const client of clients) client.write(body);
@@ -303,11 +308,13 @@ app.post("/api/media/upload", authMiddleware, upload.single("file"), asyncHandle
     uploaded = await uploadToFirebaseStorage(req.file);
   } catch (error) {
     const cloudinary = getCloudinaryConfig();
-    if (!cloudinary.configured) {
-      throw error;
+    if (cloudinary.configured) {
+      uploaded = await uploadToCloudinary(req.file);
+      provider = "cloudinary";
+    } else {
+      uploaded = { url: fileToDataUrl(req.file), publicId: null, storagePath: null };
+      provider = "inline";
     }
-    uploaded = await uploadToCloudinary(req.file);
-    provider = "cloudinary";
   }
 
   const media = {
