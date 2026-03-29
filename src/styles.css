@@ -4411,6 +4411,65 @@ td {
   }
 
   .hero-stat {
-    padding: 16px 14px !important;
+      padding: 16px 14px !important;
+    }
+  }
+
+/* Final hero first-look balance */
+.hero-showcase-shell .portfolio-hero-panel {
+  grid-template-columns: minmax(0, 1.22fr) minmax(320px, 0.78fr);
+  gap: 34px;
+}
+
+.hero-showcase-shell .hero-copy {
+  align-content: start;
+}
+
+.hero-showcase-shell .hero-copy .hero-title,
+.hero-showcase-shell .hero-copy h1 {
+  width: 100%;
+  max-width: none;
+  font-size: clamp(3rem, 4.45vw, 4.7rem);
+  line-height: 0.94;
+  letter-spacing: -0.058em;
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: normal;
+  text-wrap: nowrap;
+}
+
+.hero-showcase-shell .hero-copy .hero-role-line,
+.hero-showcase-shell .hero-copy h2 {
+  margin-top: 4px;
+  font-size: clamp(1.02rem, 1.85vw, 1.5rem);
+  line-height: 1.34;
+}
+
+.hero-showcase-shell .hero-image-shell {
+  width: min(388px, 100%);
+  align-self: start;
+  margin-top: -10px;
+}
+
+.hero-image-frame-portrait {
+  min-height: 474px;
+}
+
+.hero-image-frame-portrait .portfolio-avatar {
+  min-height: 438px;
+  object-position: center 14%;
+}
+
+@media (max-width: 1200px) {
+  .hero-showcase-shell .portfolio-hero-panel {
+    grid-template-columns: minmax(0, 1.12fr) minmax(300px, 0.88fr);
+    gap: 28px;
+  }
+
+  .hero-showcase-shell .hero-copy .hero-title,
+  .hero-showcase-shell .hero-copy h1 {
+    font-size: clamp(2.7rem, 4.1vw, 4rem);
+    white-space: normal;
+    text-wrap: balance;
   }
 }
