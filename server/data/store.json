@@ -102,6 +102,10 @@
       "secondaryButtonText": "Let's Work Together",
       "secondaryButtonLink": "#projects",
       "scrollLabel": "Scroll to explore",
+      "overlayImageOne": "/media/ai-tools-showcase.png",
+      "overlayImageTwo": "/media/meta-showcase.webp",
+      "overlayImageThree": "/media/web-dev-showcase-1.png",
+      "overlayImageFour": "/media/web-dev-showcase-2.jpg",
       "highlightItems": [
         "Digital Marketing Strategy",
         "Meta Ads Campaigns",

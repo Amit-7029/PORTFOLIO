@@ -25,6 +25,12 @@ const sections = [
 
 const iconOptions = ["award", "certificate", "star", "bolt"];
 const cmsSectionKeys = ["hero", "about", "services", "skills", "experience", "projects", "achievements", "contact", "footer"];
+const staticMediaOptions = [
+  { value: "/media/ai-tools-showcase.png", label: "ai-tools-showcase.png" },
+  { value: "/media/meta-showcase.webp", label: "meta-showcase.webp" },
+  { value: "/media/web-dev-showcase-1.png", label: "web-dev-showcase-1.png" },
+  { value: "/media/web-dev-showcase-2.jpg", label: "web-dev-showcase-2.jpg" },
+];
 
 const contentFieldMap = {
   hero: [
@@ -38,6 +44,10 @@ const contentFieldMap = {
     { key: "secondaryButtonText", label: "Secondary Button Text" },
     { key: "secondaryButtonLink", label: "Secondary Button Link" },
     { key: "scrollLabel", label: "Scroll Label" },
+    { key: "overlayImageOne", label: "Overlay Image 1", type: "media-select" },
+    { key: "overlayImageTwo", label: "Overlay Image 2", type: "media-select" },
+    { key: "overlayImageThree", label: "Overlay Image 3", type: "media-select" },
+    { key: "overlayImageFour", label: "Overlay Image 4", type: "media-select" },
     { key: "highlightItems", label: "Highlight Items", type: "list" },
     { key: "statsItems", label: "Hero Stats", type: "stats-list" },
   ],
@@ -409,18 +419,19 @@ export default function AdminPage() {
     }
 
     if (field.type === "media-select") {
+      const mediaOptions = [...staticMediaOptions, ...media.map((mediaItem) => ({ value: mediaItem.url, label: mediaItem.name }))]
+        .filter((item, index, list) => item.value && list.findIndex((candidate) => candidate.value === item.value) === index);
+
       return (
         <label key={field.key} className="full-span">
           {field.label}
           <select value={value || ""} onChange={(event) => updateSectionDraft(sectionKey, { [field.key]: event.target.value })}>
             <option value="">No image</option>
-            {media.map((mediaItem) => (
-              <option key={mediaItem.id} value={mediaItem.url}>
-                {mediaItem.name}
+            {mediaOptions.map((mediaItem) => (
+              <option key={mediaItem.value} value={mediaItem.value}>
+                {mediaItem.label}
               </option>
             ))}
-            <option value="/media/ai-tools-showcase.png">ai-tools-showcase.png</option>
-            <option value="/media/meta-showcase.webp">meta-showcase.webp</option>
           </select>
         </label>
       );
