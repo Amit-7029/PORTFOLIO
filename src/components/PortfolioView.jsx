@@ -565,6 +565,15 @@ export default function PortfolioView({ data, preview = false }) {
   const glowColor = data.theme.glowColor || primaryColor;
   const aboutPreview = stripHtml(data.profile.aboutHtml);
   const heroSection = sectionConfig.hero || {};
+  const heroTitleClassName = [
+    "hero-title",
+    "hero-stagger",
+    "hero-heading-plain",
+    heroSection.headlineBold ? "hero-title-strong" : "",
+    heroSection.headlineGlow ? "hero-title-glow" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
   const heroRoleClassName = [
     "hero-stagger",
     "hero-role-line",
@@ -839,7 +848,7 @@ export default function PortfolioView({ data, preview = false }) {
           <div className="hero-copy">
             <p className="portfolio-kicker hero-eyebrow">{heroSection.introLabel || "Hello, I'm"}</p>
             <span className="hero-meta-chip">{heroSection.kicker || "Current Profile"}</span>
-            <h1 className="hero-title hero-stagger hero-heading-plain">{data.profile.name}</h1>
+            <h1 className={heroTitleClassName}>{data.profile.name}</h1>
             <h2 className={heroRoleClassName}>
               {heroHeadlineParts.length ? (
                 <span className="hero-role-parts">
