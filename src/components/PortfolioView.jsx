@@ -352,6 +352,7 @@ export default function PortfolioView({ data, preview = false }) {
     const root = frameRef.current;
     const revealTargets = Array.from(root.querySelectorAll("[data-reveal]"));
     const sections = Array.from(root.querySelectorAll("[data-section-id]"));
+    const hasHashTarget = !preview && typeof window !== "undefined" && Boolean(window.location.hash);
 
     function revealHashTarget() {
       const hash = window.location.hash?.replace("#", "");
@@ -370,6 +371,11 @@ export default function PortfolioView({ data, preview = false }) {
     }
 
     if (preview || !scrollAnimationsEnabled) {
+      revealTargets.forEach((target) => target.classList.add("is-visible"));
+      revealHashTarget();
+    }
+
+    if (hasHashTarget) {
       revealTargets.forEach((target) => target.classList.add("is-visible"));
       revealHashTarget();
     }
@@ -399,9 +405,11 @@ export default function PortfolioView({ data, preview = false }) {
       { threshold: 0.35, rootMargin: "-20% 0px -45% 0px" },
     );
 
-    if (!preview && scrollAnimationsEnabled) {
+    if (!preview && scrollAnimationsEnabled && !hasHashTarget) {
       revealTargets.forEach((target) => revealObserver.observe(target));
       revealHashTarget();
+      window.addEventListener("hashchange", revealHashTarget);
+    } else if (!preview) {
       window.addEventListener("hashchange", revealHashTarget);
     }
     sections.forEach((section) => sectionObserver.observe(section));
