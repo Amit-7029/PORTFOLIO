@@ -2695,17 +2695,14 @@ td {
 
 @keyframes heroCopySlideCycle {
   0% {
-    opacity: 0;
+    opacity: 0.52;
     transform: scale(1.08);
   }
-  6% {
-    opacity: 0.44;
-  }
-  20% {
-    opacity: 0.44;
+  18% {
+    opacity: 0.52;
     transform: scale(1);
   }
-  28% {
+  30% {
     opacity: 0;
     transform: scale(0.98);
   }
@@ -3508,6 +3505,10 @@ td {
   animation: heroCopySlideCycle 22s ease-in-out infinite;
 }
 
+.hero-copy-slide.is-initial {
+  opacity: 0.52;
+}
+
 .hero-copy-scrim {
   background:
     radial-gradient(circle at 12% 16%, rgba(57, 215, 255, 0.16), transparent 30%),
@@ -3525,7 +3526,7 @@ td {
 
 .animations-off .hero-copy-slide:first-child,
 .portfolio-frame.is-preview .hero-copy-slide:first-child {
-  opacity: 0.38;
+  opacity: 0.52;
 }
 
 .hero-showcase-shell .portfolio-kicker {
