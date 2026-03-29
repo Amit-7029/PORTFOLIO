@@ -102,6 +102,13 @@
       "secondaryButtonText": "Let's Work Together",
       "secondaryButtonLink": "#projects",
       "scrollLabel": "Scroll to explore",
+      "overlayImages": [
+        "/media/ai-tools-showcase.png",
+        "/media/meta-showcase.webp",
+        "/media/web-dev-showcase-1.png",
+        "/media/web-dev-showcase-2.jpg"
+      ],
+      "overlayOpacity": 44,
       "overlayImageOne": "/media/ai-tools-showcase.png",
       "overlayImageTwo": "/media/meta-showcase.webp",
       "overlayImageThree": "/media/web-dev-showcase-1.png",

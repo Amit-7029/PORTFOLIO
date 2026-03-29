@@ -44,10 +44,8 @@ const contentFieldMap = {
     { key: "secondaryButtonText", label: "Secondary Button Text" },
     { key: "secondaryButtonLink", label: "Secondary Button Link" },
     { key: "scrollLabel", label: "Scroll Label" },
-    { key: "overlayImageOne", label: "Overlay Image 1", type: "media-select" },
-    { key: "overlayImageTwo", label: "Overlay Image 2", type: "media-select" },
-    { key: "overlayImageThree", label: "Overlay Image 3", type: "media-select" },
-    { key: "overlayImageFour", label: "Overlay Image 4", type: "media-select" },
+    { key: "overlayImages", label: "Overlay Images", type: "media-list" },
+    { key: "overlayOpacity", label: "Overlay Opacity", type: "number" },
     { key: "highlightItems", label: "Highlight Items", type: "list" },
     { key: "statsItems", label: "Hero Stats", type: "stats-list" },
   ],
@@ -433,6 +431,64 @@ export default function AdminPage() {
               </option>
             ))}
           </select>
+        </label>
+      );
+    }
+
+    if (field.type === "media-list") {
+      const mediaOptions = [...staticMediaOptions, ...media.map((mediaItem) => ({ value: mediaItem.url, label: mediaItem.name }))]
+        .filter((item, index, list) => item.value && list.findIndex((candidate) => candidate.value === item.value) === index);
+
+      const currentValues = Array.isArray(value) ? value : [];
+
+      return (
+        <label key={field.key} className="full-span">
+          {field.label}
+          <textarea
+            value={currentValues.join("\n")}
+            onChange={(event) =>
+              updateSectionDraft(sectionKey, {
+                [field.key]: event.target.value
+                  .split("\n")
+                  .map((item) => item.trim())
+                  .filter(Boolean),
+              })
+            }
+            placeholder="/media/ai-tools-showcase.png&#10;/media/meta-showcase.webp"
+          />
+          <select
+            value=""
+            onChange={(event) => {
+              const nextValue = event.target.value;
+              if (!nextValue) return;
+              updateSectionDraft(sectionKey, {
+                [field.key]: [...currentValues, nextValue].filter((item, index, list) => list.indexOf(item) === index),
+              });
+              event.target.value = "";
+            }}
+          >
+            <option value="">Add image from media library</option>
+            {mediaOptions.map((mediaItem) => (
+              <option key={mediaItem.value} value={mediaItem.value}>
+                {mediaItem.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      );
+    }
+
+    if (field.type === "number") {
+      return (
+        <label key={field.key}>
+          {field.label}
+          <input
+            type="number"
+            min="0"
+            max="100"
+            value={value ?? 44}
+            onChange={(event) => updateSectionDraft(sectionKey, { [field.key]: Number(event.target.value) })}
+          />
         </label>
       );
     }

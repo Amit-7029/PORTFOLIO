@@ -515,6 +515,7 @@ export default function PortfolioView({ data, preview = false }) {
     "--hero-float-distance": `${10 * intensityFactor}px`,
     "--glow-strength": glowEnabled ? intensityFactor.toFixed(2) : "0",
     "--hero-glow-scale": glowEnabled ? (glowFactor * intensityFactor).toFixed(2) : "0",
+    "--hero-overlay-opacity": `${Math.max(0, Math.min(Number(heroSection.overlayOpacity ?? 44), 100)) / 100}`,
   };
 
   const aboutPreview = stripHtml(data.profile.aboutHtml);
@@ -527,12 +528,16 @@ export default function PortfolioView({ data, preview = false }) {
   const achievementsSection = sectionConfig.achievements || {};
   const contactSection = sectionConfig.contact || {};
   const footerSection = sectionConfig.footer || {};
-  const heroOverlayImages = [
-    heroSection.overlayImageOne || "/media/ai-tools-showcase.png",
-    heroSection.overlayImageTwo || "/media/meta-showcase.webp",
-    heroSection.overlayImageThree || "/media/web-dev-showcase-1.png",
-    heroSection.overlayImageFour || "/media/web-dev-showcase-2.jpg",
-  ].filter(Boolean);
+  const heroOverlayImages = (
+    Array.isArray(heroSection.overlayImages) && heroSection.overlayImages.length
+      ? heroSection.overlayImages
+      : [
+          heroSection.overlayImageOne || "/media/ai-tools-showcase.png",
+          heroSection.overlayImageTwo || "/media/meta-showcase.webp",
+          heroSection.overlayImageThree || "/media/web-dev-showcase-1.png",
+          heroSection.overlayImageFour || "/media/web-dev-showcase-2.jpg",
+        ]
+  ).filter(Boolean);
   const projectVisualCards = [
     {
       image: projectsSection.visualPrimaryImage || "/media/ai-tools-showcase.png",
@@ -647,6 +652,21 @@ export default function PortfolioView({ data, preview = false }) {
       {heroSection.visible !== false ? (
       <section className={`hero-showcase-shell is-visible ${heroReady ? "hero-ready" : ""}`} data-progress-zone data-section-id="hero" id="hero" style={sectionOrderStyle("hero", 0)}>
         <div className="hero-intro-curtain" aria-hidden="true" />
+        {heroOverlayImages.length ? (
+          <div className="hero-showcase-overlay" aria-hidden="true">
+            {heroOverlayImages.map((image, index) => (
+              <img
+                key={`${image}-${index}`}
+                className={`hero-showcase-overlay-slide ${index === 0 ? "is-initial" : ""}`}
+                src={image}
+                alt=""
+                loading="eager"
+                style={{ animationDelay: `${index * 5.5}s` }}
+              />
+            ))}
+            <span className="hero-showcase-overlay-scrim" />
+          </div>
+        ) : null}
         <div className="hero-ambient" aria-hidden="true">
           <span className="hero-ambient-orb hero-ambient-orb-one" />
           <span className="hero-ambient-orb hero-ambient-orb-two" />
@@ -694,24 +714,6 @@ export default function PortfolioView({ data, preview = false }) {
 
         <div className={`portfolio-hero-panel is-visible ${heroReady ? "hero-ready" : ""}`}>
           <div className="hero-copy">
-            {heroOverlayImages.length ? (
-              <div className="hero-copy-background" aria-hidden="true">
-                {heroOverlayImages.map((image, index) => (
-                  <img
-                    key={`${image}-${index}`}
-                    className={`hero-copy-slide ${index === 0 ? "is-initial" : ""}`}
-                    src={image}
-                    alt=""
-                    loading="eager"
-                    aria-hidden="true"
-                    style={{
-                      animationDelay: `${index * 5.5}s`,
-                    }}
-                  />
-                ))}
-                <span className="hero-copy-scrim" />
-              </div>
-            ) : null}
             <p className="portfolio-kicker hero-eyebrow">{heroSection.introLabel || "Hello, I'm"}</p>
             <span className="hero-meta-chip">{heroSection.kicker || "Current Profile"}</span>
             <h1 className="hero-title hero-stagger hero-heading-plain">{data.profile.name}</h1>
