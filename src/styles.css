@@ -3484,10 +3484,17 @@ td {
 
 .hero-copy-background {
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
+  top: 18px;
+  right: 18px;
+  bottom: 18px;
+  width: min(42%, 280px);
+  border-radius: 28px;
   overflow: hidden;
   pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 18px 40px rgba(4, 10, 20, 0.24);
 }
 
 .hero-copy-slide,
@@ -3511,10 +3518,62 @@ td {
 
 .hero-copy-scrim {
   background:
-    radial-gradient(circle at 12% 16%, rgba(57, 215, 255, 0.16), transparent 30%),
-    linear-gradient(90deg, rgba(6, 10, 18, 0.72) 0%, rgba(6, 10, 18, 0.58) 40%, rgba(6, 10, 18, 0.48) 100%),
-    linear-gradient(180deg, rgba(6, 10, 18, 0.08) 0%, rgba(6, 10, 18, 0.42) 100%);
+    radial-gradient(circle at 30% 16%, rgba(57, 215, 255, 0.18), transparent 32%),
+    linear-gradient(180deg, rgba(6, 10, 18, 0.12) 0%, rgba(6, 10, 18, 0.42) 100%);
   backdrop-filter: blur(0.5px);
+}
+
+.hero-showcase-shell .hero-copy .portfolio-kicker,
+.hero-showcase-shell .hero-copy .hero-meta-chip,
+.hero-showcase-shell .hero-copy .hero-title,
+.hero-showcase-shell .hero-copy .hero-role-line,
+.hero-showcase-shell .hero-copy .hero-summary,
+.hero-showcase-shell .hero-copy .hero-detail,
+.hero-showcase-shell .hero-copy .hero-socials,
+.hero-showcase-shell .hero-copy .hero-actions,
+.hero-showcase-shell .hero-copy .hero-highlights,
+.hero-showcase-shell .hero-copy .hero-scroll-indicator {
+  max-width: calc(100% - min(42%, 308px));
+}
+
+@media (max-width: 1200px) {
+  .hero-copy-background {
+    width: min(38%, 230px);
+  }
+
+  .hero-showcase-shell .hero-copy .portfolio-kicker,
+  .hero-showcase-shell .hero-copy .hero-meta-chip,
+  .hero-showcase-shell .hero-copy .hero-title,
+  .hero-showcase-shell .hero-copy .hero-role-line,
+  .hero-showcase-shell .hero-copy .hero-summary,
+  .hero-showcase-shell .hero-copy .hero-detail,
+  .hero-showcase-shell .hero-copy .hero-socials,
+  .hero-showcase-shell .hero-copy .hero-actions,
+  .hero-showcase-shell .hero-copy .hero-highlights,
+  .hero-showcase-shell .hero-copy .hero-scroll-indicator {
+    max-width: calc(100% - min(38%, 250px));
+  }
+}
+
+@media (max-width: 960px) {
+  .hero-copy-background {
+    inset: 0;
+    width: auto;
+    border-radius: inherit;
+  }
+
+  .hero-showcase-shell .hero-copy .portfolio-kicker,
+  .hero-showcase-shell .hero-copy .hero-meta-chip,
+  .hero-showcase-shell .hero-copy .hero-title,
+  .hero-showcase-shell .hero-copy .hero-role-line,
+  .hero-showcase-shell .hero-copy .hero-summary,
+  .hero-showcase-shell .hero-copy .hero-detail,
+  .hero-showcase-shell .hero-copy .hero-socials,
+  .hero-showcase-shell .hero-copy .hero-actions,
+  .hero-showcase-shell .hero-copy .hero-highlights,
+  .hero-showcase-shell .hero-copy .hero-scroll-indicator {
+    max-width: none;
+  }
 }
 
 .animations-off .hero-copy-slide,
