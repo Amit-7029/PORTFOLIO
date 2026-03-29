@@ -63,6 +63,8 @@ const contentFieldMap = {
     { key: "title", label: "Title" },
     { key: "description", label: "Description", type: "textarea" },
     { key: "highlightLabel", label: "Highlight Label" },
+    { key: "storyTextBold", label: "Story Text Bold", type: "toggle" },
+    { key: "storyTextGlow", label: "Story Text Glow", type: "toggle" },
     { key: "storyImage", label: "About Story Bottom Image", type: "media-select" },
     { key: "visualImage", label: "About Visual Image", type: "media-select" },
   ],

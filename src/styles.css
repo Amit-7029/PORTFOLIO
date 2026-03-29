@@ -1130,10 +1130,37 @@ td {
 .about-story-copy {
   display: grid;
   gap: 0;
+  color: #d7deee;
+}
+
+.about-story-copy p {
+  margin: 0;
+  font-size: 1.06rem;
+  line-height: 1.78;
+  font-weight: 500;
+  color: inherit;
 }
 
 .about-story p + p {
   margin-top: 16px;
+}
+
+.about-story-strong .about-story-copy p {
+  font-weight: 700;
+  color: #f4f7ff;
+}
+
+.about-story-glow .about-story-copy p {
+  color: #eef4ff;
+  text-shadow:
+    0 0 14px rgba(57, 215, 255, 0.1),
+    0 0 28px rgba(57, 215, 255, 0.08);
+}
+
+.about-story-strong.about-story-glow .about-story-copy p {
+  text-shadow:
+    0 0 18px rgba(57, 215, 255, 0.14),
+    0 0 34px rgba(57, 215, 255, 0.1);
 }
 
 .about-story-inline-visual {
