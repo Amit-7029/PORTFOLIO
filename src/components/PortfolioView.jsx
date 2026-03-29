@@ -545,6 +545,16 @@ export default function PortfolioView({ data, preview = false }) {
   const primaryColor = data.theme.primaryColor;
   const secondaryColor = data.theme.secondaryColor;
   const glowColor = data.theme.glowColor || primaryColor;
+  const aboutPreview = stripHtml(data.profile.aboutHtml);
+  const heroSection = sectionConfig.hero || {};
+  const aboutSection = sectionConfig.about || {};
+  const servicesSection = sectionConfig.services || {};
+  const skillsSection = sectionConfig.skills || {};
+  const experienceSection = sectionConfig.experience || {};
+  const projectsSection = sectionConfig.projects || {};
+  const achievementsSection = sectionConfig.achievements || {};
+  const contactSection = sectionConfig.contact || {};
+  const footerSection = sectionConfig.footer || {};
 
   const themeStyle = {
     "--portfolio-primary": primaryColor,
@@ -579,17 +589,6 @@ export default function PortfolioView({ data, preview = false }) {
     "--hero-glow-scale": glowEnabled ? (glowFactor * intensityFactor).toFixed(2) : "0",
     "--hero-overlay-opacity": `${Math.max(0, Math.min(Number(heroSection.overlayOpacity ?? 44), 100)) / 100}`,
   };
-
-  const aboutPreview = stripHtml(data.profile.aboutHtml);
-  const heroSection = sectionConfig.hero || {};
-  const aboutSection = sectionConfig.about || {};
-  const servicesSection = sectionConfig.services || {};
-  const skillsSection = sectionConfig.skills || {};
-  const experienceSection = sectionConfig.experience || {};
-  const projectsSection = sectionConfig.projects || {};
-  const achievementsSection = sectionConfig.achievements || {};
-  const contactSection = sectionConfig.contact || {};
-  const footerSection = sectionConfig.footer || {};
   const heroOverlayImages = (
     Array.isArray(heroSection.overlayImages) && heroSection.overlayImages.length
       ? heroSection.overlayImages
