@@ -565,6 +565,31 @@ export default function PortfolioView({ data, preview = false }) {
   const glowColor = data.theme.glowColor || primaryColor;
   const aboutPreview = stripHtml(data.profile.aboutHtml);
   const heroSection = sectionConfig.hero || {};
+  const heroRoleClassName = [
+    "hero-stagger",
+    "hero-role-line",
+    "hero-role-heading",
+    heroSection.headlineBold ? "hero-role-strong" : "",
+    heroSection.headlineGlow ? "hero-role-glow" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const heroSummaryClassName = [
+    "hero-summary",
+    "hero-stagger",
+    heroSection.bodyBold ? "hero-copy-strong" : "",
+    heroSection.bodyGlow ? "hero-copy-glow" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const heroDetailClassName = [
+    "hero-detail",
+    "hero-stagger",
+    heroSection.bodyBold ? "hero-copy-strong" : "",
+    heroSection.bodyGlow ? "hero-copy-glow" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
   const aboutSection = sectionConfig.about || {};
   const aboutStoryImage = Object.prototype.hasOwnProperty.call(aboutSection, "storyImage")
     ? aboutSection.storyImage
@@ -815,7 +840,7 @@ export default function PortfolioView({ data, preview = false }) {
             <p className="portfolio-kicker hero-eyebrow">{heroSection.introLabel || "Hello, I'm"}</p>
             <span className="hero-meta-chip">{heroSection.kicker || "Current Profile"}</span>
             <h1 className="hero-title hero-stagger hero-heading-plain">{data.profile.name}</h1>
-            <h2 className="hero-stagger hero-role-line hero-role-heading">
+            <h2 className={heroRoleClassName}>
               {heroHeadlineParts.length ? (
                 <span className="hero-role-parts">
                   {heroHeadlineParts.map((part, index) => (
@@ -829,8 +854,8 @@ export default function PortfolioView({ data, preview = false }) {
                 data.profile.headline
               )}
             </h2>
-            <p className="hero-summary hero-stagger">{data.profile.subheadline}</p>
-            <p className="hero-detail hero-stagger">{heroSection.description || aboutPreview}</p>
+            <p className={heroSummaryClassName}>{data.profile.subheadline}</p>
+            <p className={heroDetailClassName}>{heroSection.description || aboutPreview}</p>
 
             {socialLinks.length ? (
               <div className="hero-socials hero-stagger">

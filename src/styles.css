@@ -4311,6 +4311,18 @@ td {
   margin-top: 2px;
 }
 
+.hero-role-strong {
+  font-weight: 800;
+  color: #f7fbff;
+}
+
+.hero-role-glow {
+  color: #f7fbff;
+  text-shadow:
+    0 0 16px rgba(57, 215, 255, 0.12),
+    0 0 32px rgba(57, 215, 255, 0.08);
+}
+
 .hero-role-parts {
   display: flex;
   flex-wrap: wrap;
@@ -4349,6 +4361,18 @@ td {
   max-width: 54ch;
   line-height: 1.72;
   color: color-mix(in srgb, var(--portfolio-text, #f6f7fb) 78%, #91a1bf 22%);
+}
+
+.hero-copy-strong {
+  font-weight: 600;
+  color: #eef4ff;
+}
+
+.hero-copy-glow {
+  color: #f3f8ff;
+  text-shadow:
+    0 0 12px rgba(57, 215, 255, 0.08),
+    0 0 24px rgba(57, 215, 255, 0.05);
 }
 
 @media (max-width: 960px) {
