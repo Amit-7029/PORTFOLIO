@@ -29,6 +29,12 @@ async function fileToDataUrl(file) {
   return `data:image/webp;base64,${optimized.toString("base64")}`;
 }
 
+function sanitizeMediaItem(item) {
+  if (!item) return item;
+  const { assetData, ...rest } = item;
+  return rest;
+}
+
 function broadcast(type, payload) {
   const body = `event: ${type}\ndata: ${JSON.stringify(payload)}\n\n`;
   for (const client of clients) client.write(body);
@@ -36,7 +42,10 @@ function broadcast(type, payload) {
 
 function sanitizeStore(store) {
   const { adminUser, messages, ...rest } = store;
-  return rest;
+  return {
+    ...rest,
+    media: Array.isArray(rest.media) ? rest.media.map(sanitizeMediaItem) : [],
+  };
 }
 
 function dashboardStats(store) {
@@ -298,7 +307,7 @@ app.get("/api/media", authMiddleware, asyncHandler(async (_req, res) => {
   if (services.configured) {
     try {
       const mediaItems = await readFirestoreMedia(services);
-      return res.json(mediaItems);
+      return res.json(mediaItems.map(sanitizeMediaItem));
     } catch (error) {
       if (!String(error?.message || "").includes("NOT_FOUND")) {
         throw error;
@@ -307,7 +316,42 @@ app.get("/api/media", authMiddleware, asyncHandler(async (_req, res) => {
   }
 
   const store = await readStore();
-  res.json(store.media);
+  res.json((store.media || []).map(sanitizeMediaItem));
+}));
+
+app.get("/api/media/file/:id", asyncHandler(async (req, res) => {
+  const services = getFirebaseServices();
+  let mediaItem = null;
+
+  if (services.configured) {
+    const snapshot = await services.db.collection("portfolioCmsMedia").doc(req.params.id).get();
+    if (snapshot.exists) {
+      mediaItem = snapshot.data();
+    }
+  }
+
+  if (!mediaItem) {
+    const store = await readStore();
+    mediaItem = (store.media || []).find((item) => item.id === req.params.id);
+  }
+
+  if (!mediaItem?.assetData && typeof mediaItem?.url === "string" && mediaItem.url.startsWith("data:image/")) {
+    mediaItem = { ...mediaItem, assetData: mediaItem.url };
+  }
+
+  if (!mediaItem?.assetData) {
+    return res.status(404).send("Not found");
+  }
+
+  const match = mediaItem.assetData.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
+  if (!match) {
+    return res.status(400).send("Invalid media data");
+  }
+
+  const [, mimeType, base64] = match;
+  res.setHeader("Content-Type", mimeType);
+  res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+  res.send(Buffer.from(base64, "base64"));
 }));
 
 app.post("/api/media/upload", authMiddleware, upload.single("file"), asyncHandler(async (req, res) => {
@@ -319,6 +363,7 @@ app.post("/api/media/upload", authMiddleware, upload.single("file"), asyncHandle
     return res.status(400).json({ message: "Only image uploads are supported" });
   }
 
+  const mediaId = createId("media");
   let uploaded = null;
   let provider = "firebase";
 
@@ -336,14 +381,15 @@ app.post("/api/media/upload", authMiddleware, upload.single("file"), asyncHandle
   }
 
   const media = {
-    id: createId("media"),
+    id: mediaId,
     name: req.file.originalname,
-    url: uploaded.url,
+    url: provider === "inline" ? `/api/media/file/${mediaId}` : uploaded.url,
     type: provider === "inline" ? "image/webp" : req.file.mimetype,
     createdAt: new Date().toISOString(),
     provider,
     publicId: uploaded.publicId || null,
     storagePath: uploaded.storagePath || null,
+    assetData: provider === "inline" ? uploaded.url : null,
   };
 
   const services = getFirebaseServices();
@@ -359,7 +405,7 @@ app.post("/api/media/upload", authMiddleware, upload.single("file"), asyncHandle
 
   const nextStore = await readStore();
   broadcast("portfolio:update", sanitizeStore(nextStore));
-  res.status(201).json(media);
+  res.status(201).json(sanitizeMediaItem(media));
 }));
 
 app.delete("/api/media/:id", authMiddleware, asyncHandler(async (req, res) => {

@@ -57,11 +57,57 @@ function splitStore(store) {
   return { content, media };
 }
 
+function normalizeMediaItems(media) {
+  let changed = false;
+  const items = (Array.isArray(media) ? media : []).map((item) => {
+    if (item?.provider === "inline") {
+      if (typeof item?.url === "string" && item.url.startsWith("data:image/")) {
+        changed = true;
+        return {
+          ...item,
+          assetData: item.assetData || item.url,
+          url: `/api/media/file/${item.id}`,
+        };
+      }
+
+      if (item?.assetData && item.url !== `/api/media/file/${item.id}`) {
+        changed = true;
+        return {
+          ...item,
+          url: `/api/media/file/${item.id}`,
+        };
+      }
+    }
+
+    return item;
+  });
+
+  return { items, changed };
+}
+
+function replaceDataUrls(value, dataUrlMap) {
+  if (typeof value === "string") {
+    return dataUrlMap.get(value) || value;
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => replaceDataUrls(item, dataUrlMap));
+  }
+
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [key, replaceDataUrls(entry, dataUrlMap)]),
+    );
+  }
+
+  return value;
+}
+
 async function readFirestoreMedia(services) {
   const snapshot = await services.db.collection(MEDIA_COLLECTION).get();
-  return snapshot.docs
+  return normalizeMediaItems(snapshot.docs
     .map((doc) => doc.data())
-    .sort((left, right) => new Date(right.createdAt || 0).getTime() - new Date(left.createdAt || 0).getTime());
+    .sort((left, right) => new Date(right.createdAt || 0).getTime() - new Date(left.createdAt || 0).getTime())).items;
 }
 
 async function writeFirestoreFullStore(services, store) {
@@ -101,6 +147,27 @@ async function removeFirestoreMediaItem(services, id) {
   await services.db.collection(MEDIA_COLLECTION).doc(id).delete();
 }
 
+async function replaceContentMediaReferences(services, store) {
+  const rawMediaSnapshot = await services.db.collection(MEDIA_COLLECTION).get();
+  const normalizedMedia = normalizeMediaItems(
+    rawMediaSnapshot.docs
+      .map((doc) => doc.data())
+      .sort((left, right) => new Date(right.createdAt || 0).getTime() - new Date(left.createdAt || 0).getTime()),
+  );
+  const dataUrlMap = new Map();
+  normalizedMedia.items.forEach((item) => {
+    if (item?.assetData && typeof item.assetData === "string") {
+      dataUrlMap.set(item.assetData, item.url);
+    }
+  });
+
+  const replaced = replaceDataUrls(store, dataUrlMap);
+  return {
+    store: normalizeStore({ ...replaced, media: normalizedMedia.items }),
+    mediaChanged: normalizedMedia.changed,
+  };
+}
+
 function isFirestoreUnavailable(error) {
   const message = error?.message || "";
   return message.includes("5 NOT_FOUND") || message.includes("The database") || message.includes("Could not load the default credentials");
@@ -121,15 +188,37 @@ async function readStore() {
         return seed;
       }
 
-      const media = await readFirestoreMedia(services);
+      const rawMediaSnapshot = await services.db.collection(MEDIA_COLLECTION).get();
+      const normalizedMedia = normalizeMediaItems(
+        rawMediaSnapshot.docs
+          .map((doc) => doc.data())
+          .sort((left, right) => new Date(right.createdAt || 0).getTime() - new Date(left.createdAt || 0).getTime()),
+      );
+      const rawMedia = normalizedMedia.items;
       const contentData = snapshot.data();
+      const dataUrlMap = new Map();
+      rawMedia.forEach((item) => {
+        if (item?.assetData && typeof item.assetData === "string") {
+          dataUrlMap.set(item.assetData, item.url);
+        }
+      });
+      const migratedContent = replaceDataUrls(contentData, dataUrlMap);
+      const media = rawMedia;
       if (!media.length && Array.isArray(contentData?.media) && contentData.media.length) {
         const migrated = normalizeStore(contentData);
         await writeFirestoreFullStore(services, migrated);
         return migrated;
       }
 
-      return normalizeStore({ ...contentData, media });
+      const contentChanged = JSON.stringify(migratedContent) !== JSON.stringify(contentData);
+
+      if (contentChanged || normalizedMedia.changed) {
+        const migrated = normalizeStore({ ...migratedContent, media });
+        await writeFirestoreFullStore(services, migrated);
+        return migrated;
+      }
+
+      return normalizeStore({ ...migratedContent, media });
     } catch (error) {
       if (!isFirestoreUnavailable(error)) {
         throw error;
@@ -154,7 +243,11 @@ async function writeStore(next) {
 
   if (services.configured) {
     try {
-      return await writeFirestoreContentStore(services, normalized);
+      const prepared = await replaceContentMediaReferences(services, normalized);
+      if (prepared.mediaChanged) {
+        return await writeFirestoreFullStore(services, prepared.store);
+      }
+      return await writeFirestoreContentStore(services, prepared.store);
     } catch (error) {
       if (!isFirestoreUnavailable(error)) {
         throw error;
