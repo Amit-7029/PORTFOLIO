@@ -4124,6 +4124,41 @@ td {
     0 0 34px var(--portfolio-glow-soft, rgba(57, 215, 255, 0.18));
 }
 
+.portfolio-card,
+.service-card,
+.timeline-card,
+.featured-project-card,
+.project-side-card,
+.achievement-card,
+.contact-copy,
+.contact-form-glass,
+.story-slide-card,
+.contact-channel-card {
+  transition:
+    transform 0.36s ease,
+    border-color 0.36s ease,
+    box-shadow 0.36s ease,
+    background-color 0.36s ease;
+}
+
+.portfolio-card:hover,
+.service-card:hover,
+.timeline-card:hover,
+.featured-project-card:hover,
+.project-side-card:hover,
+.achievement-card:hover,
+.contact-copy:hover,
+.contact-form-glass:hover,
+.story-slide-card:hover,
+.contact-channel-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  border-color: color-mix(in srgb, var(--portfolio-glow, #39d7ff) 34%, rgba(255, 255, 255, 0.1));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 24px 56px rgba(4, 10, 24, 0.34),
+    0 0 34px var(--portfolio-glow-soft, rgba(57, 215, 255, 0.18));
+}
+
 .story-slide-media {
   position: relative;
 }
