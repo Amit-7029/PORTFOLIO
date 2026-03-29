@@ -922,14 +922,19 @@ export default function PortfolioView({ data, preview = false }) {
           </div>
           <p className="section-copy">{servicesSection.description}</p>
         </div>
-        <div className="services-grid">
-          {(data.services || []).map((service, index) => (
-            <article key={service.id || `${service.title}-${index}`} className="service-card" data-parallax-speed="0.07">
-              <span className="service-index">{String(index + 1).padStart(2, "0")}</span>
-              <strong>{service.title}</strong>
-              <p>{service.description}</p>
-            </article>
-          ))}
+          <div className="services-grid">
+            {(data.services || []).map((service, index) => (
+              <article key={service.id || `${service.title}-${index}`} className="service-card" data-parallax-speed="0.07">
+                {service.image ? (
+                  <div className="service-card-media">
+                    <img src={service.image} alt={service.title || "Service"} loading="lazy" />
+                  </div>
+                ) : null}
+                <span className="service-index">{String(index + 1).padStart(2, "0")}</span>
+                <strong>{service.title}</strong>
+                <p>{service.description}</p>
+              </article>
+            ))}
         </div>
       </section>
       ) : null}

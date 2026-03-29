@@ -130,9 +130,9 @@ const contentFieldMap = {
 };
 
 function createEmpty(section) {
-  switch (section) {
-    case "services":
-      return { title: "", description: "" };
+    switch (section) {
+      case "services":
+        return { title: "", description: "", image: "" };
     case "skills":
       return { category: "Marketing", name: "", level: 50 };
     case "projects":
@@ -722,8 +722,8 @@ export default function AdminPage() {
             </div>
           </section>
         );
-      case "services":
-        return renderListSection("services", draft.services, ["title", "description"]);
+        case "services":
+          return renderListSection("services", draft.services, ["title", "description", "image"]);
       case "skills":
         return renderListSection("skills", draft.skills, ["category", "name", "level"]);
       case "projects":
