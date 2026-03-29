@@ -600,6 +600,21 @@ export default function PortfolioView({ data, preview = false }) {
     .filter(Boolean)
     .join(" ");
   const aboutSection = sectionConfig.about || {};
+  const heroEyebrowClassName = [
+    "portfolio-kicker",
+    "hero-eyebrow",
+    heroSection.chipBold ? "hero-chip-strong" : "",
+    heroSection.chipGlow ? "hero-chip-glow" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const heroMetaChipClassName = [
+    "hero-meta-chip",
+    heroSection.chipBold ? "hero-chip-strong" : "",
+    heroSection.chipGlow ? "hero-chip-glow" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
   const aboutStoryImage = Object.prototype.hasOwnProperty.call(aboutSection, "storyImage")
     ? aboutSection.storyImage
     : "/media/about-story-visual.png";
@@ -846,8 +861,8 @@ export default function PortfolioView({ data, preview = false }) {
 
         <div className={`portfolio-hero-panel is-visible ${heroReady ? "hero-ready" : ""}`}>
           <div className="hero-copy">
-            <p className="portfolio-kicker hero-eyebrow">{heroSection.introLabel || "Hello, I'm"}</p>
-            <span className="hero-meta-chip">{heroSection.kicker || "Current Profile"}</span>
+            <p className={heroEyebrowClassName}>{heroSection.introLabel || "Hello, I'm"}</p>
+            <span className={heroMetaChipClassName}>{heroSection.kicker || "Current Profile"}</span>
             <h1 className={heroTitleClassName}>{data.profile.name}</h1>
             <h2 className={heroRoleClassName}>
               {heroHeadlineParts.length ? (
@@ -883,10 +898,31 @@ export default function PortfolioView({ data, preview = false }) {
               <a className="secondary-button portfolio-button" href={heroSection.secondaryButtonLink || "#contact"} onPointerDown={triggerRipple}>
                 {heroSection.secondaryButtonText || "Hire Me"}
               </a>
+              {heroSection.clientProjectButtonLink ? (
+                <a
+                  className="secondary-button portfolio-button portfolio-button-client"
+                  href={normalizeExternalLink(heroSection.clientProjectButtonLink)}
+                  target="_blank"
+                  rel="noreferrer"
+                  onPointerDown={triggerRipple}
+                >
+                  {heroSection.clientProjectButtonText || "Real Client Project"}
+                </a>
+              ) : null}
             </div>
             <div className="hero-highlights hero-stagger">
               {topHighlights.map((item) => (
-                <span key={item}>{item}</span>
+                <span
+                  key={item}
+                  className={[
+                    heroSection.chipBold ? "hero-chip-strong" : "",
+                    heroSection.chipGlow ? "hero-chip-glow" : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                >
+                  {item}
+                </span>
               ))}
             </div>
             <a className="hero-scroll-indicator hero-stagger" href="#about" onPointerDown={triggerRipple}>

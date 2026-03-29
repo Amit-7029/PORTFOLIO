@@ -3899,6 +3899,29 @@ td {
   background: rgba(255, 255, 255, 0.03);
 }
 
+.hero-chip-strong {
+  font-weight: 700 !important;
+  color: #f7fbff !important;
+}
+
+.hero-chip-glow {
+  color: #f7fbff !important;
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.05),
+    0 0 20px rgba(57, 215, 255, 0.12) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 26px rgba(57, 215, 255, 0.1);
+}
+
+.portfolio-button-client {
+  border-color: rgba(57, 215, 255, 0.26);
+  background: linear-gradient(135deg, rgba(57, 215, 255, 0.16), rgba(75, 124, 255, 0.14));
+  box-shadow:
+    0 16px 32px rgba(9, 17, 34, 0.24),
+    0 0 28px rgba(57, 215, 255, 0.12);
+}
+
 .hero-image-shell {
   width: min(420px, 100%);
   position: relative;
