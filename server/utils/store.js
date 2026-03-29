@@ -64,7 +64,7 @@ async function readFirestoreMedia(services) {
     .sort((left, right) => new Date(right.createdAt || 0).getTime() - new Date(left.createdAt || 0).getTime());
 }
 
-async function writeFirestoreStore(services, store) {
+async function writeFirestoreFullStore(services, store) {
   const normalized = normalizeStore(store);
   const { content, media } = splitStore(normalized);
   const batch = services.db.batch();
@@ -85,6 +85,22 @@ async function writeFirestoreStore(services, store) {
   return normalized;
 }
 
+async function writeFirestoreContentStore(services, store) {
+  const normalized = normalizeStore(store);
+  const { content } = splitStore(normalized);
+  await services.db.collection(COLLECTION).doc(DOC_ID).set(content);
+  return normalized;
+}
+
+async function upsertFirestoreMediaItem(services, item) {
+  await services.db.collection(MEDIA_COLLECTION).doc(item.id).set(item);
+  return item;
+}
+
+async function removeFirestoreMediaItem(services, id) {
+  await services.db.collection(MEDIA_COLLECTION).doc(id).delete();
+}
+
 function isFirestoreUnavailable(error) {
   const message = error?.message || "";
   return message.includes("5 NOT_FOUND") || message.includes("The database") || message.includes("Could not load the default credentials");
@@ -101,7 +117,7 @@ async function readStore() {
       const seed = readJsonSeed();
 
       if (!snapshot.exists) {
-        await writeFirestoreStore(services, seed);
+        await writeFirestoreFullStore(services, seed);
         return seed;
       }
 
@@ -109,7 +125,7 @@ async function readStore() {
       const contentData = snapshot.data();
       if (!media.length && Array.isArray(contentData?.media) && contentData.media.length) {
         const migrated = normalizeStore(contentData);
-        await writeFirestoreStore(services, migrated);
+        await writeFirestoreFullStore(services, migrated);
         return migrated;
       }
 
@@ -138,7 +154,7 @@ async function writeStore(next) {
 
   if (services.configured) {
     try {
-      return await writeFirestoreStore(services, normalized);
+      return await writeFirestoreContentStore(services, normalized);
     } catch (error) {
       if (!isFirestoreUnavailable(error)) {
         throw error;
@@ -167,4 +183,7 @@ module.exports = {
   readStore,
   writeStore,
   updateStore,
+  readFirestoreMedia,
+  upsertFirestoreMediaItem,
+  removeFirestoreMediaItem,
 };

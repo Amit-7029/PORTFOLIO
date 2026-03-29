@@ -4,7 +4,7 @@ const multer = require("multer");
 const { randomUUID } = require("node:crypto");
 const path = require("node:path");
 const sharp = require("sharp");
-const { readStore, updateStore } = require("./utils/store");
+const { readStore, updateStore, readFirestoreMedia, upsertFirestoreMediaItem, removeFirestoreMediaItem } = require("./utils/store");
 const { comparePassword, signToken, verifyToken } = require("./utils/auth");
 const { getFirebaseConfig, getFirebaseServices } = require("./utils/firebaseAdmin");
 const { getCloudinaryConfig, uploadBuffer, destroyAsset } = require("./utils/cloudinary");
@@ -294,6 +294,18 @@ app.put("/api/achievements/:id", authMiddleware, achievementsApi.update);
 app.delete("/api/achievements/:id", authMiddleware, achievementsApi.remove);
 
 app.get("/api/media", authMiddleware, asyncHandler(async (_req, res) => {
+  const services = getFirebaseServices();
+  if (services.configured) {
+    try {
+      const mediaItems = await readFirestoreMedia(services);
+      return res.json(mediaItems);
+    } catch (error) {
+      if (!String(error?.message || "").includes("NOT_FOUND")) {
+        throw error;
+      }
+    }
+  }
+
   const store = await readStore();
   res.json(store.media);
 }));
@@ -334,11 +346,19 @@ app.post("/api/media/upload", authMiddleware, upload.single("file"), asyncHandle
     storagePath: uploaded.storagePath || null,
   };
 
-  const store = await updateStore((current) => {
-    current.media.unshift(media);
-    return current;
-  });
-  broadcast("portfolio:update", sanitizeStore(store));
+  const services = getFirebaseServices();
+  if (services.configured) {
+    await upsertFirestoreMediaItem(services, media);
+  } else {
+    const store = await updateStore((current) => {
+      current.media.unshift(media);
+      return current;
+    });
+    broadcast("portfolio:update", sanitizeStore(store));
+  }
+
+  const nextStore = await readStore();
+  broadcast("portfolio:update", sanitizeStore(nextStore));
   res.status(201).json(media);
 }));
 
@@ -358,11 +378,18 @@ app.delete("/api/media/:id", authMiddleware, asyncHandler(async (req, res) => {
     await destroyAsset(media.publicId);
   }
 
-  const next = await updateStore((current) => {
-    current.media = current.media.filter((item) => item.id !== req.params.id);
-    return current;
-  });
-  broadcast("portfolio:update", sanitizeStore(next));
+  const services = getFirebaseServices();
+  if (services.configured) {
+    await removeFirestoreMediaItem(services, req.params.id);
+  } else {
+    await updateStore((current) => {
+      current.media = current.media.filter((item) => item.id !== req.params.id);
+      return current;
+    });
+  }
+
+  const nextStore = await readStore();
+  broadcast("portfolio:update", sanitizeStore(nextStore));
   res.json({ success: true });
 }));
 

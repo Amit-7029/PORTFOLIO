@@ -241,27 +241,31 @@ export default function AdminPage() {
   }
 
   async function saveListItem(key, item) {
-    const isDraft = !item.id || item.id.startsWith("draft_");
-    const method = isDraft ? "POST" : "PUT";
-    const url = isDraft ? `/api/${key}` : `/api/${key}/${item.id}`;
-    const payload = { ...item };
-    delete payload.id;
-    const saved = await apiFetch(url, {
-      method,
-      body: JSON.stringify(payload),
-    });
-    setDraft((current) => {
-      const list =
-        method === "POST"
-          ? [...current[key].filter((entry) => entry.id !== item.id), saved]
-          : current[key].map((entry) => (entry.id === saved.id ? saved : entry));
-      const next = { ...current, [key]: list };
-      setPortfolio(next);
-      return next;
-    });
-    const dashboard = await apiFetch("/api/dashboard/stats");
-    setStats(dashboard);
-    toast({ title: "Saved", message: `${key.slice(0, -1)} updated.`, type: "success" });
+    try {
+      const isDraft = !item.id || item.id.startsWith("draft_");
+      const method = isDraft ? "POST" : "PUT";
+      const url = isDraft ? `/api/${key}` : `/api/${key}/${item.id}`;
+      const payload = { ...item };
+      delete payload.id;
+      const saved = await apiFetch(url, {
+        method,
+        body: JSON.stringify(payload),
+      });
+      setDraft((current) => {
+        const list =
+          method === "POST"
+            ? [...current[key].filter((entry) => entry.id !== item.id), saved]
+            : current[key].map((entry) => (entry.id === saved.id ? saved : entry));
+        const next = { ...current, [key]: list };
+        setPortfolio(next);
+        return next;
+      });
+      const dashboard = await apiFetch("/api/dashboard/stats");
+      setStats(dashboard);
+      toast({ title: "Saved", message: `${key.slice(0, -1)} updated.`, type: "success" });
+    } catch (error) {
+      toast({ title: "Save failed", message: error.message || "Could not save changes.", type: "error" });
+    }
   }
 
   function updateListItem(key, id, field, value) {
