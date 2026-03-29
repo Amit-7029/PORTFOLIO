@@ -107,8 +107,10 @@
       "primaryButtonLink": "#contact",
       "secondaryButtonText": "Let's Work Together",
       "secondaryButtonLink": "#projects",
+      "secondaryButtonSolid": true,
       "clientProjectButtonText": "Real Client Project",
       "clientProjectButtonLink": "https://website-for-hospaccx.vercel.app/",
+      "clientProjectButtonSolid": true,
       "scrollLabel": "Scroll to explore",
       "overlayImages": [
         "/media/ai-tools-showcase.png",

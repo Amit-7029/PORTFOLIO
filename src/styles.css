@@ -3922,6 +3922,13 @@ td {
     0 0 28px rgba(57, 215, 255, 0.12);
 }
 
+.portfolio-frame .primary-button.portfolio-button-client {
+  background: linear-gradient(135deg, var(--portfolio-primary), #5d7cff);
+  box-shadow:
+    0 18px 35px rgba(95, 125, 255, 0.22),
+    0 0 24px rgba(57, 215, 255, 0.14);
+}
+
 .hero-image-shell {
   width: min(420px, 100%);
   position: relative;

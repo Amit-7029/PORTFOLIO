@@ -615,6 +615,19 @@ export default function PortfolioView({ data, preview = false }) {
   ]
     .filter(Boolean)
     .join(" ");
+  const secondaryButtonClassName = [
+    heroSection.secondaryButtonSolid ? "primary-button" : "secondary-button",
+    "portfolio-button",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const clientProjectButtonClassName = [
+    heroSection.clientProjectButtonSolid ? "primary-button" : "secondary-button",
+    "portfolio-button",
+    "portfolio-button-client",
+  ]
+    .filter(Boolean)
+    .join(" ");
   const aboutStoryImage = Object.prototype.hasOwnProperty.call(aboutSection, "storyImage")
     ? aboutSection.storyImage
     : "/media/about-story-visual.png";
@@ -895,12 +908,12 @@ export default function PortfolioView({ data, preview = false }) {
               <a className="primary-button portfolio-button" href={heroSection.primaryButtonLink || "#projects"} onPointerDown={triggerRipple}>
                 {heroSection.primaryButtonText || "View Projects"}
               </a>
-              <a className="secondary-button portfolio-button" href={heroSection.secondaryButtonLink || "#contact"} onPointerDown={triggerRipple}>
+              <a className={secondaryButtonClassName} href={heroSection.secondaryButtonLink || "#contact"} onPointerDown={triggerRipple}>
                 {heroSection.secondaryButtonText || "Hire Me"}
               </a>
               {heroSection.clientProjectButtonLink ? (
                 <a
-                  className="secondary-button portfolio-button portfolio-button-client"
+                  className={clientProjectButtonClassName}
                   href={normalizeExternalLink(heroSection.clientProjectButtonLink)}
                   target="_blank"
                   rel="noreferrer"
