@@ -7,6 +7,7 @@ const seedStore = require("../data/store.json");
 const DATA_PATH = path.join(__dirname, "..", "data", "store.json");
 const COLLECTION = "portfolioCms";
 const DOC_ID = "content";
+const MEDIA_COLLECTION = "portfolioCmsMedia";
 
 function readJsonSeed() {
   if (fs.existsSync(DATA_PATH)) {
@@ -49,6 +50,41 @@ function normalizeStore(store) {
   return mergeWithSeed(store, readJsonSeed());
 }
 
+function splitStore(store) {
+  const next = structuredClone(store);
+  next.media = Array.isArray(store?.media) ? store.media : [];
+  const { media, ...content } = next;
+  return { content, media };
+}
+
+async function readFirestoreMedia(services) {
+  const snapshot = await services.db.collection(MEDIA_COLLECTION).get();
+  return snapshot.docs
+    .map((doc) => doc.data())
+    .sort((left, right) => new Date(right.createdAt || 0).getTime() - new Date(left.createdAt || 0).getTime());
+}
+
+async function writeFirestoreStore(services, store) {
+  const normalized = normalizeStore(store);
+  const { content, media } = splitStore(normalized);
+  const batch = services.db.batch();
+  const contentRef = services.db.collection(COLLECTION).doc(DOC_ID);
+  batch.set(contentRef, content);
+
+  const existingMedia = await services.db.collection(MEDIA_COLLECTION).get();
+  for (const doc of existingMedia.docs) {
+    batch.delete(doc.ref);
+  }
+
+  for (const item of media) {
+    const mediaRef = services.db.collection(MEDIA_COLLECTION).doc(item.id);
+    batch.set(mediaRef, item);
+  }
+
+  await batch.commit();
+  return normalized;
+}
+
 function isFirestoreUnavailable(error) {
   const message = error?.message || "";
   return message.includes("5 NOT_FOUND") || message.includes("The database") || message.includes("Could not load the default credentials");
@@ -62,14 +98,22 @@ async function readStore() {
     try {
       const docRef = services.db.collection(COLLECTION).doc(DOC_ID);
       const snapshot = await docRef.get();
+      const seed = readJsonSeed();
 
       if (!snapshot.exists) {
-        const seed = readJsonSeed();
-        await docRef.set(seed);
+        await writeFirestoreStore(services, seed);
         return seed;
       }
 
-      return normalizeStore(snapshot.data());
+      const media = await readFirestoreMedia(services);
+      const contentData = snapshot.data();
+      if (!media.length && Array.isArray(contentData?.media) && contentData.media.length) {
+        const migrated = normalizeStore(contentData);
+        await writeFirestoreStore(services, migrated);
+        return migrated;
+      }
+
+      return normalizeStore({ ...contentData, media });
     } catch (error) {
       if (!isFirestoreUnavailable(error)) {
         throw error;
@@ -94,8 +138,7 @@ async function writeStore(next) {
 
   if (services.configured) {
     try {
-      await services.db.collection(COLLECTION).doc(DOC_ID).set(normalized);
-      return normalized;
+      return await writeFirestoreStore(services, normalized);
     } catch (error) {
       if (!isFirestoreUnavailable(error)) {
         throw error;

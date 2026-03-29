@@ -3,6 +3,7 @@ const cors = require("cors");
 const multer = require("multer");
 const { randomUUID } = require("node:crypto");
 const path = require("node:path");
+const sharp = require("sharp");
 const { readStore, updateStore } = require("./utils/store");
 const { comparePassword, signToken, verifyToken } = require("./utils/auth");
 const { getFirebaseConfig, getFirebaseServices } = require("./utils/firebaseAdmin");
@@ -18,9 +19,14 @@ function createId(prefix) {
   return `${prefix}_${randomUUID().replace(/-/g, "").slice(0, 10)}`;
 }
 
-function fileToDataUrl(file) {
-  const mimeType = file?.mimetype || "application/octet-stream";
-  return `data:${mimeType};base64,${file.buffer.toString("base64")}`;
+async function fileToDataUrl(file) {
+  const optimized = await sharp(file.buffer)
+    .rotate()
+    .resize({ width: 1800, height: 1800, fit: "inside", withoutEnlargement: true })
+    .webp({ quality: 86 })
+    .toBuffer();
+
+  return `data:image/webp;base64,${optimized.toString("base64")}`;
 }
 
 function broadcast(type, payload) {
@@ -312,7 +318,7 @@ app.post("/api/media/upload", authMiddleware, upload.single("file"), asyncHandle
       uploaded = await uploadToCloudinary(req.file);
       provider = "cloudinary";
     } else {
-      uploaded = { url: fileToDataUrl(req.file), publicId: null, storagePath: null };
+      uploaded = { url: await fileToDataUrl(req.file), publicId: null, storagePath: null };
       provider = "inline";
     }
   }
@@ -321,7 +327,7 @@ app.post("/api/media/upload", authMiddleware, upload.single("file"), asyncHandle
     id: createId("media"),
     name: req.file.originalname,
     url: uploaded.url,
-    type: req.file.mimetype,
+    type: provider === "inline" ? "image/webp" : req.file.mimetype,
     createdAt: new Date().toISOString(),
     provider,
     publicId: uploaded.publicId || null,
