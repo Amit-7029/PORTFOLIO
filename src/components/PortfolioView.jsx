@@ -107,6 +107,24 @@ function normalizeExternalLink(value) {
   return `https://${trimmed.replace(/^\/+/, "")}`;
 }
 
+function buildWhatsAppHref(rawLink, rawPhone, text) {
+  const encodedText = encodeURIComponent(text || "");
+  const normalizedLink = String(rawLink || "").trim();
+  const phoneDigits = String(rawPhone || "").replace(/\D/g, "");
+
+  if (normalizedLink) {
+    const hasQuery = normalizedLink.includes("?");
+    const separator = hasQuery ? "&" : "?";
+    return `${normalizedLink}${separator}text=${encodedText}`;
+  }
+
+  if (phoneDigits) {
+    return `https://wa.me/${phoneDigits}?text=${encodedText}`;
+  }
+
+  return "";
+}
+
 function useCountUp(target, enabled) {
   const [value, setValue] = useState(enabled ? 0 : target);
 
@@ -267,7 +285,7 @@ export default function PortfolioView({ data, preview = false }) {
   const [heroReady, setHeroReady] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
+  const [contactForm, setContactForm] = useState({ name: "", phone: "", message: "" });
   const siteConfig = data?.siteConfig || {};
   const sectionConfig = data?.sections || {};
   const categoryMeta = siteConfig.skillCategoryMeta || defaultCategoryMeta;
@@ -669,16 +687,22 @@ export default function PortfolioView({ data, preview = false }) {
 
   function handleContactSubmit(event) {
     event.preventDefault();
-    const subject = encodeURIComponent(contactSection.formSubject || "Portfolio Inquiry");
     const lines = [
       `${contactSection.formNameLabel || "Name"}: ${contactForm.name}`,
-      `${contactSection.formEmailLabel || "Email"}: ${contactForm.email}`,
+      `${contactSection.formPhoneLabel || "Phone"}: ${contactForm.phone}`,
       "",
       `${contactSection.formMessageLabel || "Message"}:`,
       contactForm.message,
     ];
-    const body = encodeURIComponent(lines.join("\n"));
-    window.location.href = `mailto:${data.settings.email}?subject=${subject}&body=${body}`;
+    const whatsappHref = buildWhatsAppHref(
+      data.settings.whatsappLink,
+      data.settings.phone,
+      lines.join("\n"),
+    );
+
+    if (whatsappHref) {
+      window.open(whatsappHref, "_blank", "noopener,noreferrer");
+    }
   }
 
   function goToSlide(index) {
@@ -1126,16 +1150,16 @@ export default function PortfolioView({ data, preview = false }) {
                 required
               />
             </label>
-            <label>
-              {contactSection.formEmailLabel || "Email"}
-              <input
-                type="email"
-                value={contactForm.email}
-                onChange={(event) => handleContactFieldChange("email", event.target.value)}
-                placeholder={contactSection.formEmailPlaceholder || "you@example.com"}
-                required
-              />
-            </label>
+              <label>
+                {contactSection.formPhoneLabel || "Phone"}
+                <input
+                  type="tel"
+                  value={contactForm.phone}
+                  onChange={(event) => handleContactFieldChange("phone", event.target.value)}
+                  placeholder={contactSection.formPhonePlaceholder || "Your phone number"}
+                  required
+                />
+              </label>
             <label className="full-span">
               {contactSection.formMessageLabel || "Message"}
               <textarea

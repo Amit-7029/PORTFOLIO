@@ -209,11 +209,11 @@
       "formSubject": "Portfolio Inquiry",
       "formNameLabel": "Name",
       "formNamePlaceholder": "Your name",
-      "formEmailLabel": "Email",
-      "formEmailPlaceholder": "you@example.com",
+      "formPhoneLabel": "Phone Number",
+      "formPhonePlaceholder": "Your phone number",
       "formMessageLabel": "Message",
       "formMessagePlaceholder": "Tell me about your business or project requirement",
-      "formButtonText": "Let's Work Together"
+      "formButtonText": "Chat on WhatsApp"
     },
     "footer": {
       "visible": true,
