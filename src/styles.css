@@ -2366,6 +2366,11 @@ td {
   transform: none;
 }
 
+.portfolio-frame.hash-navigation [data-reveal] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
 .portfolio-story-section {
   overflow: visible;
 }

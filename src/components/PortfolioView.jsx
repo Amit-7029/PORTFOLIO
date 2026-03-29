@@ -260,6 +260,7 @@ function ProjectSlide({ slide, onRipple }) {
 
 export default function PortfolioView({ data, preview = false }) {
   const frameRef = useRef(null);
+  const hashNavigationMode = !preview && typeof window !== "undefined" && Boolean(window.location.hash);
 
   const [activeSection, setActiveSection] = useState("hero");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -352,7 +353,7 @@ export default function PortfolioView({ data, preview = false }) {
     const root = frameRef.current;
     const revealTargets = Array.from(root.querySelectorAll("[data-reveal]"));
     const sections = Array.from(root.querySelectorAll("[data-section-id]"));
-    const hasHashTarget = !preview && typeof window !== "undefined" && Boolean(window.location.hash);
+    const hasHashTarget = hashNavigationMode;
 
     function revealHashTarget() {
       const hash = window.location.hash?.replace("#", "");
@@ -419,7 +420,40 @@ export default function PortfolioView({ data, preview = false }) {
       sectionObserver.disconnect();
       window.removeEventListener("hashchange", revealHashTarget);
     };
-  }, [preview, scrollAnimationsEnabled, data]);
+  }, [preview, scrollAnimationsEnabled, data, hashNavigationMode]);
+
+  useEffect(() => {
+    if (!hashNavigationMode || !frameRef.current) return undefined;
+
+    let timeoutId = 0;
+    let rafId = 0;
+
+    const root = frameRef.current;
+
+    const revealAndScroll = () => {
+      const hash = window.location.hash?.replace("#", "");
+      if (!hash) return;
+
+      root.querySelectorAll("[data-reveal]").forEach((node) => node.classList.add("is-visible"));
+
+      const target = root.querySelector(`#${hash}`);
+      if (!(target instanceof HTMLElement)) return;
+
+      target.classList.add("is-visible");
+      rafId = requestAnimationFrame(() => {
+        target.scrollIntoView({ block: "start", behavior: "auto" });
+      });
+    };
+
+    timeoutId = window.setTimeout(revealAndScroll, 180);
+    window.addEventListener("hashchange", revealAndScroll);
+
+    return () => {
+      if (timeoutId) window.clearTimeout(timeoutId);
+      if (rafId) cancelAnimationFrame(rafId);
+      window.removeEventListener("hashchange", revealAndScroll);
+    };
+  }, [hashNavigationMode, data]);
 
   useEffect(() => {
     if (preview) return undefined;
@@ -669,7 +703,9 @@ export default function PortfolioView({ data, preview = false }) {
         scrollAnimationsEnabled ? "" : "scroll-effects-off"
       } ${parallaxEnabled ? "" : "parallax-off"} ${backgroundEffectsEnabled ? "" : "background-effects-off"} ${
         imageZoomEnabled ? "" : "image-zoom-off"
-      } ${introAnimationEnabled ? "" : "intro-sequence-off"} ${data.theme.buttonStyle === "square" ? "buttons-square" : ""}`}
+      } ${introAnimationEnabled ? "" : "intro-sequence-off"} ${data.theme.buttonStyle === "square" ? "buttons-square" : ""} ${
+        hashNavigationMode ? "hash-navigation" : ""
+      }`}
       style={themeStyle}
     >
       <div className="scroll-progress-indicator" aria-hidden="true">
