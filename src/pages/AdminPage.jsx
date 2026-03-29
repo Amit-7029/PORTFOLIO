@@ -32,6 +32,11 @@ const staticMediaOptions = [
   { value: "/media/web-dev-showcase-2.jpg", label: "web-dev-showcase-2.jpg" },
 ];
 
+function buildMediaOptions(media) {
+  return [...staticMediaOptions, ...media.map((mediaItem) => ({ value: mediaItem.url, label: mediaItem.name }))]
+    .filter((item, index, list) => item.value && list.findIndex((candidate) => candidate.value === item.value) === index);
+}
+
 const contentFieldMap = {
   hero: [
     { key: "visible", label: "Visible", type: "toggle" },
@@ -302,9 +307,115 @@ export default function AdminPage() {
       });
       setMedia((current) => [uploaded, ...current]);
       toast({ title: "Uploaded", message: "Media uploaded successfully.", type: "success" });
+      return uploaded;
     } catch (error) {
       toast({ title: "Upload failed", message: error.message || "Image upload failed.", type: "error" });
+      return null;
     }
+  }
+
+  function renderInlineUploadButton(onUploaded, text = "Upload image") {
+    return (
+      <label className="inline-upload-button">
+        {text}
+        <input
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={async (event) => {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            const uploaded = await handleUpload(file);
+            if (uploaded) onUploaded(uploaded);
+            event.target.value = "";
+          }}
+        />
+      </label>
+    );
+  }
+
+  function renderMediaPicker({ label, value, onChange, allowMultiple = false }) {
+    const mediaOptions = buildMediaOptions(media);
+    const selectedValues = allowMultiple ? (Array.isArray(value) ? value : []) : [];
+
+    return (
+      <div className="full-span media-picker-field">
+        <span className="field-label">{label}</span>
+        {!allowMultiple ? (
+          <>
+            <div className="media-picker-row">
+              <select value={value || ""} onChange={(event) => onChange(event.target.value)}>
+                <option value="">No image</option>
+                {mediaOptions.map((mediaItem) => (
+                  <option key={mediaItem.value} value={mediaItem.value}>
+                    {mediaItem.label}
+                  </option>
+                ))}
+              </select>
+              {renderInlineUploadButton((uploaded) => onChange(uploaded.url))}
+            </div>
+            {value ? (
+              <div className="inline-media-preview">
+                <img src={value} alt={label} />
+                <button type="button" className="ghost-button" onClick={() => onChange("")}>Remove</button>
+              </div>
+            ) : null}
+          </>
+        ) : (
+          <>
+            <textarea
+              value={selectedValues.join("\n")}
+              onChange={(event) =>
+                onChange(
+                  event.target.value
+                    .split("\n")
+                    .map((item) => item.trim())
+                    .filter(Boolean),
+                )
+              }
+              placeholder="/media/ai-tools-showcase.png&#10;/media/meta-showcase.webp"
+            />
+            <div className="media-picker-row">
+              <select
+                value=""
+                onChange={(event) => {
+                  const nextValue = event.target.value;
+                  if (!nextValue) return;
+                  onChange([...selectedValues, nextValue].filter((item, index, list) => list.indexOf(item) === index));
+                  event.target.value = "";
+                }}
+              >
+                <option value="">Add image from library</option>
+                {mediaOptions.map((mediaItem) => (
+                  <option key={mediaItem.value} value={mediaItem.value}>
+                    {mediaItem.label}
+                  </option>
+                ))}
+              </select>
+              {renderInlineUploadButton((uploaded) => {
+                onChange([...selectedValues, uploaded.url].filter((item, index, list) => list.indexOf(item) === index));
+              }, "Upload image")}
+            </div>
+            {selectedValues.length ? (
+              <div className="inline-media-list">
+                {selectedValues.map((item) => (
+                  <article key={item} className="inline-media-chip-card">
+                    <img src={item} alt={label} />
+                    <button
+                      type="button"
+                      className="ghost-button"
+                      onClick={() => onChange(selectedValues.filter((entry) => entry !== item))}
+                    >
+                      Remove
+                    </button>
+                  </article>
+                ))}
+              </div>
+            ) : null}
+          </>
+        )}
+      </div>
+    );
   }
 
   async function handleLogout() {
@@ -421,64 +532,27 @@ export default function AdminPage() {
     }
 
     if (field.type === "media-select") {
-      const mediaOptions = [...staticMediaOptions, ...media.map((mediaItem) => ({ value: mediaItem.url, label: mediaItem.name }))]
-        .filter((item, index, list) => item.value && list.findIndex((candidate) => candidate.value === item.value) === index);
-
       return (
-        <label key={field.key} className="full-span">
-          {field.label}
-          <select value={value || ""} onChange={(event) => updateSectionDraft(sectionKey, { [field.key]: event.target.value })}>
-            <option value="">No image</option>
-            {mediaOptions.map((mediaItem) => (
-              <option key={mediaItem.value} value={mediaItem.value}>
-                {mediaItem.label}
-              </option>
-            ))}
-          </select>
-        </label>
+        <React.Fragment key={field.key}>
+          {renderMediaPicker({
+            label: field.label,
+            value,
+            onChange: (nextValue) => updateSectionDraft(sectionKey, { [field.key]: nextValue }),
+          })}
+        </React.Fragment>
       );
     }
 
     if (field.type === "media-list") {
-      const mediaOptions = [...staticMediaOptions, ...media.map((mediaItem) => ({ value: mediaItem.url, label: mediaItem.name }))]
-        .filter((item, index, list) => item.value && list.findIndex((candidate) => candidate.value === item.value) === index);
-
-      const currentValues = Array.isArray(value) ? value : [];
-
       return (
-        <label key={field.key} className="full-span">
-          {field.label}
-          <textarea
-            value={currentValues.join("\n")}
-            onChange={(event) =>
-              updateSectionDraft(sectionKey, {
-                [field.key]: event.target.value
-                  .split("\n")
-                  .map((item) => item.trim())
-                  .filter(Boolean),
-              })
-            }
-            placeholder="/media/ai-tools-showcase.png&#10;/media/meta-showcase.webp"
-          />
-          <select
-            value=""
-            onChange={(event) => {
-              const nextValue = event.target.value;
-              if (!nextValue) return;
-              updateSectionDraft(sectionKey, {
-                [field.key]: [...currentValues, nextValue].filter((item, index, list) => list.indexOf(item) === index),
-              });
-              event.target.value = "";
-            }}
-          >
-            <option value="">Add image from media library</option>
-            {mediaOptions.map((mediaItem) => (
-              <option key={mediaItem.value} value={mediaItem.value}>
-                {mediaItem.label}
-              </option>
-            ))}
-          </select>
-        </label>
+        <React.Fragment key={field.key}>
+          {renderMediaPicker({
+            label: field.label,
+            value,
+            allowMultiple: true,
+            onChange: (nextValue) => updateSectionDraft(sectionKey, { [field.key]: nextValue }),
+          })}
+        </React.Fragment>
       );
     }
 
@@ -540,11 +614,11 @@ export default function AdminPage() {
               <label>Name<input value={draft.profile.name} onChange={(e) => updateDraft("profile", { name: e.target.value })} /></label>
               <label>Headline<input value={draft.profile.headline} onChange={(e) => updateDraft("profile", { headline: e.target.value })} /></label>
               <label className="full-span">Subheadline<input value={draft.profile.subheadline} onChange={(e) => updateDraft("profile", { subheadline: e.target.value })} /></label>
-              <label className="full-span">Profile Image
-                <select value={draft.profile.image} onChange={(e) => updateDraft("profile", { image: e.target.value })}>
-                  {media.map((item) => <option key={item.id} value={item.url}>{item.name}</option>)}
-                </select>
-              </label>
+              {renderMediaPicker({
+                label: "Profile Image",
+                value: draft.profile.image,
+                onChange: (nextValue) => updateDraft("profile", { image: nextValue }),
+              })}
               <div className="full-span">
                 <span className="field-label">About</span>
                 <RichTextEditor value={draft.profile.aboutHtml} onChange={(value) => updateDraft("profile", { aboutHtml: value })} />
@@ -868,13 +942,13 @@ export default function AdminPage() {
                   }
                   if (field === "image") {
                     return (
-                      <label key={field}>
-                        Image
-                        <select value={item.image || ""} onChange={(e) => updateListItem(key, item.id, field, e.target.value)}>
-                          <option value="">No image</option>
-                          {media.map((mediaItem) => <option key={mediaItem.id} value={mediaItem.url}>{mediaItem.name}</option>)}
-                        </select>
-                      </label>
+                      <React.Fragment key={field}>
+                        {renderMediaPicker({
+                          label: "Image",
+                          value: item.image || "",
+                          onChange: (nextValue) => updateListItem(key, item.id, field, nextValue),
+                        })}
+                      </React.Fragment>
                     );
                   }
                   if (field === "tags") {
