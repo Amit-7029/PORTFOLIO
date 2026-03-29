@@ -896,7 +896,12 @@ export default function PortfolioView({ data, preview = false }) {
         </div>
         <div className="about-grid">
           <article className="portfolio-card about-story" data-parallax-speed="0.08">
-            <div dangerouslySetInnerHTML={{ __html: data.profile.aboutHtml }} />
+            <div className="about-story-copy" dangerouslySetInnerHTML={{ __html: data.profile.aboutHtml }} />
+            {aboutSection.visualImage ? (
+              <div className="about-story-visual">
+                <img src={aboutSection.visualImage} alt={aboutSection.title || "About visual"} loading="lazy" />
+              </div>
+            ) : null}
           </article>
           <article className="portfolio-card highlight-card" data-parallax-speed="0.12">
             <span className="detail-label">{aboutSection.highlightLabel || "Focus Areas"}</span>

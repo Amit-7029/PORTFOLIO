@@ -1115,8 +1115,51 @@ td {
   padding: 22px;
 }
 
+.about-story {
+  display: grid;
+  gap: 18px;
+}
+
+.about-story-copy {
+  display: grid;
+  gap: 0;
+}
+
 .about-story p + p {
   margin-top: 16px;
+}
+
+.about-story-visual {
+  position: relative;
+  overflow: hidden;
+  min-height: 260px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(circle at top, rgba(56, 214, 255, 0.16), transparent 48%),
+    rgba(8, 15, 28, 0.84);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 18px 34px rgba(1, 10, 22, 0.34);
+}
+
+.about-story-visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(4, 10, 19, 0.04), rgba(4, 10, 19, 0.14)),
+    radial-gradient(circle at bottom, rgba(57, 215, 255, 0.14), transparent 44%);
+  pointer-events: none;
+}
+
+.about-story-visual img {
+  width: 100%;
+  height: 100%;
+  min-height: 260px;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
 }
 
 .detail-label {

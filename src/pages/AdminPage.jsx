@@ -26,6 +26,7 @@ const sections = [
 const iconOptions = ["award", "certificate", "star", "bolt"];
 const cmsSectionKeys = ["hero", "about", "services", "skills", "experience", "projects", "achievements", "contact", "footer"];
 const staticMediaOptions = [
+  { value: "/media/about-workspace.png", label: "about-workspace.png" },
   { value: "/media/ai-tools-showcase.png", label: "ai-tools-showcase.png" },
   { value: "/media/meta-showcase.webp", label: "meta-showcase.webp" },
   { value: "/media/web-dev-showcase-1.png", label: "web-dev-showcase-1.png" },
@@ -61,6 +62,7 @@ const contentFieldMap = {
     { key: "title", label: "Title" },
     { key: "description", label: "Description", type: "textarea" },
     { key: "highlightLabel", label: "Highlight Label" },
+    { key: "visualImage", label: "About Visual Image", type: "media-select" },
   ],
   services: [
     { key: "visible", label: "Visible", type: "toggle" },
