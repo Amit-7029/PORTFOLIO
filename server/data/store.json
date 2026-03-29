@@ -146,11 +146,12 @@
       "visible": true,
       "navLabel": "About",
       "kicker": "About Me",
-      "title": "Practical Skills Backed By Real Execution",
-      "description": "I help businesses with digital growth, marketing support, website development, and structured business work that improves trust, reach, and day-to-day performance.",
-      "highlightLabel": "Core Focus",
-      "visualImage": "/media/about-workspace.png"
-    },
+    "title": "Practical Skills Backed By Real Execution",
+    "description": "I help businesses with digital growth, marketing support, website development, and structured business work that improves trust, reach, and day-to-day performance.",
+    "highlightLabel": "Core Focus",
+    "storyImage": "/media/about-story-visual.png",
+    "visualImage": "/media/about-workspace.png"
+  },
     "services": {
       "visible": true,
       "navLabel": "Services",

@@ -1123,6 +1123,7 @@ td {
 .about-story {
   display: grid;
   align-content: start;
+  gap: 18px;
   min-height: 100%;
 }
 
@@ -1133,6 +1134,39 @@ td {
 
 .about-story p + p {
   margin-top: 16px;
+}
+
+.about-story-inline-visual {
+  position: relative;
+  overflow: hidden;
+  margin-top: auto;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02)),
+    rgba(7, 13, 24, 0.82);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 20px 38px rgba(1, 10, 22, 0.28);
+}
+
+.about-story-inline-visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(4, 10, 19, 0.02), rgba(4, 10, 19, 0.18)),
+    radial-gradient(circle at top right, rgba(57, 215, 255, 0.16), transparent 34%);
+}
+
+.about-story-inline-visual img {
+  width: 100%;
+  height: auto;
+  min-height: 232px;
+  object-fit: cover;
+  object-position: center;
+  display: block;
 }
 
 .about-visual-card,
@@ -1238,6 +1272,10 @@ td {
 
   .about-visual-card {
     grid-column: 1 / -1;
+  }
+
+  .about-story-inline-visual img {
+    min-height: 320px;
   }
 
   .about-story-visual img {
@@ -2089,6 +2127,10 @@ td {
   .public-contact-form,
   .services-grid {
     grid-template-columns: 1fr;
+  }
+
+  .about-story-inline-visual img {
+    min-height: 220px;
   }
 
   .portfolio-topbar,

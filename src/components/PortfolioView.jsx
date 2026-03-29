@@ -566,6 +566,9 @@ export default function PortfolioView({ data, preview = false }) {
   const aboutPreview = stripHtml(data.profile.aboutHtml);
   const heroSection = sectionConfig.hero || {};
   const aboutSection = sectionConfig.about || {};
+  const aboutStoryImage = Object.prototype.hasOwnProperty.call(aboutSection, "storyImage")
+    ? aboutSection.storyImage
+    : "/media/about-story-visual.png";
   const servicesSection = sectionConfig.services || {};
   const skillsSection = sectionConfig.skills || {};
   const experienceSection = sectionConfig.experience || {};
@@ -897,6 +900,11 @@ export default function PortfolioView({ data, preview = false }) {
         <div className="about-grid">
           <article className="portfolio-card about-story" data-parallax-speed="0.08">
             <div className="about-story-copy" dangerouslySetInnerHTML={{ __html: data.profile.aboutHtml }} />
+            {aboutStoryImage ? (
+              <div className="about-story-inline-visual">
+                <img src={aboutStoryImage} alt={aboutSection.title || "About story visual"} loading="lazy" />
+              </div>
+            ) : null}
           </article>
           {aboutSection.visualImage ? (
             <article className="portfolio-card about-visual-card" data-parallax-speed="0.1">
