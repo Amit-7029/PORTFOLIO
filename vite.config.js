@@ -3,6 +3,9 @@ const react = require("@vitejs/plugin-react").default;
 
 module.exports = defineConfig({
   plugins: [react()],
+  build: {
+    minify: false,
+  },
   server: {
     port: 5173,
     proxy: {
