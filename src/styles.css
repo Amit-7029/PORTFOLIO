@@ -1071,7 +1071,7 @@ td {
   grid-template-columns: minmax(0, 1fr) minmax(260px, 420px);
   gap: 20px;
   align-items: end;
-  margin-bottom: 22px;
+  margin-bottom: 30px;
 }
 
 .portfolio-section-head.is-centered {
@@ -1082,7 +1082,12 @@ td {
 
 .portfolio-section-head.is-centered > div,
 .portfolio-section-head.is-centered > p {
-  max-width: 760px;
+  max-width: 980px;
+}
+
+.portfolio-section-head.is-centered h3 {
+  white-space: nowrap;
+  text-wrap: nowrap;
 }
 
 .section-copy,
@@ -2357,6 +2362,11 @@ td {
     grid-template-columns: 1fr;
     gap: 14px;
     margin-bottom: 18px;
+  }
+
+  .portfolio-section-head.is-centered h3 {
+    white-space: normal;
+    text-wrap: balance;
   }
 
   .skill-category-card,
