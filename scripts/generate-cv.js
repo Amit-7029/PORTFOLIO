@@ -7,6 +7,10 @@ const storePath = path.join(root, "server", "data", "store.json");
 const outputDir = path.join(root, "output", "pdf");
 const publicDir = path.join(root, "public", "downloads");
 
+function ensureDir(dir) {
+  fs.mkdirSync(dir, { recursive: true });
+}
+
 function stripHtml(html) {
   return String(html || "")
     .replace(/&nbsp;/gi, " ")
@@ -20,119 +24,81 @@ function stripHtml(html) {
     .trim();
 }
 
-function ensureDir(dir) {
-  fs.mkdirSync(dir, { recursive: true });
-}
-
-function drawPill(doc, x, y, text, options = {}) {
-  const paddingX = options.paddingX || 10;
-  const paddingY = options.paddingY || 6;
-  const height = options.height || 24;
-  const width = doc.widthOfString(text, { fontSize: options.fontSize || 9 }) + paddingX * 2;
-
-  doc
-    .save()
-    .roundedRect(x, y, width, height, 12)
-    .fillAndStroke(options.fill || "#EAF3FF", options.stroke || "#C9D9F5")
-    .restore();
-
-  doc
-    .fillColor(options.textColor || "#134074")
-    .font(options.font || "Helvetica-Bold")
-    .fontSize(options.fontSize || 9)
-    .text(text, x, y + paddingY + 1, {
-      width,
-      align: "center",
-    });
-
-  return width;
+function drawRoundedPanel(doc, x, y, width, height, fill, stroke, radius = 18) {
+  doc.save().roundedRect(x, y, width, height, radius).fillAndStroke(fill, stroke).restore();
 }
 
 function drawSectionTitle(doc, x, y, title, accent) {
+  doc.fillColor(accent).font("Helvetica-Bold").fontSize(9.5).text(title.toUpperCase(), x, y, {
+    characterSpacing: 1.8,
+  });
   doc
-    .fillColor(accent)
-    .font("Helvetica-Bold")
-    .fontSize(10)
-    .text(title.toUpperCase(), x, y, { characterSpacing: 1.6 });
-
-  doc
-    .strokeColor("#D6E2F3")
+    .strokeColor("#DCE8F7")
     .lineWidth(1)
-    .moveTo(x, y + 16)
-    .lineTo(x + 160, y + 16)
+    .moveTo(x, y + 15)
+    .lineTo(x + 126, y + 15)
     .stroke();
 }
 
-function writeBulletList(doc, items, x, startY, width, options = {}) {
-  let y = startY;
-  const bulletColor = options.bulletColor || "#2D6CDF";
-  const textColor = options.textColor || "#24324A";
-  const fontSize = options.fontSize || 10.5;
+function drawBulletList(doc, items, x, y, width, options = {}) {
+  let currentY = y;
+  const textColor = options.textColor || "#30445F";
+  const bulletColor = options.bulletColor || "#2F80ED";
+  const fontSize = options.fontSize || 9.7;
 
   items.forEach((item) => {
-    doc
-      .fillColor(bulletColor)
-      .circle(x + 4, y + 7, 2.2)
-      .fill();
-
-    doc
-      .fillColor(textColor)
-      .font(options.font || "Helvetica")
-      .fontSize(fontSize)
-      .text(item, x + 14, y, {
-        width: width - 14,
-        lineGap: 3,
-      });
-
-    y = doc.y + 7;
+    doc.save().fillColor(bulletColor).circle(x + 3, currentY + 6, 2.1).fill().restore();
+    doc.fillColor(textColor).font("Helvetica").fontSize(fontSize).text(item, x + 12, currentY, {
+      width: width - 12,
+      lineGap: 2,
+    });
+    currentY = doc.y + 6;
   });
 
-  return y;
+  return currentY;
 }
 
-function writeServiceCards(doc, services, x, y, width) {
-  const gap = 12;
-  const cardWidth = (width - gap) / 2;
-  const cardHeight = 92;
-
-  services.slice(0, 4).forEach((service, index) => {
-    const col = index % 2;
-    const row = Math.floor(index / 2);
-    const cardX = x + col * (cardWidth + gap);
-    const cardY = y + row * (cardHeight + gap);
-
-    doc
-      .save()
-      .roundedRect(cardX, cardY, cardWidth, cardHeight, 14)
-      .fillAndStroke("#F5F9FF", "#D9E5F5")
-      .restore();
-
-    doc
-      .fillColor("#123B73")
-      .font("Helvetica-Bold")
-      .fontSize(11)
-      .text(service.title, cardX + 14, cardY + 12, {
-        width: cardWidth - 28,
-        lineGap: 2,
-      });
-
-    doc
-      .fillColor("#4A5E7A")
-      .font("Helvetica")
-      .fontSize(9.2)
-      .text(service.description, cardX + 14, cardY + 38, {
-        width: cardWidth - 28,
-        height: 40,
-        ellipsis: true,
-        lineGap: 2,
-      });
+function drawSkillTag(doc, x, y, text) {
+  const width = doc.widthOfString(text, { font: "Helvetica-Bold", fontSize: 8.4 }) + 20;
+  drawRoundedPanel(doc, x, y, width, 22, "#17335E", "#2F5B97", 11);
+  doc.fillColor("#FFFFFF").font("Helvetica-Bold").fontSize(8.4).text(text, x, y + 7, {
+    width,
+    align: "center",
   });
+  return width;
+}
 
-  return y + (cardHeight * 2) + gap;
+function fitTagRow(doc, tags, x, y, maxWidth) {
+  let cursorX = x;
+  let cursorY = y;
+  tags.forEach((tag) => {
+    const width = doc.widthOfString(tag, { font: "Helvetica-Bold", fontSize: 8.4 }) + 20;
+    if (cursorX + width > x + maxWidth) {
+      cursorX = x;
+      cursorY += 28;
+    }
+    drawSkillTag(doc, cursorX, cursorY, tag);
+    cursorX += width + 8;
+  });
+  return cursorY + 22;
+}
+
+function writeWrapped(doc, text, x, y, width, options = {}) {
+  doc
+    .fillColor(options.color || "#30445F")
+    .font(options.font || "Helvetica")
+    .fontSize(options.fontSize || 9.9)
+    .text(text, x, y, {
+      width,
+      lineGap: options.lineGap || 3,
+      align: options.align || "left",
+    });
+  return doc.y;
 }
 
 async function generate() {
   const store = JSON.parse(fs.readFileSync(storePath, "utf8"));
+
   ensureDir(outputDir);
   ensureDir(publicDir);
 
@@ -142,89 +108,79 @@ async function generate() {
 
   const doc = new PDFDocument({
     size: "A4",
-    margins: { top: 34, bottom: 34, left: 34, right: 34 },
+    margins: { top: 24, bottom: 24, left: 24, right: 24 },
     info: {
       Title: "Amit Shaw CV",
       Author: "Codex",
-      Subject: "Professional Resume",
+      Subject: "One-page professional resume",
     },
   });
 
-  const writeStream = fs.createWriteStream(outputPdf);
-  doc.pipe(writeStream);
+  const stream = fs.createWriteStream(outputPdf);
+  doc.pipe(stream);
 
+  const pageWidth = doc.page.width;
+  const contentWidth = pageWidth - 48;
   const accent = "#2F80ED";
   const accentDark = "#123B73";
-  const textDark = "#1C2636";
-  const textMuted = "#55657E";
-  const pageWidth = doc.page.width;
-  const contentWidth = pageWidth - doc.page.margins.left - doc.page.margins.right;
+  const ink = "#18263A";
+  const muted = "#566A85";
 
-  doc
-    .save()
-    .roundedRect(24, 20, pageWidth - 48, 132, 24)
-    .fill("#0C1630")
-    .restore();
+  const summary =
+    "Multi-skilled professional helping businesses grow through digital marketing, structured accounts support, modern websites, and AI-powered execution.";
+  const profileSummary =
+    "Results-focused professional with practical experience in Meta Ads, digital strategy, website development, AI-assisted research, and business operations. Known for combining clear thinking, disciplined execution, and client-friendly solutions.";
+  const strengths = [
+    "Meta Ads campaigns focused on reach, leads, and brand trust",
+    "Digital marketing strategy and social media support",
+    "Responsive websites for modern business presence",
+    "AI-assisted research and workflow acceleration",
+    "Advanced Excel analysis and reporting support",
+  ];
+  const coreSkills = [
+    "Meta Ads",
+    "Digital Strategy",
+    "Social Media",
+    "Web Development",
+    "AI Research",
+    "Excel Analysis",
+  ];
+  const serviceBullets = store.services.slice(0, 4).map((item) => item.title);
+  const achievements = store.achievements.map((item) => item.title);
+  const project = store.projects[0];
+  const projectLines = [
+    ["Problem", "Hospital lacked a strong online presence and digital trust."],
+    ["Solution", "Built a responsive website with service pages and easy contact flow."],
+    ["Result", "Improved branding, credibility, and patient engagement."],
+  ];
 
-  doc
-    .save()
-    .roundedRect(24, 20, pageWidth - 48, 132, 24)
-    .fillOpacity(0.18)
-    .fill("#2F80ED")
-    .restore();
+  drawRoundedPanel(doc, 16, 16, pageWidth - 32, 142, "#0D1C3A", "#17335E", 26);
+  doc.save().roundedRect(16, 16, pageWidth - 32, 142, 26).fillOpacity(0.18).fill("#2F80ED").restore();
 
-  doc
-    .fillColor("#FFFFFF")
-    .font("Helvetica-Bold")
-    .fontSize(28)
-    .text(store.profile.name, 42, 38, { width: 320 });
-
-  doc
-    .fillColor("#DDE8FF")
-    .font("Helvetica-Bold")
-    .fontSize(13)
-    .text("Accounts Executive | Digital Marketer | System Developer", 42, 74, {
-      width: 360,
-    });
-
-  doc
-    .fillColor("#B9C7E6")
-    .font("Helvetica")
-    .fontSize(10.2)
-    .text(
-      "Multi-skilled professional helping businesses grow through digital marketing, structured operations, modern websites, and AI-powered execution.",
-      42,
-      96,
-      { width: 370, lineGap: 3 }
-    );
-
-  const pillY = 118;
-  let pillX = 42;
-  ["Meta Ads", "Web Development", "AI Research", "Excel Analysis"].forEach((item) => {
-    pillX += drawPill(doc, pillX, pillY, item, {
-      fill: "#17315D",
-      stroke: "#305A96",
-      textColor: "#FFFFFF",
-      fontSize: 8.5,
-      height: 22,
-    }) + 8;
+  doc.fillColor("#FFFFFF").font("Helvetica-Bold").fontSize(29).text(store.profile.name, 36, 36, {
+    width: 340,
+  });
+  doc.fillColor("#DCE9FF").font("Helvetica-Bold").fontSize(13.5).text(
+    "Accounts Executive | Digital Marketer | System Developer",
+    36,
+    76,
+    { width: 360 }
+  );
+  writeWrapped(doc, summary, 36, 101, 360, {
+    color: "#BED0F2",
+    fontSize: 10.6,
+    lineGap: 3,
   });
 
-  const photoX = pageWidth - 160;
-  const photoY = 34;
-  doc
-    .save()
-    .roundedRect(photoX - 6, photoY - 6, 108, 108, 20)
-    .fill("#1A2B53")
-    .restore();
-  doc.image(profileImage, photoX, photoY, { width: 96, height: 96 });
+  fitTagRow(doc, coreSkills, 36, 126, 360);
 
-  doc
-    .save()
-    .roundedRect(24, 162, pageWidth - 48, 58, 20)
-    .fill("#F7FAFF")
-    .restore();
+  drawRoundedPanel(doc, pageWidth - 160, 30, 108, 108, "#21406E", "#3D6FAE", 20);
+  doc.image(profileImage, pageWidth - 154, 36, {
+    width: 96,
+    height: 96,
+  });
 
+  drawRoundedPanel(doc, 24, 172, contentWidth, 56, "#F6FAFF", "#DFE9F7", 22);
   const contactItems = [
     `Phone: ${store.settings.phone}`,
     `Email: ${store.settings.email}`,
@@ -232,191 +188,107 @@ async function generate() {
     "Portfolio: skill-deploy-b13dy5vw9a.vercel.app",
   ];
   contactItems.forEach((item, index) => {
-    const x = 42 + (index % 2) * 255;
-    const y = 178 + Math.floor(index / 2) * 18;
-    doc
-      .fillColor(accentDark)
-      .font("Helvetica-Bold")
-      .fontSize(10)
-      .text(item, x, y, { width: 220 });
+    const x = 40 + (index % 2) * 255;
+    const y = 188 + Math.floor(index / 2) * 18;
+    doc.fillColor(accentDark).font("Helvetica-Bold").fontSize(10.1).text(item, x, y, { width: 225 });
   });
 
-  let y = 242;
-  const leftX = 34;
-  const rightX = 318;
-  const columnWidth = 244;
+  const leftX = 24;
+  const rightX = 250;
+  const leftW = 198;
+  const rightW = 322;
+  let leftY = 250;
+  let rightY = 250;
 
-  drawSectionTitle(doc, leftX, y, "Profile Summary", accent);
-  doc
-    .fillColor(textDark)
-    .font("Helvetica")
-    .fontSize(10.5)
-    .text(
-      stripHtml(store.profile.aboutHtml),
-      leftX,
-      y + 24,
-      { width: columnWidth, lineGap: 4 }
-    );
+  drawSectionTitle(doc, leftX, leftY, "Profile Summary", accent);
+  leftY = writeWrapped(doc, profileSummary, leftX, leftY + 22, leftW, {
+    color: ink,
+    fontSize: 10,
+    lineGap: 4,
+  }) + 16;
 
-  drawSectionTitle(doc, rightX, y, "Core Strengths", accent);
-  writeBulletList(
-    doc,
-    [
-      "Meta Ads campaigns for reach, leads, and brand growth",
-      "Digital marketing strategy and social media support",
-      "Responsive website development for modern businesses",
-      "AI-assisted research and workflow optimization",
-      "Advanced Excel reporting and analysis support",
-    ],
-    rightX,
-    y + 24,
-    columnWidth,
-    { textColor: textDark }
-  );
-
-  y = 408;
-  drawSectionTitle(doc, leftX, y, "Experience", accent);
-  const expStart = y + 24;
-  store.experiences.forEach((exp, index) => {
-    const blockY = expStart + index * 72;
-    doc
-      .fillColor(accentDark)
-      .font("Helvetica-Bold")
-      .fontSize(11.5)
-      .text(exp.role, leftX, blockY, { width: columnWidth });
-    doc
-      .fillColor(accent)
-      .font("Helvetica-Bold")
-      .fontSize(9.5)
-      .text(`${exp.company} | ${exp.duration}`, leftX, blockY + 16, { width: columnWidth });
-    doc
-      .fillColor(textMuted)
-      .font("Helvetica")
-      .fontSize(9.8)
-      .text(exp.description, leftX, blockY + 32, {
-        width: columnWidth,
-        lineGap: 3,
-      });
-  });
-
-  drawSectionTitle(doc, rightX, y, "Selected Project", accent);
-  const project = store.projects[0];
-  doc
-    .save()
-    .roundedRect(rightX, y + 24, columnWidth, 146, 18)
-    .fillAndStroke("#F6FAFF", "#D8E5F5")
-    .restore();
-  doc
-    .fillColor(accentDark)
-    .font("Helvetica-Bold")
-    .fontSize(12.5)
-    .text(project.title, rightX + 14, y + 36, { width: columnWidth - 28 });
-  const projectBlocks = [
-    "Problem: Limited online presence and weak digital trust.",
-    "Solution: Built a responsive website with service pages and a simple contact flow.",
-    "Result: Better branding, higher credibility, and stronger patient engagement.",
-  ];
-  projectBlocks.forEach((line, index) => {
-    const [label, rest] = line.split(": ");
-    const lineY = y + 62 + index * 28;
-    doc
-      .fillColor(textDark)
-      .font("Helvetica-Bold")
-      .fontSize(9.8)
-      .text(`${label}:`, rightX + 14, lineY, { continued: true });
-    doc
-      .font("Helvetica")
-      .text(` ${rest}`, { width: columnWidth - 28, lineGap: 2 });
-  });
-  doc
-    .fillColor(accent)
-    .font("Helvetica-Bold")
-    .fontSize(9.3)
-    .text("Live Project: website-for-hospaccx.vercel.app", rightX + 14, y + 138, {
-      width: columnWidth - 28,
+  drawSectionTitle(doc, leftX, leftY, "Experience", accent);
+  leftY += 24;
+  store.experiences.forEach((exp) => {
+    doc.fillColor(accentDark).font("Helvetica-Bold").fontSize(11.4).text(exp.role, leftX, leftY, {
+      width: leftW,
     });
-
-  doc.addPage({
-    size: "A4",
-    margins: { top: 34, bottom: 34, left: 34, right: 34 },
-  });
-
-  doc
-    .save()
-    .roundedRect(24, 20, pageWidth - 48, 90, 24)
-    .fill("#0C1630")
-    .restore();
-
-  doc
-    .fillColor("#FFFFFF")
-    .font("Helvetica-Bold")
-    .fontSize(24)
-    .text("Amit Shaw - Professional Resume", 38, 38, { width: 380 });
-  doc
-    .fillColor("#C7D6F4")
-    .font("Helvetica")
-    .fontSize(11)
-    .text("Services, skills, achievements, and project-ready capabilities", 38, 70);
-
-  let page2Y = 132;
-  drawSectionTitle(doc, 34, page2Y, "Services", accent);
-  page2Y = writeServiceCards(doc, store.services, 34, page2Y + 24, contentWidth);
-
-  drawSectionTitle(doc, 34, page2Y + 18, "Skills Snapshot", accent);
-  let chipY = page2Y + 44;
-  let chipX = 34;
-  store.skills.forEach((skill) => {
-    const width = drawPill(doc, chipX, chipY, `${skill.name} ${skill.level}%`, {
-      fill: "#F2F7FF",
-      stroke: "#D2E0F5",
-      textColor: "#19437B",
-      height: 24,
+    doc.fillColor(accent).font("Helvetica-Bold").fontSize(9.4).text(`${exp.company} | ${exp.duration}`, leftX, leftY + 16, {
+      width: leftW,
     });
-    chipX += width + 8;
-    if (chipX > pageWidth - 150) {
-      chipX = 34;
-      chipY += 32;
-    }
+    leftY = writeWrapped(doc, exp.description, leftX, leftY + 31, leftW, {
+      color: muted,
+      fontSize: 9.5,
+      lineGap: 3,
+    }) + 10;
   });
 
-  const achieveY = chipY + 52;
-  drawSectionTitle(doc, 34, achieveY, "Achievements", accent);
-  writeBulletList(
-    doc,
-    store.achievements.map((item) => item.title),
-    34,
-    achieveY + 24,
-    contentWidth,
-    { textColor: textDark }
-  );
+  drawSectionTitle(doc, leftX, leftY, "Achievements", accent);
+  leftY = drawBulletList(doc, achievements, leftX, leftY + 24, leftW, {
+    textColor: ink,
+    fontSize: 9.5,
+  }) + 10;
 
-  const footerY = 730;
+  drawSectionTitle(doc, rightX, rightY, "Core Strengths", accent);
+  rightY = drawBulletList(doc, strengths, rightX, rightY + 24, rightW, {
+    textColor: ink,
+    fontSize: 9.6,
+  }) + 12;
+
+  drawSectionTitle(doc, rightX, rightY, "Selected Project", accent);
+  rightY += 24;
+  drawRoundedPanel(doc, rightX, rightY, rightW, 140, "#F7FAFF", "#D8E6F7", 20);
+  doc.fillColor(accentDark).font("Helvetica-Bold").fontSize(12.5).text(project.title, rightX + 14, rightY + 14, {
+    width: rightW - 28,
+  });
+
+  let projectY = rightY + 42;
+  projectLines.forEach(([label, text]) => {
+    doc.fillColor(ink).font("Helvetica-Bold").fontSize(9.8).text(`${label}:`, rightX + 14, projectY, {
+      continued: true,
+    });
+    doc.fillColor(muted).font("Helvetica").fontSize(9.8).text(` ${text}`, {
+      width: rightW - 28,
+      lineGap: 2,
+    });
+    projectY = doc.y + 6;
+  });
+
+  doc.fillColor(accent).font("Helvetica-Bold").fontSize(9.3).text(
+    "Live Project: website-for-hospaccx.vercel.app",
+    rightX + 14,
+    rightY + 116,
+    { width: rightW - 28 }
+  );
+  rightY += 156;
+
+  drawSectionTitle(doc, rightX, rightY, "Services", accent);
+  rightY = drawBulletList(doc, serviceBullets, rightX, rightY + 24, rightW, {
+    textColor: ink,
+    fontSize: 9.6,
+  }) + 8;
+
+  drawSectionTitle(doc, rightX, rightY, "Skill Snapshot", accent);
+  fitTagRow(doc, store.skills.map((item) => item.name), rightX, rightY + 24, rightW);
+
+  drawRoundedPanel(doc, 24, 760, contentWidth, 42, "#F6FAFF", "#D8E6F7", 16);
+  doc.fillColor(accentDark).font("Helvetica-Bold").fontSize(11.2).text("Why Hire Me", 38, 774);
   doc
-    .save()
-    .roundedRect(24, footerY, pageWidth - 48, 68, 18)
-    .fill("#F7FAFF")
-    .restore();
-  doc
-    .fillColor(accentDark)
-    .font("Helvetica-Bold")
-    .fontSize(12)
-    .text("Why Hire Me", 40, footerY + 14);
-  doc
-    .fillColor(textMuted)
+    .fillColor(muted)
     .font("Helvetica")
-    .fontSize(10.2)
+    .fontSize(9.7)
     .text(
-      "I combine business support, digital marketing, web development, and AI-backed execution to help businesses look professional, work smarter, and grow with confidence.",
-      40,
-      footerY + 32,
-      { width: pageWidth - 80, lineGap: 3 }
+      "I combine business support, digital growth, web execution, and AI-backed research to deliver practical results with a professional client experience.",
+      120,
+      773,
+      { width: 410, lineGap: 2 }
     );
 
   doc.end();
 
   await new Promise((resolve, reject) => {
-    writeStream.on("finish", resolve);
-    writeStream.on("error", reject);
+    stream.on("finish", resolve);
+    stream.on("error", reject);
   });
 
   fs.copyFileSync(outputPdf, publicPdf);
