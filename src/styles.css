@@ -2837,6 +2837,22 @@ td {
   max-width: 68ch;
 }
 
+.case-study-copy {
+  display: grid;
+  gap: 14px;
+}
+
+.case-study-copy p {
+  margin: 0;
+  max-width: 68ch;
+  line-height: 1.72;
+}
+
+.case-study-copy p strong {
+  color: var(--portfolio-text, #f6f7fb);
+  font-weight: 800;
+}
+
 .story-slide-frame-support {
   min-height: 360px;
   padding: 24px;

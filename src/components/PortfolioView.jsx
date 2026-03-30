@@ -125,6 +125,34 @@ function buildWhatsAppHref(rawLink, rawPhone, text) {
   return "";
 }
 
+function formatCaseStudyDescription(text) {
+  const raw = String(text || "").trim();
+  if (!raw) return [];
+
+  const normalized = raw.replace(/\r\n/g, "\n");
+  const labelPattern = /(Problem:|Solution:|Result:)/gi;
+
+  if (labelPattern.test(normalized)) {
+    const matches = Array.from(normalized.matchAll(/(Problem:|Solution:|Result:)/gi));
+    return matches.map((match, index) => {
+      const label = match[1];
+      const start = match.index + label.length;
+      const end = index + 1 < matches.length ? matches[index + 1].index : normalized.length;
+      const body = normalized.slice(start, end).trim().replace(/\s*\n+\s*/g, " ");
+      return {
+        label: label.replace(":", ""),
+        body,
+      };
+    });
+  }
+
+  return normalized
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((body) => ({ label: "", body }));
+}
+
 function useCountUp(target, enabled) {
   const [value, setValue] = useState(enabled ? 0 : target);
 
@@ -254,13 +282,21 @@ function ProjectSlide({ slide, onRipple }) {
   }
 
   const projectHref = normalizeExternalLink(slide.liveLink);
+  const caseStudyBlocks = formatCaseStudyDescription(slide.description);
 
   return (
     <article className="story-slide-card story-slide-card-text">
       <div className="story-slide-copy story-slide-copy-text">
         <span className="story-slide-eyebrow">{slide.eyebrow || "Project Spotlight"}</span>
         <strong>{slide.title}</strong>
-        <p>{slide.description}</p>
+        <div className="case-study-copy">
+          {caseStudyBlocks.map((block, index) => (
+            <p key={`${block.label || "line"}-${index}`}>
+              {block.label ? <strong>{`${block.label}: `}</strong> : null}
+              <span>{block.body}</span>
+            </p>
+          ))}
+        </div>
         <div className="tag-row">
           {slide.tags.map((tag) => (
             <span key={tag}>{tag}</span>
