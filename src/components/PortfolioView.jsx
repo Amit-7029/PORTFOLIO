@@ -312,6 +312,107 @@ function ProjectSlide({ slide, onRipple }) {
   );
 }
 
+function PricingGlyph({ type }) {
+  const icons = {
+    plus: "+",
+    shield: "S",
+    crown: "P",
+    spark: "*",
+  };
+
+  return <span aria-hidden="true">{icons[type] || "+"}</span>;
+}
+
+function PricingExtraRow({ item }) {
+  return (
+    <article className="pricing-extra-card">
+      <strong>{item.label}</strong>
+      <span>
+        {item.price}
+        {item.suffix || ""}
+      </span>
+    </article>
+  );
+}
+
+function PricingCard({ plan, featured, onSelect, onRipple }) {
+  return (
+    <article className={`pricing-card ${featured ? "is-featured" : ""}`} data-parallax-speed="0.05">
+      {plan.badge ? <span className="pricing-badge">{plan.badge}</span> : null}
+      <div className="pricing-card-head">
+        <span className="pricing-icon-pill">
+          <PricingGlyph type={plan.iconKey} />
+        </span>
+        <div>
+          <strong>{plan.name}</strong>
+          <p>{plan.price}</p>
+        </div>
+      </div>
+      <ul className="pricing-feature-list">
+        {(plan.features || []).map((feature) => (
+          <li key={feature}>
+            <span className="pricing-feature-check" aria-hidden="true">•</span>
+            <span>{feature}</span>
+          </li>
+        ))}
+      </ul>
+      <button type="button" className={`portfolio-button ${featured ? "primary-button" : "secondary-button"} pricing-card-button`} onClick={() => onSelect(plan)} onPointerDown={onRipple}>
+        {plan.ctaLabel || "Buy Now"}
+      </button>
+    </article>
+  );
+}
+
+function PurchaseModal({
+  open,
+  plan,
+  pricingSection,
+  onClose,
+  onContinue,
+  onRipple,
+  showSuccess,
+}) {
+  if (!open || !plan) return null;
+
+  return (
+    <div className="purchase-modal-backdrop" role="presentation" onClick={onClose}>
+      <div className="purchase-modal" role="dialog" aria-modal="true" aria-label={pricingSection.modalTitle || "Choose your payment method"} onClick={(event) => event.stopPropagation()}>
+        <button type="button" className="purchase-modal-close" onClick={onClose} aria-label="Close purchase modal">
+          ×
+        </button>
+        <span className="portfolio-kicker">{pricingSection.kicker || "Pricing"}</span>
+        <h3>{pricingSection.modalTitle || "Choose your payment method"}</h3>
+        <p className="purchase-modal-copy">{pricingSection.modalHelper}</p>
+        <div className="purchase-plan-summary">
+          <strong>{plan.name}</strong>
+          <span>{plan.price}</span>
+        </div>
+        <div className="purchase-method-grid">
+          {[pricingSection.paymentMethodRazorpay, pricingSection.paymentMethodUpi, pricingSection.paymentMethodCards].filter(Boolean).map((item) => (
+            <article key={item} className="purchase-method-pill">
+              <span className="purchase-method-dot" aria-hidden="true" />
+              <strong>{item}</strong>
+            </article>
+          ))}
+        </div>
+        {showSuccess ? (
+          <div className="purchase-success-message">
+            <strong>{pricingSection.successMessage || "Thank you! We will contact you within 24 hours"}</strong>
+          </div>
+        ) : null}
+        <div className="purchase-modal-actions">
+          <button type="button" className="secondary-button portfolio-button" onClick={onClose} onPointerDown={onRipple}>
+            Close
+          </button>
+          <button type="button" className="primary-button portfolio-button" onClick={onContinue} onPointerDown={onRipple}>
+            {pricingSection.paymentPrimaryButton || plan.ctaLabel || "Continue Purchase"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function PortfolioView({ data, preview = false }) {
   const frameRef = useRef(null);
   const hashNavigationMode = !preview && typeof window !== "undefined" && Boolean(window.location.hash);
@@ -322,6 +423,9 @@ export default function PortfolioView({ data, preview = false }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [contactForm, setContactForm] = useState({ name: "", phone: "", message: "" });
+  const [selectedPricingPlan, setSelectedPricingPlan] = useState(null);
+  const [purchaseModalOpen, setPurchaseModalOpen] = useState(false);
+  const [purchaseSuccess, setPurchaseSuccess] = useState(false);
   const siteConfig = data?.siteConfig || {};
   const sectionConfig = data?.sections || {};
   const categoryMeta = siteConfig.skillCategoryMeta || defaultCategoryMeta;
@@ -679,6 +783,7 @@ export default function PortfolioView({ data, preview = false }) {
   const skillsSection = sectionConfig.skills || {};
   const experienceSection = sectionConfig.experience || {};
   const projectsSection = sectionConfig.projects || {};
+  const pricingSection = sectionConfig.pricing || {};
   const achievementsSection = sectionConfig.achievements || {};
   const contactSection = sectionConfig.contact || {};
   const footerSection = sectionConfig.footer || {};
@@ -767,12 +872,17 @@ export default function PortfolioView({ data, preview = false }) {
     .map((item) => item.trim())
     .filter(Boolean);
 
-  const defaultOrder = ["hero", "about", "services", "skills", "experience", "projects", "achievements", "contact", "footer"];
+  const defaultOrder = ["hero", "about", "services", "skills", "experience", "projects", "pricing", "achievements", "contact", "footer"];
   const normalizedOrder = [...(siteConfig.sectionOrder || defaultOrder)];
   if (sectionConfig.experience && !normalizedOrder.includes("experience")) {
     const insertIndex = normalizedOrder.indexOf("projects");
     if (insertIndex === -1) normalizedOrder.push("experience");
     else normalizedOrder.splice(insertIndex, 0, "experience");
+  }
+  if (sectionConfig.pricing && !normalizedOrder.includes("pricing")) {
+    const insertIndex = normalizedOrder.indexOf("achievements");
+    if (insertIndex === -1) normalizedOrder.push("pricing");
+    else normalizedOrder.splice(insertIndex, 0, "pricing");
   }
 
   const navItems = normalizedOrder
@@ -780,6 +890,9 @@ export default function PortfolioView({ data, preview = false }) {
     .map((id) => [id, sectionConfig[id]?.navLabel || id]);
   const orderedSectionIds = normalizedOrder;
   const sectionHeadClassName = `portfolio-section-head ${siteConfig.sectionHeadingAlign === "center" ? "is-centered" : ""}`;
+  const pricingPlans = Array.isArray(data.pricingPlans) ? data.pricingPlans : [];
+  const pricingExtras = Array.isArray(data.pricingExtras) ? data.pricingExtras : [];
+  const featuredPricingPlan = pricingPlans.find((plan) => plan.highlighted) || pricingPlans[1] || pricingPlans[0] || null;
 
   function sectionOrderStyle(sectionId, offset = 0) {
     const index = orderedSectionIds.indexOf(sectionId);
@@ -824,6 +937,39 @@ export default function PortfolioView({ data, preview = false }) {
 
   function goToPreviousSlide() {
     setCurrentSlide((current) => (current - 1 + storySlides.length) % storySlides.length);
+  }
+
+  function openPricingModal(plan) {
+    setSelectedPricingPlan(plan || featuredPricingPlan);
+    setPurchaseSuccess(false);
+    setPurchaseModalOpen(true);
+  }
+
+  function closePricingModal() {
+    setPurchaseModalOpen(false);
+    setPurchaseSuccess(false);
+  }
+
+  function handlePurchaseContinue() {
+    const plan = selectedPricingPlan || featuredPricingPlan;
+    if (!plan) return;
+
+    const purchaseMessage = [
+      "Hello, I want to purchase a doctor website package.",
+      `Package: ${plan.name}`,
+      `Price: ${plan.price}`,
+    ].join("\n");
+
+    const actionType = plan.actionType || "modal";
+    const directHref = normalizeExternalLink(plan.ctaLink);
+    const whatsappHref = buildWhatsAppHref(data.settings.whatsappLink, data.settings.phone, purchaseMessage);
+    const nextHref = actionType === "payment-link" && directHref ? directHref : actionType === "whatsapp" ? whatsappHref : directHref || whatsappHref;
+
+    if (nextHref && !preview && typeof window !== "undefined") {
+      window.open(nextHref, "_blank", "noopener,noreferrer");
+    }
+
+    setPurchaseSuccess(true);
   }
 
   return (
@@ -1231,6 +1377,49 @@ export default function PortfolioView({ data, preview = false }) {
       </section>
       ) : null}
 
+      {pricingSection.visible !== false ? (
+      <section className="portfolio-section pricing-section" id="pricing" data-section-id="pricing" data-reveal style={sectionOrderStyle("pricing")}>
+        <div className={`${sectionHeadClassName} pricing-section-head`}>
+          <div>
+            <p className="portfolio-kicker">{pricingSection.kicker || "Pricing"}</p>
+            <h3>{pricingSection.title || "Doctor Website Packages"}</h3>
+          </div>
+          <p className="section-copy">{pricingSection.description || "Choose the best plan to grow your clinic online"}</p>
+        </div>
+
+        <div className="pricing-grid">
+          {pricingPlans.map((plan) => (
+            <PricingCard
+              key={plan.id || plan.name}
+              plan={plan}
+              featured={Boolean(plan.highlighted)}
+              onSelect={openPricingModal}
+              onRipple={triggerRipple}
+            />
+          ))}
+        </div>
+
+        {pricingExtras.length ? (
+          <div className="pricing-extras-shell">
+            <div className="pricing-extras-head">
+              <span className="detail-label">{pricingSection.extrasTitle || "Extra Features"}</span>
+            </div>
+            <div className="pricing-extras-grid">
+              {pricingExtras.map((item) => (
+                <PricingExtraRow key={item.id || item.label} item={item} />
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        <article className="pricing-trust-card">
+          <span className="detail-label">{pricingSection.trustTitle || "Trusted by Clinics"}</span>
+          <strong>{pricingSection.trustLine || "Simple, fast, and conversion-focused doctor websites built to improve trust and appointment enquiries."}</strong>
+          {pricingSection.testimonialLine ? <p>{pricingSection.testimonialLine}</p> : null}
+        </article>
+      </section>
+      ) : null}
+
       {achievementsSection.visible !== false ? (
       <section className="portfolio-section" id="achievements" data-section-id="achievements" data-reveal style={sectionOrderStyle("achievements")}>
         <div className={sectionHeadClassName}>
@@ -1344,6 +1533,22 @@ export default function PortfolioView({ data, preview = false }) {
       <a className="portfolio-whatsapp" href={data.settings.whatsappLink} target="_blank" rel="noreferrer" onPointerDown={triggerRipple}>
         WhatsApp
       </a>
+
+      {pricingSection.visible !== false && featuredPricingPlan ? (
+        <button type="button" className="pricing-mobile-sticky-cta" onClick={() => openPricingModal(featuredPricingPlan)} onPointerDown={triggerRipple}>
+          {pricingSection.mobileStickyLabel || featuredPricingPlan.ctaLabel || "Get Started"}
+        </button>
+      ) : null}
+
+      <PurchaseModal
+        open={purchaseModalOpen}
+        plan={selectedPricingPlan || featuredPricingPlan}
+        pricingSection={pricingSection}
+        onClose={closePricingModal}
+        onContinue={handlePurchaseContinue}
+        onRipple={triggerRipple}
+        showSuccess={purchaseSuccess}
+      />
     </div>
   );
 }

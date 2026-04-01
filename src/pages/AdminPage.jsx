@@ -13,6 +13,7 @@ const sections = [
   "theme",
   "site",
   "content",
+  "pricing",
   "services",
   "skills",
   "projects",
@@ -24,7 +25,8 @@ const sections = [
 ];
 
 const iconOptions = ["award", "certificate", "star", "bolt"];
-const cmsSectionKeys = ["hero", "about", "services", "skills", "experience", "projects", "achievements", "contact", "footer"];
+const pricingIconOptions = ["plus", "shield", "crown", "spark"];
+const cmsSectionKeys = ["hero", "about", "services", "skills", "experience", "projects", "pricing", "achievements", "contact", "footer"];
 const staticMediaOptions = [
   { value: "/media/about-workspace.png", label: "about-workspace.png" },
   { value: "/media/about-story-visual.png", label: "about-story-visual.png" },
@@ -113,6 +115,25 @@ const contentFieldMap = {
     { key: "visualSecondaryLabel", label: "Secondary Visual Label" },
     { key: "visualSecondaryTitle", label: "Secondary Visual Title" },
   ],
+  pricing: [
+    { key: "visible", label: "Visible", type: "toggle" },
+    { key: "navLabel", label: "Nav Label" },
+    { key: "kicker", label: "Kicker" },
+    { key: "title", label: "Title" },
+    { key: "description", label: "Subtitle", type: "textarea" },
+    { key: "extrasTitle", label: "Extras Title" },
+    { key: "trustTitle", label: "Trust Title" },
+    { key: "trustLine", label: "Trust Line", type: "textarea" },
+    { key: "testimonialLine", label: "Testimonial Line", type: "textarea" },
+    { key: "mobileStickyLabel", label: "Mobile Sticky CTA" },
+    { key: "modalTitle", label: "Modal Title" },
+    { key: "modalHelper", label: "Modal Helper", type: "textarea" },
+    { key: "successMessage", label: "Success Message", type: "textarea" },
+    { key: "paymentPrimaryButton", label: "Modal Primary Button" },
+    { key: "paymentMethodRazorpay", label: "Razorpay Label" },
+    { key: "paymentMethodUpi", label: "UPI Label" },
+    { key: "paymentMethodCards", label: "Card / Net Banking Label" },
+  ],
   achievements: [
     { key: "visible", label: "Visible", type: "toggle" },
     { key: "navLabel", label: "Nav Label" },
@@ -162,6 +183,10 @@ function createEmpty(section) {
       return { role: "", company: "", duration: "", description: "" };
     case "achievements":
       return { title: "", description: "", icon: "award" };
+    case "pricingPlans":
+      return { name: "", price: "", badge: "", highlighted: false, iconKey: "plus", ctaLabel: "Buy Now", ctaLink: "", actionType: "modal", features: [] };
+    case "pricingExtras":
+      return { label: "", price: "", suffix: "" };
     default:
       return {};
   }
@@ -445,7 +470,7 @@ export default function AdminPage() {
 
   function moveSection(sectionKey, targetIndex) {
     setDraft((current) => {
-      const order = [...(current.siteConfig?.sectionOrder || cmsSectionKeys)];
+      const order = [...orderedCmsSections];
       const sourceIndex = order.indexOf(sectionKey);
       if (sourceIndex === -1 || targetIndex < 0 || targetIndex >= order.length) {
         return current;
@@ -471,6 +496,14 @@ export default function AdminPage() {
     ],
     [stats, messageCount],
   );
+  const orderedCmsSections = useMemo(() => {
+    const order = [...(draft?.siteConfig?.sectionOrder || cmsSectionKeys)];
+    if (!order.includes("pricing")) {
+      const insertIndex = order.indexOf("achievements");
+      order.splice(insertIndex === -1 ? order.length : insertIndex, 0, "pricing");
+    }
+    return order;
+  }, [draft?.siteConfig?.sectionOrder]);
 
   if (!draft) {
     return <div className="screen-center">Loading admin...</div>;
@@ -596,6 +629,136 @@ export default function AdminPage() {
         {field.label}
         <input value={value || ""} onChange={(event) => updateSectionDraft(sectionKey, { [field.key]: event.target.value })} />
       </label>
+    );
+  }
+
+  function renderPricingManager() {
+    return (
+      <section className="admin-panel">
+        <div className="panel-head">
+          <div>
+            <p className="section-label">pricing</p>
+            <h2>Pricing & Purchase Manager</h2>
+          </div>
+        </div>
+
+        <div className="stack-list">
+          <article className="editor-card">
+            <div className="panel-head">
+              <div>
+                <p className="section-label">Packages</p>
+                <h2 style={{ fontSize: "1.15rem" }}>Pricing Plans</h2>
+              </div>
+              <button className="secondary-button" onClick={() => addListItem("pricingPlans")}>Add Plan</button>
+            </div>
+
+            <div className="stack-list">
+              {(draft.pricingPlans || []).map((plan) => (
+                <article key={plan.id} className="editor-card">
+                  <div className="form-grid">
+                    <label>
+                      Plan Name
+                      <input value={plan.name || ""} onChange={(e) => updateListItem("pricingPlans", plan.id, "name", e.target.value)} />
+                    </label>
+                    <label>
+                      Price
+                      <input value={plan.price || ""} onChange={(e) => updateListItem("pricingPlans", plan.id, "price", e.target.value)} />
+                    </label>
+                    <label>
+                      Badge Text
+                      <input value={plan.badge || ""} onChange={(e) => updateListItem("pricingPlans", plan.id, "badge", e.target.value)} />
+                    </label>
+                    <label>
+                      Icon Key
+                      <select value={plan.iconKey || "plus"} onChange={(e) => updateListItem("pricingPlans", plan.id, "iconKey", e.target.value)}>
+                        {pricingIconOptions.map((option) => <option key={option}>{option}</option>)}
+                      </select>
+                    </label>
+                    <label>
+                      CTA Label
+                      <input value={plan.ctaLabel || ""} onChange={(e) => updateListItem("pricingPlans", plan.id, "ctaLabel", e.target.value)} />
+                    </label>
+                    <label>
+                      Action Type
+                      <select value={plan.actionType || "modal"} onChange={(e) => updateListItem("pricingPlans", plan.id, "actionType", e.target.value)}>
+                        <option value="modal">modal</option>
+                        <option value="payment-link">payment-link</option>
+                        <option value="whatsapp">whatsapp</option>
+                      </select>
+                    </label>
+                    <label className="full-span">
+                      CTA Link
+                      <input value={plan.ctaLink || ""} onChange={(e) => updateListItem("pricingPlans", plan.id, "ctaLink", e.target.value)} />
+                    </label>
+                    <label className="toggle-field">
+                      Highlighted
+                      <input type="checkbox" checked={Boolean(plan.highlighted)} onChange={(e) => updateListItem("pricingPlans", plan.id, "highlighted", e.target.checked)} />
+                    </label>
+                    <label className="full-span">
+                      Features
+                      <textarea
+                        value={(plan.features || []).join("\n")}
+                        onChange={(e) =>
+                          updateListItem(
+                            "pricingPlans",
+                            plan.id,
+                            "features",
+                            e.target.value.split("\n").map((item) => item.trim()).filter(Boolean),
+                          )
+                        }
+                        placeholder={"1 Page Website\nMobile Responsive Design\nWhatsApp & Call Button"}
+                      />
+                    </label>
+                  </div>
+                  <div className="panel-actions">
+                    <button className="primary-button" onClick={() => saveListItem("pricingPlans", plan)}>Save</button>
+                    {plan.id && !plan.id.startsWith("draft_") ? (
+                      <button className="ghost-button" onClick={() => setPendingDelete({ key: "pricingPlans", id: plan.id })}>Delete</button>
+                    ) : null}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </article>
+
+          <article className="editor-card">
+            <div className="panel-head">
+              <div>
+                <p className="section-label">Add-ons</p>
+                <h2 style={{ fontSize: "1.15rem" }}>Extra Pricing Rows</h2>
+              </div>
+              <button className="secondary-button" onClick={() => addListItem("pricingExtras")}>Add Extra</button>
+            </div>
+
+            <div className="stack-list">
+              {(draft.pricingExtras || []).map((item) => (
+                <article key={item.id} className="editor-card">
+                  <div className="form-grid">
+                    <label>
+                      Label
+                      <input value={item.label || ""} onChange={(e) => updateListItem("pricingExtras", item.id, "label", e.target.value)} />
+                    </label>
+                    <label>
+                      Price
+                      <input value={item.price || ""} onChange={(e) => updateListItem("pricingExtras", item.id, "price", e.target.value)} />
+                    </label>
+                    <label>
+                      Billing Suffix
+                      <input value={item.suffix || ""} onChange={(e) => updateListItem("pricingExtras", item.id, "suffix", e.target.value)} />
+                    </label>
+                  </div>
+                  <div className="panel-actions">
+                    <button className="primary-button" onClick={() => saveListItem("pricingExtras", item)}>Save</button>
+                    {item.id && !item.id.startsWith("draft_") ? (
+                      <button className="ghost-button" onClick={() => setPendingDelete({ key: "pricingExtras", id: item.id })}>Delete</button>
+                    ) : null}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </article>
+        </div>
+      </section>
     );
   }
 
@@ -763,7 +926,7 @@ export default function AdminPage() {
               </label>
             </div>
             <div className="stack-list" style={{ marginTop: "20px" }}>
-              {(draft.siteConfig.sectionOrder || cmsSectionKeys).map((sectionKey, index) => (
+              {orderedCmsSections.map((sectionKey, index) => (
                 <article
                   key={sectionKey}
                   className="editor-card"
@@ -772,7 +935,7 @@ export default function AdminPage() {
                   onDragOver={(event) => event.preventDefault()}
                   onDrop={() => {
                     if (!draggedSectionId || draggedSectionId === sectionKey) return;
-                    const targetIndex = (draft.siteConfig.sectionOrder || cmsSectionKeys).indexOf(sectionKey);
+                    const targetIndex = orderedCmsSections.indexOf(sectionKey);
                     moveSection(draggedSectionId, targetIndex);
                     setDraggedSectionId(null);
                   }}
@@ -801,7 +964,7 @@ export default function AdminPage() {
           <section className="admin-panel">
             <div className="panel-head"><div><p className="section-label">Content</p><h2>All Section Content</h2></div></div>
             <div className="stack-list">
-              {(draft.siteConfig.sectionOrder || cmsSectionKeys).map((sectionKey) => (
+              {orderedCmsSections.map((sectionKey) => (
                 <article key={sectionKey} className="editor-card">
                   <div className="panel-head">
                     <div>
@@ -820,6 +983,8 @@ export default function AdminPage() {
             </div>
           </section>
         );
+      case "pricing":
+        return renderPricingManager();
         case "services":
           return renderListSection("services", draft.services, ["title", "description", "image"]);
       case "skills":

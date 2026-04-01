@@ -276,6 +276,8 @@ const servicesApi = createListHandlers("services");
 const experiencesApi = createListHandlers("experiences");
 const projectsApi = createListHandlers("projects");
 const achievementsApi = createListHandlers("achievements");
+const pricingPlansApi = createListHandlers("pricingPlans");
+const pricingExtrasApi = createListHandlers("pricingExtras");
 
 app.get("/api/skills", authMiddleware, skillsApi.list);
 app.post("/api/skills", authMiddleware, skillsApi.create);
@@ -301,6 +303,16 @@ app.get("/api/achievements", authMiddleware, achievementsApi.list);
 app.post("/api/achievements", authMiddleware, achievementsApi.create);
 app.put("/api/achievements/:id", authMiddleware, achievementsApi.update);
 app.delete("/api/achievements/:id", authMiddleware, achievementsApi.remove);
+
+app.get("/api/pricingPlans", authMiddleware, pricingPlansApi.list);
+app.post("/api/pricingPlans", authMiddleware, pricingPlansApi.create);
+app.put("/api/pricingPlans/:id", authMiddleware, pricingPlansApi.update);
+app.delete("/api/pricingPlans/:id", authMiddleware, pricingPlansApi.remove);
+
+app.get("/api/pricingExtras", authMiddleware, pricingExtrasApi.list);
+app.post("/api/pricingExtras", authMiddleware, pricingExtrasApi.create);
+app.put("/api/pricingExtras/:id", authMiddleware, pricingExtrasApi.update);
+app.delete("/api/pricingExtras/:id", authMiddleware, pricingExtrasApi.remove);
 
 app.get("/api/media", authMiddleware, asyncHandler(async (_req, res) => {
   const services = getFirebaseServices();

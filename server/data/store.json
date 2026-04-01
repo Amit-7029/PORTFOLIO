@@ -25,6 +25,7 @@
       "skills",
       "experience",
       "projects",
+      "pricing",
       "achievements",
       "contact",
       "footer"
@@ -199,6 +200,25 @@
       "visualSecondaryLabel": "Meta Ads",
       "visualSecondaryTitle": "Campaign-focused digital growth"
     },
+    "pricing": {
+      "visible": true,
+      "navLabel": "Pricing",
+      "kicker": "Pricing",
+      "title": "Doctor Website Packages",
+      "description": "Choose the best plan to grow your clinic online",
+      "extrasTitle": "Extra Features",
+      "trustTitle": "Trusted by Clinics",
+      "trustLine": "Simple, fast, and conversion-focused doctor websites built to improve trust and appointment enquiries.",
+      "testimonialLine": "Designed for clinics that want a professional online presence without unnecessary complexity.",
+      "mobileStickyLabel": "Talk About Packages",
+      "modalTitle": "Choose your payment method",
+      "modalHelper": "Secure your plan today. We support Razorpay, UPI, and Card / Net Banking options, and we will contact you within 24 hours.",
+      "successMessage": "Thank you! We will contact you within 24 hours",
+      "paymentPrimaryButton": "Continue Purchase",
+      "paymentMethodRazorpay": "Razorpay Payment Gateway",
+      "paymentMethodUpi": "UPI Payment Option",
+      "paymentMethodCards": "Card / Net Banking"
+    },
     "achievements": {
       "visible": true,
       "navLabel": "Achievements",
@@ -353,6 +373,87 @@
         "Better Branding"
       ],
       "featured": true
+    }
+  ],
+  "pricingPlans": [
+    {
+      "id": "pricing_1",
+      "name": "Starter Plan",
+      "price": "₹5,999",
+      "badge": "",
+      "highlighted": false,
+      "iconKey": "plus",
+      "ctaLabel": "Buy Now",
+      "ctaLink": "",
+      "actionType": "modal",
+      "features": [
+        "1 Page Website",
+        "Mobile Responsive Design",
+        "WhatsApp & Call Button",
+        "Basic Doctor Info Section",
+        "4–6 Services Listing",
+        "Delivery in 2 Days"
+      ]
+    },
+    {
+      "id": "pricing_2",
+      "name": "Professional Plan",
+      "price": "₹8,999",
+      "badge": "Most Popular",
+      "highlighted": true,
+      "iconKey": "shield",
+      "ctaLabel": "Get Started",
+      "ctaLink": "",
+      "actionType": "modal",
+      "features": [
+        "3–5 Pages Website",
+        "Premium UI Design",
+        "Google Maps Integration",
+        "Appointment via WhatsApp",
+        "Basic SEO Setup",
+        "Speed Optimization",
+        "7 Days Support"
+      ]
+    },
+    {
+      "id": "pricing_3",
+      "name": "Premium Plan",
+      "price": "₹12,999",
+      "badge": "",
+      "highlighted": false,
+      "iconKey": "crown",
+      "ctaLabel": "Buy Now",
+      "ctaLink": "",
+      "actionType": "modal",
+      "features": [
+        "5–7 Pages Website",
+        "Advanced SEO Optimization",
+        "Google Business Profile Setup",
+        "WhatsApp Automation",
+        "Contact Form Integration",
+        "1 Month Support",
+        "High-conversion design"
+      ]
+    }
+  ],
+  "pricingExtras": [
+    {
+      "id": "extra_1",
+      "label": "Domain & Hosting",
+      "price": "₹1500",
+      "suffix": "/year"
+    },
+    {
+      "id": "extra_2",
+      "label": "Monthly Maintenance",
+      "price": "₹500",
+      "suffix": "/month"
+    },
+    {
+      "id": "extra_3",
+      "label": "Google Business Setup",
+      "price": "₹2000",
+      "suffix": ""
     }
   ],
   "achievements": [
