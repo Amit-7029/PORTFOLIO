@@ -934,10 +934,11 @@ td {
   gap: 12px;
 }
 
-.hero-highlights span {
+.hero-highlight-chip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  max-width: 100%;
   min-height: 42px;
   padding: 10px 16px;
   border-radius: 999px;
@@ -957,19 +958,19 @@ td {
   animation: chipBlinkGlow 3.4s ease-in-out infinite;
 }
 
-.hero-highlights span:nth-child(2) {
+.hero-highlight-chip:nth-child(2) {
   animation-delay: 0.35s;
 }
 
-.hero-highlights span:nth-child(3) {
+.hero-highlight-chip:nth-child(3) {
   animation-delay: 0.7s;
 }
 
-.hero-highlights span:nth-child(4) {
+.hero-highlight-chip:nth-child(4) {
   animation-delay: 1.05s;
 }
 
-.hero-highlights span:hover {
+.hero-highlight-chip:hover {
   transform: translateY(-2px);
   border-color: rgba(124, 156, 255, 0.3);
   box-shadow:
@@ -1949,7 +1950,7 @@ td {
 }
 
 .portfolio-frame.theme-light .hero-summary,
-.portfolio-frame.theme-light .hero-highlights span,
+.portfolio-frame.theme-light .hero-highlight-chip,
 .portfolio-frame.theme-light .timeline-body span,
 .portfolio-frame.theme-light .contact-list a {
   color: #101521;
@@ -2320,7 +2321,7 @@ td {
     gap: 10px;
   }
 
-  .hero-highlights span {
+  .hero-highlight-chip {
     min-height: 40px;
     width: 100%;
     justify-content: center;
@@ -3918,7 +3919,7 @@ td {
   gap: 10px;
 }
 
-.hero-highlights span {
+.hero-highlight-chip {
   min-height: 38px;
   padding: 8px 14px;
   font-size: 0.82rem;
@@ -4754,7 +4755,7 @@ td {
     gap: 12px !important;
   }
 
-  .hero-highlights span {
+  .hero-highlight-chip {
     width: 100% !important;
     min-height: 46px;
     justify-content: flex-start !important;
@@ -4798,7 +4799,7 @@ td {
     font-size: 1rem !important;
   }
 
-  .hero-highlights span {
+  .hero-highlight-chip {
     font-size: 0.96rem !important;
     letter-spacing: 0 !important;
   }

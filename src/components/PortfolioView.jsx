@@ -1107,9 +1107,10 @@ export default function PortfolioView({ data, preview = false }) {
             </div>
             <div className="hero-highlights hero-stagger">
               {topHighlights.map((item) => (
-                <span
+                <div
                   key={item}
                   className={[
+                    "hero-highlight-chip",
                     heroSection.chipBold ? "hero-chip-strong" : "",
                     heroSection.chipGlow ? "hero-chip-glow" : "",
                   ]
@@ -1117,7 +1118,7 @@ export default function PortfolioView({ data, preview = false }) {
                     .join(" ")}
                 >
                   {item}
-                </span>
+                </div>
               ))}
             </div>
             <a className="hero-scroll-indicator hero-stagger" href="#about" onPointerDown={triggerRipple}>
