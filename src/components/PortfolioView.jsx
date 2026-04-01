@@ -1534,12 +1534,6 @@ export default function PortfolioView({ data, preview = false }) {
         WhatsApp
       </a>
 
-      {pricingSection.visible !== false && featuredPricingPlan ? (
-        <button type="button" className="pricing-mobile-sticky-cta" onClick={() => openPricingModal(featuredPricingPlan)} onPointerDown={triggerRipple}>
-          {pricingSection.mobileStickyLabel || featuredPricingPlan.ctaLabel || "Get Started"}
-        </button>
-      ) : null}
-
       <PurchaseModal
         open={purchaseModalOpen}
         plan={selectedPricingPlan || featuredPricingPlan}
