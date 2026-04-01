@@ -4749,11 +4749,21 @@ td {
 
   .hero-highlights {
     width: 100%;
-    gap: 10px !important;
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 12px !important;
   }
 
   .hero-highlights span {
-    min-height: 40px;
+    width: 100% !important;
+    min-height: 46px;
+    justify-content: flex-start !important;
+    text-align: left;
+    white-space: normal !important;
+    line-height: 1.45;
+    padding: 12px 14px;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
   .hero-stats-bar {
@@ -4786,6 +4796,11 @@ td {
 
   .hero-showcase-shell .hero-copy .hero-role-line {
     font-size: 1rem !important;
+  }
+
+  .hero-highlights span {
+    font-size: 0.96rem !important;
+    letter-spacing: 0 !important;
   }
 
   .hero-stats-bar {
