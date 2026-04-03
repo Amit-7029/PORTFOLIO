@@ -1105,7 +1105,7 @@ export default function PortfolioView({ data, preview = false }) {
                 </a>
               ) : null}
             </div>
-            <div className="hero-highlights hero-stagger">
+            <div className="hero-highlights hero-highlights-desktop hero-stagger">
               {topHighlights.map((item) => (
                 <div
                   key={item}
@@ -1117,6 +1117,13 @@ export default function PortfolioView({ data, preview = false }) {
                     .filter(Boolean)
                     .join(" ")}
                 >
+                  {item}
+                </div>
+              ))}
+            </div>
+            <div className="hero-highlights-mobile hero-stagger">
+              {topHighlights.map((item) => (
+                <div key={`mobile-${item}`} className="hero-highlight-mobile-card">
                   {item}
                 </div>
               ))}

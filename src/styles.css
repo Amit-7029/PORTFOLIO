@@ -934,6 +934,10 @@ td {
   gap: 12px;
 }
 
+.hero-highlights-mobile {
+  display: none;
+}
+
 .hero-highlight-chip {
   display: inline-flex;
   align-items: center;
@@ -4748,21 +4752,35 @@ td {
     justify-content: center;
   }
 
-  .hero-highlights {
+  .hero-highlights-desktop {
+    display: none !important;
+  }
+
+  .hero-highlights-mobile {
     width: 100%;
     display: grid !important;
     grid-template-columns: 1fr;
     gap: 12px !important;
   }
 
-  .hero-highlight-chip {
+  .hero-highlight-mobile-card {
     width: 100% !important;
     min-height: 46px;
+    display: flex;
+    align-items: center;
     justify-content: flex-start !important;
     text-align: left;
     white-space: normal !important;
     line-height: 1.45;
     padding: 12px 14px;
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    color: #f5f9ff;
+    font-weight: 700;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 10px 22px rgba(0, 0, 0, 0.18);
     overflow-wrap: anywhere;
     word-break: break-word;
   }
@@ -4799,7 +4817,7 @@ td {
     font-size: 1rem !important;
   }
 
-  .hero-highlight-chip {
+  .hero-highlight-mobile-card {
     font-size: 0.96rem !important;
     letter-spacing: 0 !important;
   }
