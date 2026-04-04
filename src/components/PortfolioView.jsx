@@ -1059,20 +1059,6 @@ export default function PortfolioView({ data, preview = false }) {
             <p className={heroEyebrowClassName}>{heroSection.introLabel || "Hello, I'm"}</p>
             <span className={heroMetaChipClassName}>{heroSection.kicker || "Current Profile"}</span>
             <h1 className={heroTitleClassName}>{data.profile.name}</h1>
-            <h2 className={heroRoleClassName}>
-              {heroHeadlineParts.length ? (
-                <span className="hero-role-parts">
-                  {heroHeadlineParts.map((part, index) => (
-                    <React.Fragment key={`${part}-${index}`}>
-                      {index > 0 ? <span className="hero-role-separator" aria-hidden="true">|</span> : null}
-                      <span className="hero-role-part">{part}</span>
-                    </React.Fragment>
-                  ))}
-                </span>
-              ) : (
-                data.profile.headline
-              )}
-            </h2>
             <p className={heroSummaryClassName}>{data.profile.subheadline}</p>
             <p className={heroDetailClassName}>{heroSection.description || aboutPreview}</p>
 
