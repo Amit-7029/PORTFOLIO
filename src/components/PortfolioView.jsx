@@ -1105,29 +1105,6 @@ export default function PortfolioView({ data, preview = false }) {
                 </a>
               ) : null}
             </div>
-            <div className="hero-highlights hero-highlights-desktop hero-stagger">
-              {topHighlights.map((item) => (
-                <div
-                  key={item}
-                  className={[
-                    "hero-highlight-chip",
-                    heroSection.chipBold ? "hero-chip-strong" : "",
-                    heroSection.chipGlow ? "hero-chip-glow" : "",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                >
-                  {item}
-                </div>
-              ))}
-            </div>
-            <div className="hero-highlights-mobile hero-stagger">
-              {topHighlights.map((item) => (
-                <div key={`mobile-${item}`} className="hero-highlight-mobile-card">
-                  {item}
-                </div>
-              ))}
-            </div>
             <a className="hero-scroll-indicator hero-stagger" href="#about" onPointerDown={triggerRipple}>
               <span className="hero-scroll-label">{heroSection.scrollLabel || "Scroll to explore"}</span>
               <span className="hero-scroll-arrow" aria-hidden="true">
