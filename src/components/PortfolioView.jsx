@@ -739,7 +739,10 @@ export default function PortfolioView({ data, preview = false }) {
   ]
     .filter(Boolean)
     .join(" ");
-  const aboutSection = sectionConfig.about || {};
+  const aboutSection = {
+    ...(sectionConfig.about || {}),
+    visible: false,
+  };
   const heroEyebrowClassName = [
     "portfolio-kicker",
     "hero-eyebrow",
@@ -875,7 +878,7 @@ export default function PortfolioView({ data, preview = false }) {
     .map((item) => item.trim())
     .filter(Boolean);
 
-  const defaultOrder = ["hero", "about", "services", "skills", "experience", "projects", "achievements", "contact", "footer"];
+  const defaultOrder = ["hero", "services", "skills", "experience", "projects", "achievements", "contact", "footer"];
   const normalizedOrder = [...(siteConfig.sectionOrder || defaultOrder)];
   if (sectionConfig.experience && !normalizedOrder.includes("experience")) {
     const insertIndex = normalizedOrder.indexOf("projects");

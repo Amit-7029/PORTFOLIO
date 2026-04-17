@@ -20,7 +20,6 @@
     "sectionHeadingAlign": "center",
     "sectionOrder": [
       "hero",
-      "about",
       "services",
       "skills",
       "experience",
@@ -153,7 +152,7 @@
       ]
     },
     "about": {
-      "visible": true,
+      "visible": false,
       "navLabel": "About",
       "kicker": "About Me",
       "title": "Practical Skills Backed By Real Execution",
