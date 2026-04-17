@@ -783,7 +783,10 @@ export default function PortfolioView({ data, preview = false }) {
   const skillsSection = sectionConfig.skills || {};
   const experienceSection = sectionConfig.experience || {};
   const projectsSection = sectionConfig.projects || {};
-  const pricingSection = sectionConfig.pricing || {};
+  const pricingSection = {
+    ...(sectionConfig.pricing || {}),
+    visible: false,
+  };
   const achievementsSection = sectionConfig.achievements || {};
   const contactSection = sectionConfig.contact || {};
   const footerSection = sectionConfig.footer || {};
@@ -872,17 +875,12 @@ export default function PortfolioView({ data, preview = false }) {
     .map((item) => item.trim())
     .filter(Boolean);
 
-  const defaultOrder = ["hero", "about", "services", "skills", "experience", "projects", "pricing", "achievements", "contact", "footer"];
+  const defaultOrder = ["hero", "about", "services", "skills", "experience", "projects", "achievements", "contact", "footer"];
   const normalizedOrder = [...(siteConfig.sectionOrder || defaultOrder)];
   if (sectionConfig.experience && !normalizedOrder.includes("experience")) {
     const insertIndex = normalizedOrder.indexOf("projects");
     if (insertIndex === -1) normalizedOrder.push("experience");
     else normalizedOrder.splice(insertIndex, 0, "experience");
-  }
-  if (sectionConfig.pricing && !normalizedOrder.includes("pricing")) {
-    const insertIndex = normalizedOrder.indexOf("achievements");
-    if (insertIndex === -1) normalizedOrder.push("pricing");
-    else normalizedOrder.splice(insertIndex, 0, "pricing");
   }
 
   const navItems = normalizedOrder

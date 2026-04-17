@@ -25,7 +25,6 @@
       "skills",
       "experience",
       "projects",
-      "pricing",
       "achievements",
       "contact",
       "footer"
@@ -201,7 +200,7 @@
       "visualSecondaryTitle": "Campaign-focused digital growth"
     },
     "pricing": {
-      "visible": true,
+      "visible": false,
       "navLabel": "Pricing",
       "kicker": "Pricing",
       "title": "Doctor Website Packages",
