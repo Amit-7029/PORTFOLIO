@@ -5640,3 +5640,144 @@ td {
     transform: translate(-50%, -50%) rotateZ(360deg) translate3d(20px, 120px, 60px);
   }
 }
+
+/* Final hero intro animation imported from the updated static portfolio style. */
+.hero-showcase-shell .hero-title {
+  overflow: visible;
+}
+
+.hero-name-animated {
+  display: inline-flex;
+  align-items: baseline;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: visible;
+}
+
+.hero-name-singleline {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.hero-letter {
+  display: inline-block;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  text-shadow:
+    0 0 18px rgba(255, 255, 255, 0.1),
+    0 0 34px rgba(57, 215, 255, 0.18),
+    0 0 46px rgba(2, 8, 18, 0.7) !important;
+  opacity: 0.18;
+  transform: translateX(0);
+  filter: blur(0);
+  will-change: transform, opacity, filter;
+}
+
+.hero-name-animated .hero-letter {
+  animation: heroLetterLoop 0.92s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--letter-delay);
+}
+
+.hero-letter-gap {
+  width: 0.18em;
+}
+
+.hero-focus-line {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  column-gap: 0.48em;
+  row-gap: 0.18em;
+  margin: -8px 0 22px;
+  max-width: 760px;
+  font-size: clamp(1.28rem, 2.5vw, 2.08rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.045em;
+  color: rgba(222, 232, 248, 0.82);
+  text-shadow:
+    0 0 18px rgba(57, 215, 255, 0.18),
+    0 0 24px rgba(3, 8, 17, 0.7);
+}
+
+.hero-focus-prefix {
+  color: rgba(190, 205, 226, 0.84);
+  font-weight: 760;
+}
+
+.hero-focus-rotating {
+  color: #ffffff;
+  font-weight: 900;
+  text-shadow:
+    0 0 18px rgba(255, 255, 255, 0.18),
+    0 0 24px rgba(57, 215, 255, 0.22),
+    0 0 34px rgba(9, 16, 28, 0.72);
+  animation: roleRotatingFade 0.55s ease both;
+}
+
+.hero-showcase-shell .hero-copy .hero-focus-prefix {
+  color: rgba(205, 218, 238, 0.9) !important;
+  -webkit-text-fill-color: rgba(205, 218, 238, 0.9) !important;
+}
+
+.hero-showcase-shell .hero-copy .hero-focus-rotating {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.animations-off .hero-name-animated .hero-letter,
+.portfolio-frame.is-preview .hero-name-animated .hero-letter,
+.animations-off .hero-focus-rotating,
+.portfolio-frame.is-preview .hero-focus-rotating {
+  animation: none;
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+@keyframes heroLetterLoop {
+  0% {
+    opacity: 0;
+    transform: translateX(-22px);
+    filter: blur(8px);
+  }
+
+  42% {
+    opacity: 1;
+    transform: translateX(0);
+    filter: blur(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes roleRotatingFade {
+  0% {
+    opacity: 0.45;
+    transform: translateY(10px);
+    filter: blur(5px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-name-animated {
+    white-space: normal;
+  }
+
+  .hero-focus-line {
+    margin: -4px 0 18px;
+    font-size: clamp(1.1rem, 6.5vw, 1.72rem);
+    line-height: 1.28;
+    letter-spacing: -0.04em;
+  }
+}

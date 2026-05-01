@@ -224,6 +224,32 @@ function AnimatedText({ text, mode = "chars", className = "" }) {
   );
 }
 
+function HeroAnimatedName({ name, enabled }) {
+  const characters = Array.from(String(name || ""));
+
+  if (!enabled) {
+    return <>{name}</>;
+  }
+
+  return (
+    <span className="hero-name-animated hero-name-singleline" aria-label={name}>
+      {characters.map((character, index) => {
+        const isSpace = character === " ";
+        return (
+          <span
+            key={`${character}-${index}`}
+            className={`hero-letter ${isSpace ? "hero-letter-gap" : ""}`}
+            aria-hidden="true"
+            style={{ "--letter-delay": `${Math.min(index * 0.05, 0.85).toFixed(2)}s` }}
+          >
+            {isSpace ? "\u00A0" : character}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
 function HeroStat({ label, value, suffix = "", enabled }) {
   const numericValue = Number.parseInt(value, 10);
   const isNumeric = Number.isFinite(numericValue);
@@ -563,11 +589,17 @@ export default function PortfolioView({ data, preview = false }) {
   const [selectedPricingPlan, setSelectedPricingPlan] = useState(null);
   const [purchaseModalOpen, setPurchaseModalOpen] = useState(false);
   const [purchaseSuccess, setPurchaseSuccess] = useState(false);
+  const [activeFocusIndex, setActiveFocusIndex] = useState(0);
   const siteConfig = data?.siteConfig || {};
   const sectionConfig = data?.sections || {};
   const categoryMeta = siteConfig.skillCategoryMeta || defaultCategoryMeta;
   const achievementLabels = siteConfig.achievementIconLabels || defaultAchievementLabels;
   const showTopbarBrand = siteConfig.showBrand === true;
+  const heroFocusItems = useMemo(() => {
+    const cmsItems = sectionConfig.hero?.focusItems || sectionConfig.hero?.rotatingRoles || [];
+    const sourceItems = Array.isArray(cmsItems) && cmsItems.length ? cmsItems : String(data?.profile?.headline || "").split("|");
+    return sourceItems.map((item) => String(item || "").trim()).filter(Boolean);
+  }, [data?.profile?.headline, sectionConfig.hero?.focusItems, sectionConfig.hero?.rotatingRoles]);
 
   const groupedSkills = useMemo(() => {
     if (!data?.skills) return [];
@@ -641,6 +673,20 @@ export default function PortfolioView({ data, preview = false }) {
     const timeoutId = window.setTimeout(() => setHeroReady(true), 120);
     return () => window.clearTimeout(timeoutId);
   }, [preview, introAnimationEnabled, data?.profile?.name, data?.profile?.headline, data?.profile?.image]);
+
+  useEffect(() => {
+    setActiveFocusIndex(0);
+
+    if (preview || !motionEnabled || heroFocusItems.length <= 1) {
+      return undefined;
+    }
+
+    const intervalId = window.setInterval(() => {
+      setActiveFocusIndex((current) => (current + 1) % heroFocusItems.length);
+    }, 2800 * speedFactor);
+
+    return () => window.clearInterval(intervalId);
+  }, [heroFocusItems.length, motionEnabled, preview, speedFactor]);
 
   useEffect(() => {
     if (!frameRef.current) return undefined;
@@ -1197,7 +1243,17 @@ export default function PortfolioView({ data, preview = false }) {
           <div className="hero-copy">
             <p className={heroEyebrowClassName}>{heroSection.introLabel || "Hello, I'm"}</p>
             <span className={heroMetaChipClassName}>{heroSection.kicker || "Current Profile"}</span>
-            <h1 className={heroTitleClassName}>{data.profile.name}</h1>
+            <h1 className={heroTitleClassName}>
+              <HeroAnimatedName name={data.profile.name} enabled={motionEnabled && !preview} />
+            </h1>
+            {heroFocusItems.length ? (
+              <p className="hero-focus-line hero-stagger" aria-live="polite">
+                <span className="hero-focus-prefix">{heroSection.focusPrefix || "Focused on"}</span>
+                <span key={heroFocusItems[activeFocusIndex] || heroFocusItems[0]} className="hero-focus-rotating">
+                  {heroFocusItems[activeFocusIndex] || heroFocusItems[0]}
+                </span>
+              </p>
+            ) : null}
             <p className={heroSummaryClassName}>{data.profile.subheadline}</p>
             <p className={heroDetailClassName}>{heroSection.description || aboutPreview}</p>
 
