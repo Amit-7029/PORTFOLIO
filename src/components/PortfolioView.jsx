@@ -240,6 +240,128 @@ function HeroStat({ label, value, suffix = "", enabled }) {
   );
 }
 
+function HeroCanvasScene({ enabled }) {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!enabled || !canvas) return undefined;
+
+    const context = canvas.getContext("2d", { alpha: true });
+    if (!context) return undefined;
+
+    let frameId = 0;
+    let width = 0;
+    let height = 0;
+    let particles = [];
+    let pointerX = 0;
+    let pointerY = 0;
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      const nextWidth = Math.max(1, Math.floor(rect.width));
+      const nextHeight = Math.max(1, Math.floor(rect.height));
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+
+      width = nextWidth;
+      height = nextHeight;
+      canvas.width = Math.floor(nextWidth * dpr);
+      canvas.height = Math.floor(nextHeight * dpr);
+      context.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const count = Math.max(42, Math.min(110, Math.round((width * height) / 15500)));
+      particles = Array.from({ length: count }, (_, index) => {
+        const depth = 0.35 + Math.random() * 1.15;
+        return {
+          x: Math.random() * width,
+          y: Math.random() * height,
+          z: depth,
+          r: 0.6 + depth * 1.4,
+          speed: 0.12 + depth * 0.22,
+          phase: index * 0.47,
+        };
+      });
+    }
+
+    function onPointerMove(event) {
+      const rect = canvas.getBoundingClientRect();
+      pointerX = (event.clientX - rect.left) / Math.max(rect.width, 1) - 0.5;
+      pointerY = (event.clientY - rect.top) / Math.max(rect.height, 1) - 0.5;
+    }
+
+    function draw(now) {
+      const time = now * 0.001;
+      context.clearRect(0, 0, width, height);
+
+      const centerX = width * (0.68 + pointerX * 0.04);
+      const centerY = height * (0.44 + pointerY * 0.04);
+      const radius = Math.min(width, height) * 0.36;
+
+      const glow = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius * 1.55);
+      glow.addColorStop(0, "rgba(57, 215, 255, 0.2)");
+      glow.addColorStop(0.42, "rgba(76, 124, 255, 0.08)");
+      glow.addColorStop(1, "rgba(5, 11, 22, 0)");
+      context.fillStyle = glow;
+      context.fillRect(0, 0, width, height);
+
+      context.save();
+      context.translate(centerX, centerY);
+      context.rotate(time * 0.08 + pointerX * 0.18);
+
+      for (let ring = 0; ring < 4; ring += 1) {
+        context.beginPath();
+        context.ellipse(0, 0, radius * (0.55 + ring * 0.2), radius * (0.18 + ring * 0.055), time * 0.16 + ring * 0.7, 0, Math.PI * 2);
+        context.strokeStyle = `rgba(57, 215, 255, ${0.12 - ring * 0.018})`;
+        context.lineWidth = 1;
+        context.stroke();
+      }
+
+      for (let spoke = 0; spoke < 18; spoke += 1) {
+        const angle = (spoke / 18) * Math.PI * 2 + time * 0.11;
+        const inner = radius * 0.18;
+        const outer = radius * (0.58 + (spoke % 4) * 0.05);
+        context.beginPath();
+        context.moveTo(Math.cos(angle) * inner, Math.sin(angle) * inner * 0.45);
+        context.lineTo(Math.cos(angle) * outer, Math.sin(angle) * outer * 0.45);
+        context.strokeStyle = "rgba(142, 229, 255, 0.11)";
+        context.lineWidth = 1;
+        context.stroke();
+      }
+      context.restore();
+
+      particles.forEach((particle, index) => {
+        particle.y -= particle.speed;
+        particle.x += Math.sin(time + particle.phase) * 0.18 + pointerX * particle.z * 0.18;
+        if (particle.y < -12) {
+          particle.y = height + 12;
+          particle.x = Math.random() * width;
+        }
+
+        const alpha = 0.18 + Math.sin(time * 1.4 + particle.phase) * 0.12 + particle.z * 0.08;
+        context.beginPath();
+        context.arc(particle.x, particle.y, particle.r, 0, Math.PI * 2);
+        context.fillStyle = index % 5 === 0 ? `rgba(255, 255, 255, ${alpha})` : `rgba(57, 215, 255, ${alpha})`;
+        context.fill();
+      });
+
+      frameId = requestAnimationFrame(draw);
+    }
+
+    resize();
+    window.addEventListener("resize", resize);
+    canvas.addEventListener("pointermove", onPointerMove);
+    frameId = requestAnimationFrame(draw);
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      window.removeEventListener("resize", resize);
+      canvas.removeEventListener("pointermove", onPointerMove);
+    };
+  }, [enabled]);
+
+  return <canvas ref={canvasRef} className="hero-3d-canvas" aria-hidden="true" />;
+}
+
 function SocialIcon({ type }) {
   const icons = {
     linkedin: (
@@ -995,6 +1117,7 @@ export default function PortfolioView({ data, preview = false }) {
       {heroSection.visible !== false ? (
       <section className={`hero-showcase-shell is-visible ${heroReady ? "hero-ready" : ""}`} data-progress-zone data-section-id="hero" id="hero" style={sectionOrderStyle("hero", 0)}>
         <div className="hero-intro-curtain" aria-hidden="true" />
+        <HeroCanvasScene enabled={backgroundEffectsEnabled && motionEnabled && !preview} />
         {heroOverlayImages.length ? (
           <div className="hero-showcase-overlay" aria-hidden="true">
             {heroOverlayImages.map((image, index) => (

@@ -1,14 +1,14 @@
 {
-  "updatedAt": "2026-03-28T09:30:00.000Z",
+  "updatedAt": "2026-05-01T06:39:51.604Z",
   "adminUser": {
     "username": "admin",
     "passwordHash": "$2b$10$a.c7f1tlPfHSV8H/JQ7Qa.v7Yq9.noNRevX8gZxJbXt9IqOKYaQEa"
   },
   "profile": {
     "name": "Amit Shaw",
-    "headline": "Digital Marketing Specialist | Meta Ads Expert | Web Developer | AI Researcher",
-    "subheadline": "I help businesses get more visibility, better leads, and a stronger digital presence through Meta Ads, smart marketing strategy, website development, and AI-powered research.",
-    "aboutHtml": "<p>I'm Amit Shaw, a multi-skilled professional focused on business growth through digital strategy and practical execution.</p><p>I work across Meta Ads, digital marketing, website development, AI-powered research, and data analysis.</p><p>I believe good work should not just look professional, it should deliver clear results.</p><p>My approach is simple: understand the problem, build the right solution, and help businesses grow with confidence.</p>",
+    "headline": "Accounting Assistant | Digital Marketing Support | Website Builder | AI Productivity Workflows",
+    "subheadline": "I support businesses with accurate accounting operations, organized billing workflows, digital marketing execution, and professional websites that improve visibility and daily efficiency.",
+    "aboutHtml": "<p>I'm Amit Shaw, an Accounting Assistant and Digital Marketing Support professional focused on helping businesses stay accurate, organized, and more visible online.</p><p>My work includes vendor ledger management, purchase entries, billing operations, Meta Ads support, website structuring, and AI-assisted workflow execution.</p><p>I bring together financial accuracy and digital support so daily operations run smoothly while business visibility and presentation continue to improve.</p>",
     "image": "/media/amit-kumar-shaw.jpeg"
   },
   "siteConfig": {
@@ -35,28 +35,28 @@
       "bolt": "Fast Learner"
     },
     "skillCategoryMeta": {
-      "Marketing": {
-        "label": "Marketing",
-        "eyebrow": "Audience & Growth",
-        "description": "Campaign planning, social media execution, and digital visibility strategies focused on reach, leads, and brand growth.",
+      "Accounting & Operations": {
+        "label": "Accounting & Operations",
+        "eyebrow": "Accuracy & Daily Workflow",
+        "description": "Core operational skills used in accounting support, billing work, purchase records, and business documentation.",
         "glyph": "01"
       },
-      "Tech": {
-        "label": "Tech",
-        "eyebrow": "Web & Build",
-        "description": "Professional website development, clean responsive layouts, and practical digital experiences that build trust.",
+      "Digital Marketing": {
+        "label": "Digital Marketing",
+        "eyebrow": "Visibility & Lead Support",
+        "description": "Practical digital marketing skills used to support visibility, campaigns, engagement, and business growth.",
         "glyph": "02"
       },
-      "Analytics": {
-        "label": "Analytics",
-        "eyebrow": "Data & Decisions",
-        "description": "Excel-based analysis, reporting structure, and workflow support that help businesses make better decisions.",
+      "Technical Skills": {
+        "label": "Technical Skills",
+        "eyebrow": "Build & Planning",
+        "description": "AI-assisted building and content structuring skills used for websites, apps, and clean digital presentation.",
         "glyph": "03"
       },
-      "AI Tools": {
-        "label": "AI Tools",
-        "eyebrow": "Research & Speed",
-        "description": "AI-powered research and ChatGPT-assisted workflows for faster insights, smarter planning, and efficient execution.",
+      "Tools": {
+        "label": "Tools",
+        "eyebrow": "Productivity & Execution",
+        "description": "A reliable tool stack for finance support, research, structured content work, and faster professional delivery.",
         "glyph": "04"
       }
     }
@@ -94,8 +94,8 @@
       "visible": true,
       "navLabel": "Home",
       "introLabel": "Hello, I'm",
-      "kicker": "Growth-Focused Freelancer",
-      "description": "I work with a result-driven mindset, combining digital marketing, Meta Ads, AI-powered research, and professional website development to solve real business problems clearly and effectively.",
+      "kicker": "Available for accounting, digital marketing, and website support projects",
+      "description": "I combine financial accuracy with practical digital execution so daily operations stay organized while business visibility and presentation keep improving.",
       "headlineBold": true,
       "headlineGlow": true,
       "bodyBold": true,
@@ -104,7 +104,7 @@
       "chipGlow": true,
       "primaryButtonText": "Hire Me",
       "primaryButtonLink": "#contact",
-      "secondaryButtonText": "Let's Work Together",
+      "secondaryButtonText": "View Projects",
       "secondaryButtonLink": "#projects",
       "secondaryButtonSolid": true,
       "clientProjectButtonText": "Real Client Project",
@@ -117,37 +117,39 @@
         "/media/web-dev-showcase-1.png",
         "/media/web-dev-showcase-2.jpg"
       ],
-      "overlayOpacity": 44,
+      "overlayOpacity": 52,
       "overlayImageOne": "/media/ai-tools-showcase.png",
       "overlayImageTwo": "/media/meta-showcase.webp",
       "overlayImageThree": "/media/web-dev-showcase-1.png",
       "overlayImageFour": "/media/web-dev-showcase-2.jpg",
       "highlightItems": [
-        "Digital Marketing Strategy",
+        "Tally Prime",
+        "Vendor Ledger Management",
+        "Billing & POS Handling",
         "Meta Ads Campaigns",
         "Website Development",
-        "AI-Powered Research"
+        "AI Productivity Tools"
       ],
       "statsItems": [
         {
           "value": "2",
           "suffix": "+",
-          "label": "Years Building Skills"
+          "label": "Career Roles"
         },
         {
-          "value": "6",
+          "value": "8",
           "suffix": "+",
-          "label": "Services Offered"
+          "label": "Service Areas"
         },
         {
-          "value": "12",
+          "value": "18",
           "suffix": "+",
-          "label": "Core Skills"
+          "label": "CV Skills"
         },
         {
-          "value": "1",
+          "value": "2",
           "suffix": "+",
-          "label": "Real Website Project"
+          "label": "Featured Projects"
         }
       ]
     },
@@ -167,29 +169,29 @@
       "visible": true,
       "navLabel": "Services",
       "kicker": "Services",
-      "title": "What I Help Businesses Achieve",
-      "description": "Every service is designed around business outcomes: better visibility, cleaner execution, and a more professional online presence."
+      "title": "Professional Support Across Operations And Growth",
+      "description": "My services combine accounting support, billing accuracy, marketing execution, and modern digital presentation so businesses can work smarter and look more credible."
     },
     "skills": {
       "visible": true,
       "navLabel": "Skills",
       "kicker": "Skills",
-      "title": "A Multi-Skilled System For Business Growth",
-      "description": "Marketing, tech, analytics, and AI tools combined into a practical capability stack that supports both visibility and execution."
+      "title": "A Complete Skill Set Shaped By Real Work",
+      "description": "Accounting accuracy, digital marketing, website building, Excel, and AI workflows brought together for practical business execution."
     },
     "experience": {
       "visible": true,
       "navLabel": "Experience",
       "kicker": "Experience",
-      "title": "Hands-On Work That Builds Accuracy And Trust",
-      "description": "My experience combines daily business support, disciplined record handling, and practical execution across both operations and digital work."
+      "title": "Hands-On Experience That Supports Accuracy, Speed, And Trust",
+      "description": "My work experience combines accounting support, billing operations, digital execution, and system-focused problem solving."
     },
     "projects": {
       "visible": true,
       "navLabel": "Projects",
       "kicker": "Portfolio",
-      "title": "Case Study Built Around Real Business Value",
-      "description": "A focused project showcase that explains the business problem, the solution delivered, and the real outcome created.",
+      "title": "Projects That Connect Execution With Visibility",
+      "description": "A focused project showcase that explains the work delivered, the business problem solved, and the visible outcome created.",
       "projectEyebrow": "Case Study",
       "visualPrimaryImage": "/media/ai-tools-showcase.png",
       "visualPrimaryLabel": "AI Research & Tools",
@@ -222,15 +224,15 @@
       "navLabel": "Achievements",
       "kicker": "Achievements",
       "title": "Proof Of Learning, Curiosity, And Growth",
-      "description": "Recognition matters when it reflects consistency, fast learning, and the ability to keep improving across different types of work."
+      "description": "Recognition and learning milestones that reflect consistency, fast learning, and steady improvement across practical work."
     },
     "contact": {
       "visible": true,
       "navLabel": "Contact",
       "kicker": "Contact",
-      "availability": "Available for freelance projects, growth-focused collaborations, and professional digital support.",
-      "title": "Let's grow your business with smart strategies",
-      "description": "If you need better marketing, a professional website, or smarter research support, I'm ready to help you build with clarity and results.",
+      "availability": "Available for accounting support, marketing assistance, website projects, and business workflow support.",
+      "title": "Let's support your business with accuracy and smart execution",
+      "description": "If you need accounting support, billing help, marketing execution, or a professional website, I'm ready to contribute with reliable work and clear communication.",
       "emailLabel": "Email",
       "emailHint": "Best for project discussions and formal communication.",
       "phoneLabel": "Phone",
@@ -244,7 +246,7 @@
       "formPhoneLabel": "Phone Number",
       "formPhonePlaceholder": "Your phone number",
       "formMessageLabel": "Message",
-      "formMessagePlaceholder": "Tell me about your business or project requirement",
+      "formMessagePlaceholder": "Tell me about your accounting, marketing, or website requirement",
       "formButtonText": "Chat on WhatsApp"
     },
     "footer": {
@@ -256,121 +258,231 @@
   "services": [
     {
       "id": "service_1",
-      "title": "Meta Ads Campaign Management",
-      "description": "I create targeted Facebook and Instagram ad campaigns designed to increase reach, generate leads, and improve return on ad spend."
+      "title": "Accounting Operations Support",
+      "description": "Accurate support for daily accounting workflows including transaction recording, document coordination, and structured financial updates.",
+      "image": "/media/about-workspace.png"
     },
     {
       "id": "service_2",
-      "title": "Digital Marketing Strategy",
-      "description": "I help businesses build clear marketing plans that improve online visibility, audience targeting, and growth direction."
+      "title": "Vendor Ledger Management",
+      "description": "Organized ledger handling and verification support that keeps vendor records clean, updated, and easier to track.",
+      "image": "/media/web-dev-showcase-2.jpg"
     },
     {
       "id": "service_3",
-      "title": "Social Media Management",
-      "description": "I support brands with better content direction, platform consistency, and audience-focused communication that builds trust."
+      "title": "Purchase Entry & Documentation",
+      "description": "Consistent purchase entry updates and record keeping designed to support smoother internal workflows and proper documentation.",
+      "image": "/media/about-story-visual.png"
     },
     {
       "id": "service_4",
-      "title": "Website Development",
-      "description": "I build clean, responsive, and professional websites that improve brand image and make it easier for customers to take action."
+      "title": "Billing & POS Handling",
+      "description": "Support for billing systems, cash handling, UPI transactions, and customer-facing billing processes with accuracy and speed.",
+      "image": "/media/hospital-project.jpeg"
     },
     {
       "id": "service_5",
-      "title": "AI-Powered Research Support",
-      "description": "I use AI tools like ChatGPT for fast research, idea generation, content support, and smarter business problem-solving."
+      "title": "Meta Ads & Lead Support",
+      "description": "Meta Ads campaign support and digital marketing execution focused on better reach, lead generation, and online visibility.",
+      "image": "/media/meta-showcase.webp"
     },
     {
       "id": "service_6",
-      "title": "Excel Data Analysis",
-      "description": "I organize and analyze business data in Excel to support reporting, decisions, and better workflow management."
+      "title": "Website & Content Structuring",
+      "description": "Professional website planning, content structuring, and AI-assisted web builds that improve presentation and accessibility.",
+      "image": "/media/web-dev-showcase-1.png"
+    },
+    {
+      "id": "service_7",
+      "title": "Advance SEO Support",
+      "description": "Basic on-page structure and visibility improvements that help websites communicate clearly and perform better online.",
+      "image": "/media/web-dev-showcase-2.jpg"
+    },
+    {
+      "id": "service_8",
+      "title": "Excel & AI Productivity Support",
+      "description": "MS Excel, ChatGPT, Codex, Claude, and AI productivity workflows used to speed up research, planning, and execution.",
+      "image": "/media/ai-tools-showcase.png"
     }
   ],
   "skills": [
     {
       "id": "skill_1",
-      "category": "Marketing",
-      "name": "Meta Ads Campaigns",
-      "level": 88
+      "category": "Accounting & Operations",
+      "name": "Tally Prime",
+      "level": 90
     },
     {
       "id": "skill_2",
-      "category": "Marketing",
-      "name": "Digital Marketing Strategy",
-      "level": 84
+      "category": "Accounting & Operations",
+      "name": "Vendor Ledger Management",
+      "level": 88
     },
     {
       "id": "skill_3",
-      "category": "Marketing",
-      "name": "Social Media Management",
-      "level": 80
-    },
-    {
-      "id": "skill_4",
-      "category": "Tech",
-      "name": "Website Development",
+      "category": "Accounting & Operations",
+      "name": "Purchase Entry",
       "level": 86
     },
     {
+      "id": "skill_4",
+      "category": "Accounting & Operations",
+      "name": "Billing & POS Handling",
+      "level": 84
+    },
+    {
       "id": "skill_5",
-      "category": "Tech",
-      "name": "Responsive Web Design",
-      "level": 81
+      "category": "Accounting & Operations",
+      "name": "Documentation & Record Keeping",
+      "level": 87
     },
     {
       "id": "skill_6",
-      "category": "Analytics",
-      "name": "Advanced MS Excel",
-      "level": 89
+      "category": "Digital Marketing",
+      "name": "Meta Ads Campaign Support",
+      "level": 88
     },
     {
       "id": "skill_7",
-      "category": "Analytics",
-      "name": "Data Analysis",
+      "category": "Digital Marketing",
+      "name": "Lead Generation Support",
       "level": 84
     },
     {
       "id": "skill_8",
-      "category": "AI Tools",
-      "name": "AI-Powered Research",
-      "level": 92
+      "category": "Digital Marketing",
+      "name": "Social Media Management",
+      "level": 82
     },
     {
       "id": "skill_9",
-      "category": "AI Tools",
-      "name": "ChatGPT Workflows",
+      "category": "Digital Marketing",
+      "name": "Advance SEO",
+      "level": 78
+    },
+    {
+      "id": "skill_10",
+      "category": "Technical Skills",
+      "name": "AI Tools / Prompt-Based Workflow",
+      "level": 92
+    },
+    {
+      "id": "skill_11",
+      "category": "Technical Skills",
+      "name": "Website Structuring & Content Planning",
+      "level": 88
+    },
+    {
+      "id": "skill_12",
+      "category": "Technical Skills",
+      "name": "Web Development / Vibe Coding",
+      "level": 86
+    },
+    {
+      "id": "skill_13",
+      "category": "Technical Skills",
+      "name": "App Development / Vibe Coding",
+      "level": 80
+    },
+    {
+      "id": "skill_14",
+      "category": "Tools",
+      "name": "MS Excel",
+      "level": 89
+    },
+    {
+      "id": "skill_15",
+      "category": "Tools",
+      "name": "ChatGPT",
+      "level": 92
+    },
+    {
+      "id": "skill_16",
+      "category": "Tools",
+      "name": "AI Productivity Tools",
       "level": 90
+    },
+    {
+      "id": "skill_17",
+      "category": "Tools",
+      "name": "Codex",
+      "level": 84
+    },
+    {
+      "id": "skill_18",
+      "category": "Tools",
+      "name": "Claude",
+      "level": 82
     }
   ],
   "experiences": [
     {
       "id": "exp_1",
-      "role": "Accounts Executive | Digital Marketer | System Developer",
-      "company": "Current Role",
-      "duration": "Current",
-      "description": "Working across accounts operations, digital marketing support, and system development with a focus on accuracy, business growth, and efficient workflow execution."
+      "role": "Accounting Assistant",
+      "company": "Hospaccx, A Unit of Banerjee Diagnostic Foundation",
+      "duration": "March 2025 - Present",
+      "description": "Maintaining vendor ledgers and purchase entries in Tally Prime, recording daily financial transactions, supporting document coordination, and helping improve accounting workflow accuracy."
     },
     {
       "id": "exp_2",
-      "role": "Pharmacy Cashier",
-      "company": "Previous Role",
-      "duration": "Previous",
-      "description": "Handled pharmacy billing operations, cash transactions, and customer-facing billing processes with practical POS familiarity and steady execution."
+      "role": "Pharmacy Billing Executive / Cashier",
+      "company": "Hospaccx, A Unit of Banerjee Diagnostic Foundation",
+      "duration": "Previous Role",
+      "description": "Managed daily billing operations, handled cash and UPI transactions, maintained sales records, and worked with billing and inventory systems for accurate transaction processing."
     }
   ],
   "projects": [
     {
       "id": "project_1",
       "title": "Hospital Website Development",
-      "description": "Problem: The hospital had limited online presence and needed a more professional digital identity to build trust and improve patient communication. Solution: I developed a modern, responsive website designed to present the hospital clearly and professionally across desktop and mobile devices, with service pages and an easy contact system. Result: The new website improved the hospital's branding, strengthened credibility, and created a better experience for visitors looking for services and contact details.",
+      "description": "Problem: The hospital had limited online presence and needed a more professional digital identity to build trust and improve patient communication. Solution: I developed a modern, responsive website designed to present the hospital clearly across desktop and mobile devices, with service pages and an easy contact system. Result: The new website improved branding, strengthened credibility, and created a better experience for visitors looking for services and contact details.",
       "image": "/media/hospital-project.jpeg",
       "liveLink": "https://website-for-hospaccx.vercel.app/",
       "tags": [
         "Responsive Website",
-        "Service Pages",
-        "Contact System",
-        "Better Branding"
+        "Contact Features",
+        "Appointment Support",
+        "SEO Structure"
       ],
       "featured": true
+    },
+    {
+      "id": "project_2",
+      "title": "Doctor Portfolio Website",
+      "description": "Built a professional doctor portfolio website using AI-assisted development tools with a clean layout, user-friendly navigation, and accessibility-focused structure.",
+      "image": "/media/ai-tools-showcase.png",
+      "liveLink": "https://dr-subhadip-raptan.vercel.app/",
+      "tags": [
+        "Portfolio Website",
+        "Professional Profile Build"
+      ],
+      "featured": false
+    },
+    {
+      "id": "project_3",
+      "title": "Meta Ads And Lead Generation Support",
+      "description": "Campaign support focused on better reach, lead generation, and visibility through structured Meta Ads execution and social media planning.",
+      "image": "/media/meta-showcase.webp",
+      "liveLink": "",
+      "tags": [
+        "Marketing Support",
+        "Meta Ads",
+        "Lead Generation"
+      ],
+      "featured": false
+    },
+    {
+      "id": "project_4",
+      "title": "AI-Assisted Website And App Workflow",
+      "description": "Prompt-based building, content planning, and tool-assisted execution used to structure websites, workflows, and professional digital assets faster.",
+      "image": "/media/web-dev-showcase-1.png",
+      "liveLink": "",
+      "tags": [
+        "AI Workflow",
+        "Web Structuring",
+        "Productivity"
+      ],
+      "featured": false
     }
   ],
   "pricingPlans": [
@@ -481,12 +593,12 @@
     "linkedinLink": "",
     "githubLink": "",
     "contactKicker": "Contact",
-    "contactTitle": "Let's grow your business with smart strategies",
-    "contactDescription": "If you need better marketing, a professional website, or smarter research support, I'm ready to help you build with clarity and results.",
-    "contactAvailability": "Available for freelance projects, growth-focused collaborations, and professional digital support.",
-    "seoTitle": "Amit Shaw | Digital Marketing Specialist | Web Developer",
-    "seoDescription": "Digital Marketing Specialist, Meta Ads Expert, Web Developer, and AI Researcher helping businesses grow with strategy, websites, and smart execution.",
-    "seoKeywords": "Amit Shaw, digital marketing specialist, meta ads expert, web developer, AI researcher, website development, social media management, data analysis"
+    "contactTitle": "Let's support your business with accuracy and smart execution",
+    "contactDescription": "If you need accounting support, billing help, marketing execution, or a professional website, I'm ready to contribute with reliable work and clear communication.",
+    "contactAvailability": "Available for accounting support, marketing assistance, website projects, and business workflow support.",
+    "seoTitle": "Amit Shaw | Accounting Assistant | Digital Marketing Support | Website Builder",
+    "seoDescription": "Amit Shaw supports businesses with accounting operations, billing workflows, Meta Ads support, website structuring, and AI-assisted execution.",
+    "seoKeywords": "Amit Shaw, accounting assistant, digital marketing support, vendor ledger, Tally Prime, Meta Ads, website builder, AI productivity workflows"
   },
   "messages": [],
   "media": [

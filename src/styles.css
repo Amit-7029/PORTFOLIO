@@ -5275,3 +5275,187 @@ td {
     flex-direction: column;
   }
 }
+
+/* Final 3D portfolio upgrade: public site only, admin UI untouched. */
+.hero-showcase-shell {
+  min-height: min(920px, calc(100svh - 44px));
+  background:
+    linear-gradient(120deg, rgba(6, 14, 26, 0.88), rgba(10, 18, 34, 0.76)),
+    var(--portfolio-surface, rgba(10, 16, 28, 0.76));
+}
+
+.hero-3d-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.82;
+  mix-blend-mode: screen;
+  pointer-events: auto;
+}
+
+.hero-showcase-overlay {
+  z-index: 0;
+  opacity: 1;
+}
+
+.hero-showcase-overlay-slide {
+  opacity: 0;
+  filter: saturate(1.18) contrast(1.08) brightness(0.82);
+  transform: scale(1.08);
+}
+
+.hero-showcase-overlay-slide.is-initial {
+  opacity: calc(var(--hero-overlay-opacity, 0.44) * 0.72);
+}
+
+.hero-showcase-overlay-scrim {
+  background:
+    radial-gradient(circle at 18% 24%, rgba(57, 215, 255, 0.18), transparent 36%),
+    linear-gradient(90deg, rgba(5, 10, 19, 0.74) 0%, rgba(5, 10, 19, 0.58) 45%, rgba(5, 10, 19, 0.34) 100%),
+    linear-gradient(180deg, rgba(5, 10, 19, 0.26) 0%, rgba(5, 10, 19, 0.58) 100%);
+}
+
+.hero-showcase-shell .portfolio-topbar,
+.hero-showcase-shell .portfolio-hero-panel,
+.hero-showcase-shell .hero-stats-bar {
+  z-index: 2;
+}
+
+.hero-showcase-shell .hero-copy {
+  background:
+    linear-gradient(180deg, rgba(6, 13, 24, 0.72), rgba(6, 13, 24, 0.5)),
+    rgba(8, 15, 28, 0.34);
+  backdrop-filter: blur(10px);
+  border-color: rgba(127, 205, 255, 0.12);
+}
+
+.hero-showcase-shell .hero-copy::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(90deg, rgba(57, 215, 255, 0.1), transparent 32%),
+    radial-gradient(circle at 20% 26%, rgba(57, 215, 255, 0.12), transparent 36%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero-showcase-shell .hero-copy .hero-title,
+.hero-showcase-shell .hero-copy h1 {
+  white-space: normal;
+  text-wrap: balance;
+  max-width: 11.5ch;
+}
+
+.hero-showcase-shell .hero-copy .hero-summary,
+.hero-showcase-shell .hero-copy .hero-detail {
+  font-weight: 650 !important;
+  color: #dce8fb !important;
+  text-shadow:
+    0 0 16px rgba(57, 215, 255, 0.1),
+    0 0 22px rgba(0, 0, 0, 0.46) !important;
+}
+
+.hero-showcase-shell .hero-image-shell {
+  align-self: center;
+  margin-top: -18px;
+}
+
+.hero-image-frame-portrait {
+  transform: translateY(-10px);
+}
+
+.hero-image-frame-portrait .portfolio-avatar {
+  object-position: center 8%;
+}
+
+.service-card,
+.skill-category-card,
+.timeline-content,
+.project-side-card,
+.achievement-card,
+.story-slide-card,
+.contact-channel-card,
+.contact-form-glass {
+  will-change: transform;
+}
+
+.service-card:hover,
+.skill-category-card:hover,
+.timeline-content:hover,
+.project-side-card:hover,
+.achievement-card:hover,
+.story-slide-card:hover,
+.contact-channel-card:hover,
+.contact-form-glass:hover {
+  transform: translateY(-7px) scale(1.018);
+  border-color: color-mix(in srgb, var(--portfolio-glow, #39d7ff) 42%, rgba(255, 255, 255, 0.1));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 24px 58px rgba(2, 8, 18, 0.34),
+    0 0 36px var(--portfolio-glow-soft, rgba(57, 215, 255, 0.18));
+}
+
+@media (max-width: 960px) {
+  .hero-showcase-shell {
+    min-height: auto;
+  }
+
+  .hero-showcase-shell .portfolio-hero-panel {
+    grid-template-columns: 1fr !important;
+  }
+
+  .hero-showcase-shell .hero-copy {
+    order: 1 !important;
+    justify-items: start !important;
+    text-align: left !important;
+  }
+
+  .hero-showcase-shell .hero-copy .hero-title,
+  .hero-showcase-shell .hero-copy h1 {
+    max-width: 100%;
+  }
+
+  .hero-showcase-shell .hero-visual {
+    order: 2 !important;
+  }
+
+  .hero-showcase-shell .hero-actions,
+  .hero-showcase-shell .hero-socials {
+    justify-content: flex-start !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-3d-canvas {
+    opacity: 0.48;
+  }
+
+  .hero-showcase-overlay-slide {
+    filter: saturate(1.08) contrast(1.04) brightness(0.72);
+  }
+
+  .hero-showcase-shell .hero-copy {
+    padding: 20px !important;
+  }
+
+  .hero-showcase-shell .hero-copy .hero-title,
+  .hero-showcase-shell .hero-copy h1 {
+    font-size: clamp(2.45rem, 12vw, 3.7rem) !important;
+    line-height: 0.98 !important;
+    letter-spacing: -0.045em !important;
+  }
+
+  .hero-showcase-shell .hero-copy .hero-summary,
+  .hero-showcase-shell .hero-copy .hero-detail {
+    font-size: 0.95rem !important;
+    line-height: 1.68 !important;
+  }
+
+  .hero-image-frame-portrait {
+    transform: none;
+  }
+}
