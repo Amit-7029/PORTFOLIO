@@ -5284,15 +5284,131 @@ td {
     var(--portfolio-surface, rgba(10, 16, 28, 0.76));
 }
 
+.hero-3d-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  perspective: 900px;
+  transform-style: preserve-3d;
+}
+
 .hero-3d-canvas {
   position: absolute;
   inset: 0;
-  z-index: 0;
   width: 100%;
   height: 100%;
-  opacity: 0.82;
+  opacity: 0.95;
   mix-blend-mode: screen;
-  pointer-events: auto;
+}
+
+.hero-3d-hologram {
+  position: absolute;
+  top: 18%;
+  right: 12%;
+  width: clamp(240px, 28vw, 430px);
+  aspect-ratio: 1;
+  transform-style: preserve-3d;
+  transform: rotateX(62deg) rotateZ(-18deg);
+  filter: drop-shadow(0 0 26px rgba(57, 215, 255, 0.35));
+  animation: heroHologramFloat 6s ease-in-out infinite;
+}
+
+.hero-3d-core,
+.hero-3d-ring,
+.hero-3d-orbit,
+.hero-3d-node {
+  position: absolute;
+  border-radius: 999px;
+  left: 50%;
+  top: 50%;
+  transform-style: preserve-3d;
+}
+
+.hero-3d-core {
+  width: 28%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) rotateX(-62deg);
+  background:
+    radial-gradient(circle at 34% 26%, rgba(255, 255, 255, 0.9), rgba(57, 215, 255, 0.36) 28%, rgba(75, 124, 255, 0.12) 58%, transparent 72%);
+  box-shadow:
+    0 0 28px rgba(57, 215, 255, 0.46),
+    0 0 64px rgba(75, 124, 255, 0.24);
+  animation: heroCorePulse 2.4s ease-in-out infinite;
+}
+
+.hero-3d-ring {
+  border: 2px solid rgba(113, 230, 255, 0.42);
+  box-shadow:
+    0 0 18px rgba(57, 215, 255, 0.32),
+    inset 0 0 18px rgba(57, 215, 255, 0.16);
+}
+
+.hero-3d-ring-one {
+  width: 62%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) rotateZ(0deg);
+  animation: heroRingSpin 9s linear infinite;
+}
+
+.hero-3d-ring-two {
+  width: 82%;
+  aspect-ratio: 1;
+  border-color: rgba(95, 142, 255, 0.34);
+  transform: translate(-50%, -50%) rotateY(55deg);
+  animation: heroRingSpinReverse 12s linear infinite;
+}
+
+.hero-3d-ring-three {
+  width: 100%;
+  aspect-ratio: 1;
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%) rotateX(66deg);
+  animation: heroRingSpin 15s linear infinite;
+}
+
+.hero-3d-orbit {
+  width: 112%;
+  height: 34%;
+  border: 1px solid rgba(57, 215, 255, 0.24);
+  transform: translate(-50%, -50%) rotateZ(28deg);
+  animation: heroOrbitSweep 7s linear infinite;
+}
+
+.hero-3d-orbit-two {
+  width: 92%;
+  height: 26%;
+  border-color: rgba(143, 166, 255, 0.28);
+  transform: translate(-50%, -50%) rotateZ(-36deg);
+  animation-duration: 10s;
+  animation-direction: reverse;
+}
+
+.hero-3d-node {
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  background: #9ef3ff;
+  box-shadow:
+    0 0 14px rgba(57, 215, 255, 0.8),
+    0 0 32px rgba(57, 215, 255, 0.38);
+}
+
+.hero-3d-node-one {
+  transform: translate(-50%, -50%) translate3d(150px, -10px, 80px);
+  animation: heroNodeOrbitOne 5.8s linear infinite;
+}
+
+.hero-3d-node-two {
+  transform: translate(-50%, -50%) translate3d(-130px, 32px, -40px);
+  animation: heroNodeOrbitTwo 7.4s linear infinite;
+}
+
+.hero-3d-node-three {
+  width: 9px;
+  height: 9px;
+  transform: translate(-50%, -50%) translate3d(20px, 120px, 60px);
+  animation: heroNodeOrbitThree 8.6s linear infinite;
 }
 
 .hero-showcase-overlay {
@@ -5320,7 +5436,7 @@ td {
 .hero-showcase-shell .portfolio-topbar,
 .hero-showcase-shell .portfolio-hero-panel,
 .hero-showcase-shell .hero-stats-bar {
-  z-index: 2;
+  z-index: 3;
 }
 
 .hero-showcase-shell .hero-copy {
@@ -5431,7 +5547,14 @@ td {
 
 @media (max-width: 768px) {
   .hero-3d-canvas {
-    opacity: 0.48;
+    opacity: 0.58;
+  }
+
+  .hero-3d-hologram {
+    top: 9%;
+    right: -18%;
+    width: 310px;
+    opacity: 0.72;
   }
 
   .hero-showcase-overlay-slide {
@@ -5457,5 +5580,63 @@ td {
 
   .hero-image-frame-portrait {
     transform: none;
+  }
+}
+
+@keyframes heroHologramFloat {
+  0%,
+  100% {
+    transform: rotateX(62deg) rotateZ(-18deg) translate3d(0, -8px, 0);
+  }
+  50% {
+    transform: rotateX(62deg) rotateZ(-8deg) translate3d(0, 12px, 26px);
+  }
+}
+
+@keyframes heroRingSpin {
+  to {
+    transform: translate(-50%, -50%) rotateZ(360deg);
+  }
+}
+
+@keyframes heroRingSpinReverse {
+  to {
+    transform: translate(-50%, -50%) rotateY(55deg) rotateZ(-360deg);
+  }
+}
+
+@keyframes heroOrbitSweep {
+  to {
+    transform: translate(-50%, -50%) rotateZ(388deg);
+  }
+}
+
+@keyframes heroCorePulse {
+  0%,
+  100% {
+    opacity: 0.68;
+    transform: translate(-50%, -50%) rotateX(-62deg) scale(0.94);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotateX(-62deg) scale(1.08);
+  }
+}
+
+@keyframes heroNodeOrbitOne {
+  to {
+    transform: translate(-50%, -50%) rotateZ(360deg) translate3d(150px, -10px, 80px);
+  }
+}
+
+@keyframes heroNodeOrbitTwo {
+  to {
+    transform: translate(-50%, -50%) rotateZ(-360deg) translate3d(-130px, 32px, -40px);
+  }
+}
+
+@keyframes heroNodeOrbitThree {
+  to {
+    transform: translate(-50%, -50%) rotateZ(360deg) translate3d(20px, 120px, 60px);
   }
 }

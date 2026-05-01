@@ -359,7 +359,22 @@ function HeroCanvasScene({ enabled }) {
     };
   }, [enabled]);
 
-  return <canvas ref={canvasRef} className="hero-3d-canvas" aria-hidden="true" />;
+  return (
+    <div className="hero-3d-layer" aria-hidden="true">
+      <canvas ref={canvasRef} className="hero-3d-canvas" />
+      <div className="hero-3d-hologram">
+        <span className="hero-3d-core" />
+        <span className="hero-3d-ring hero-3d-ring-one" />
+        <span className="hero-3d-ring hero-3d-ring-two" />
+        <span className="hero-3d-ring hero-3d-ring-three" />
+        <span className="hero-3d-orbit hero-3d-orbit-one" />
+        <span className="hero-3d-orbit hero-3d-orbit-two" />
+        <span className="hero-3d-node hero-3d-node-one" />
+        <span className="hero-3d-node hero-3d-node-two" />
+        <span className="hero-3d-node hero-3d-node-three" />
+      </div>
+    </div>
+  );
 }
 
 function SocialIcon({ type }) {
