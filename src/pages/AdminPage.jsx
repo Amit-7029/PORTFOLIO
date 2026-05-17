@@ -28,6 +28,7 @@ const iconOptions = ["award", "certificate", "star", "bolt"];
 const pricingIconOptions = ["plus", "shield", "crown", "spark"];
 const cmsSectionKeys = ["hero", "about", "services", "skills", "experience", "projects", "pricing", "achievements", "contact", "footer"];
 const staticMediaOptions = [
+  { value: "/media/amit-kumar-shaw.jpeg", label: "amit-kumar-shaw.jpeg" },
   { value: "/media/about-workspace.png", label: "about-workspace.png" },
   { value: "/media/about-story-visual.png", label: "about-story-visual.png" },
   { value: "/media/ai-tools-showcase.png", label: "ai-tools-showcase.png" },
