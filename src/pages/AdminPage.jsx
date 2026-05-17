@@ -47,6 +47,10 @@ const contentFieldMap = {
     { key: "navLabel", label: "Nav Label" },
     { key: "introLabel", label: "Intro Label" },
     { key: "kicker", label: "Kicker" },
+    { key: "focusPrefix", label: "Focus Prefix" },
+    { key: "focusItems", label: "Rotating Focus Items", type: "list" },
+    { key: "nameAnimationEnabled", label: "Name Animation", type: "toggle" },
+    { key: "nameAnimationStyle", label: "Name Animation Style" },
     { key: "description", label: "Detail Text", type: "textarea" },
     { key: "headlineBold", label: "Headline Bold", type: "toggle" },
     { key: "headlineGlow", label: "Headline Glow", type: "toggle" },
@@ -1068,6 +1072,26 @@ export default function AdminPage() {
               <label className="full-span">Meta Title<input value={draft.settings.seoTitle} onChange={(e) => updateDraft("settings", { seoTitle: e.target.value })} /></label>
               <label className="full-span">Meta Description<textarea value={draft.settings.seoDescription} onChange={(e) => updateDraft("settings", { seoDescription: e.target.value })} /></label>
               <label className="full-span">Keywords<input value={draft.settings.seoKeywords} onChange={(e) => updateDraft("settings", { seoKeywords: e.target.value })} /></label>
+              <label>SEO Site Name<input value={draft.settings.seoSiteName || ""} onChange={(e) => updateDraft("settings", { seoSiteName: e.target.value })} /></label>
+              <label>SEO Author<input value={draft.settings.seoAuthor || ""} onChange={(e) => updateDraft("settings", { seoAuthor: e.target.value })} /></label>
+              <label>Canonical URL<input value={draft.settings.seoCanonicalUrl || ""} onChange={(e) => updateDraft("settings", { seoCanonicalUrl: e.target.value })} /></label>
+              <label>Robots<input value={draft.settings.seoRobots || ""} onChange={(e) => updateDraft("settings", { seoRobots: e.target.value })} /></label>
+              <label>SEO Locale<input value={draft.settings.seoLocale || ""} onChange={(e) => updateDraft("settings", { seoLocale: e.target.value })} /></label>
+              <label>SEO Language<input value={draft.settings.seoLanguage || ""} onChange={(e) => updateDraft("settings", { seoLanguage: e.target.value })} /></label>
+              <label>SEO Type<input value={draft.settings.seoType || ""} onChange={(e) => updateDraft("settings", { seoType: e.target.value })} /></label>
+              <label className="toggle-field">Structured Data
+                <input type="checkbox" checked={draft.settings.seoStructuredDataEnabled !== false} onChange={(e) => updateDraft("settings", { seoStructuredDataEnabled: e.target.checked })} />
+              </label>
+              {renderMediaPicker({
+                label: "SEO / Social Share Image",
+                value: draft.settings.seoImage || draft.profile.image,
+                onChange: (nextValue) => updateDraft("settings", { seoImage: nextValue }),
+              })}
+              {renderMediaPicker({
+                label: "Favicon Image",
+                value: draft.settings.faviconImage || draft.profile.image,
+                onChange: (nextValue) => updateDraft("settings", { faviconImage: nextValue }),
+              })}
             </div>
             <div className="panel-actions">
               <button className="primary-button" onClick={() => persist("settings", draft.settings)}>Save Settings</button>

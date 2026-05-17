@@ -95,6 +95,15 @@
       "navLabel": "Home",
       "introLabel": "Hello, I'm",
       "kicker": "Available for accounting, digital marketing, and website support projects",
+      "focusPrefix": "Focused on",
+      "focusItems": [
+        "Accounting Assistant",
+        "Digital Marketing Support",
+        "Website Builder",
+        "AI Productivity Workflows"
+      ],
+      "nameAnimationEnabled": true,
+      "nameAnimationStyle": "letter-reveal",
       "description": "I combine financial accuracy with practical digital execution so daily operations stay organized while business visibility and presentation keep improving.",
       "headlineBold": true,
       "headlineGlow": true,
@@ -598,7 +607,17 @@
     "contactAvailability": "Available for accounting support, marketing assistance, website projects, and business workflow support.",
     "seoTitle": "Amit Shaw | Accounting Assistant | Digital Marketing Support | Website Builder",
     "seoDescription": "Amit Shaw supports businesses with accounting operations, billing workflows, Meta Ads support, website structuring, and AI-assisted execution.",
-    "seoKeywords": "Amit Shaw, accounting assistant, digital marketing support, vendor ledger, Tally Prime, Meta Ads, website builder, AI productivity workflows"
+    "seoKeywords": "Amit Shaw, accounting assistant, digital marketing support, vendor ledger, Tally Prime, Meta Ads, website builder, AI productivity workflows",
+    "seoSiteName": "Amit Shaw Portfolio",
+    "seoAuthor": "Amit Shaw",
+    "seoCanonicalUrl": "https://skill-deploy-b13dy5vw9a.vercel.app",
+    "seoRobots": "index, follow, max-image-preview:large",
+    "seoLocale": "en_IN",
+    "seoLanguage": "en",
+    "seoType": "profile",
+    "seoImage": "/media/amit-kumar-shaw.jpeg",
+    "faviconImage": "/media/amit-kumar-shaw.jpeg",
+    "seoStructuredDataEnabled": true
   },
   "messages": [],
   "media": [

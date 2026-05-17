@@ -1244,7 +1244,7 @@ export default function PortfolioView({ data, preview = false }) {
             <p className={heroEyebrowClassName}>{heroSection.introLabel || "Hello, I'm"}</p>
             <span className={heroMetaChipClassName}>{heroSection.kicker || "Current Profile"}</span>
             <h1 className={heroTitleClassName}>
-              <HeroAnimatedName name={data.profile.name} enabled={motionEnabled && !preview} />
+              <HeroAnimatedName name={data.profile.name} enabled={heroSection.nameAnimationEnabled !== false && motionEnabled && !preview} />
             </h1>
             {heroFocusItems.length ? (
               <p className="hero-focus-line hero-stagger" aria-live="polite">
